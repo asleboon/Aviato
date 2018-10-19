@@ -174,7 +174,7 @@ it can support you with keeping track of the top-10 list of channels. Your imple
 must adhere to the `ZapLogger` interface. Hint: You do not need to store all the zap events
 to compute the number of viewers for each channel.
 
-##Publish/Subscribe gRPC Client and Server
+## Publish/Subscribe gRPC Client and Server
 
 `a.` (20 points) Associated with your UDP zapserver, implement a gRPC-based server (called
 a publisher) that takes `Subscribe()` requests from external clients wishing to subscribe to
