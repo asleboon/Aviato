@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto;
+
+service Subscription {
+	rpc Subscribe(stream SubscribeMessage) returns (stream NotificationMessage) {}
+}
+
+message SubscribeMessage {
+	// TODO: Add the variable(s) in the subscribe message
+}
+
+message NotificationMessage {
+	// TODO: Add the variable(s) in the notification message
+}
