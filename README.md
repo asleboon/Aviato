@@ -5,7 +5,7 @@
 | Lab 6:	 | Processing Channel Zaps	 |
 | -------------------- | ------------------------------------- |
 | Subject: | DAT320 Operating Systems |
-| Deadline: | Nov 16 2018 23:00 |
+| Deadline: | Nov 16 2018 17:00 |
 | Expected effort: | 15-20 hours |
 | Grading: | Graded |
 | Submission: | Group |
