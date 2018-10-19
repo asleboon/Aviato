@@ -1,8 +1,8 @@
 ![UiS](http://www.ux.uis.no/~telea/uis-logo-en.png)
 
-# Lab 7: Processing Channel Zaps
+# Lab 6: Processing Channel Zaps
 
-| Lab 7:	 | Processing Channel Zaps	 |
+| Lab 6:	 | Processing Channel Zaps	 |
 | -------------------- | ------------------------------------- |
 | Subject: | DAT320 Operating Systems |
 | Deadline: | Nov 19 2015 23:00 |
