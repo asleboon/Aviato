@@ -1,4 +1,4 @@
-![UiS](https://www.uis.no/getfile.php/13391907/Biblioteket/Logo%20og%20veiledninger/UiS_liggende_logo_liten.png)
+![UiS](http://www.ux.uis.no/~telea/uis-logo-en.png)
 
 # Lab 6: Processing Channel Zaps
 
