@@ -6,7 +6,8 @@ package zlog
 import (
 	"fmt"
 	"time"
-	. "github.com/uis-dat320/glabs/lab7"
+
+	. "github.com/uis-dat320-fall18/assignments/lab6"
 )
 
 type Zaps []ChZap

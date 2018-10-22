@@ -4,11 +4,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/uis-dat320/glabs/lab7/zlog"
 	"log"
 	"os"
 	"os/signal"
 	"runtime/pprof"
+
+	"github.com/uis-dat320-fall18/assignments/lab6/zlog"
 )
 
 var (

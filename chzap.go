@@ -1,7 +1,7 @@
 // +build !solution
 
 // Leave an empty line above this comment.
-package lab7
+package lab6
 
 import (
 	"time"

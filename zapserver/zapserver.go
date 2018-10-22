@@ -6,8 +6,9 @@
 package main
 
 import (
-	"github.com/uis-dat320/glabs/lab7/zlog"
 	"log"
+
+	"github.com/uis-dat320-fall18/assignments/lab6/zlog"
 )
 
 // REMARK: This function should return (i.e. it should not block)
