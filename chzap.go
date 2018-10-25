@@ -14,6 +14,7 @@ const timeLen = len(timeFormat)
 
 type StatusChange struct {
 	// Exported or Unexported?
+	// Time time.Time?
 	Volume     int
 	MuteStatus int
 	HDMIStatus int
@@ -21,12 +22,12 @@ type StatusChange struct {
 }
 
 type ChZap struct {
-	Date         time.Time // trenger vi denne?
+	Date         time.Time // Is this needed?
 	Time         time.Time
 	IP           string
 	ToChan       string
 	FromChan     string
-	StatusChange StatusChange // skal det være status change object
+	StatusChange StatusChange // Statuschange object?
 	//TODO finish this struct (1p)
 }
 

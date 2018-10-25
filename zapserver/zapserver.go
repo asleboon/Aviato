@@ -44,7 +44,6 @@ func runLab() {
 // REMARK: This function should return (i.e. it should not block)
 func startServer() {
 	log.Println("Starting ZapServer...")
-	//TODO write this method (5p)C
 	// Build UDP address
 	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
 
