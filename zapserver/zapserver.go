@@ -6,7 +6,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net"
 
 	"github.com/uis-dat320-fall18/assignments/lab6/zlog"
 )
@@ -17,7 +19,7 @@ func runLab() {
 	case "a", "c1", "c2", "d", "e":
 		ztore = zlog.NewSimpleZapLogger()
 	case "f":
-		//TODO activate with new ZapLogger data structure (task f)
+		// TODO activate with new ZapLogger data structure (task f)
 		// ztore = zlog.NewViewersZapLogger()
 	}
 	switch *labnum {
@@ -42,5 +44,21 @@ func runLab() {
 // REMARK: This function should return (i.e. it should not block)
 func startServer() {
 	log.Println("Starting ZapServer...")
-	//TODO write this method (5p)
+	//TODO write this method (5p)C
+	// Build UDP address
+	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
+
+	// Create connection
+	UDPConn, err := net.ListenMulticastUDP("udp", nil, addr)
+	if err != nil {
+		fmt.Println("NewUDPServer: Error creating UDP connection")
+	}
+
+	// Serve UDPServer
+	for {
+		buf := make([]byte, 1024)                // Make a buffer used to store bytes read from UDP
+		n, addr, err := UDPConn.ReadFromUDP(buf) // n = Number of bytes read, addr = UDP connection address, err = Error
+		txt := string(buf[:n])
+		fmt.Println(txt, addr, err)
+	}
 }
