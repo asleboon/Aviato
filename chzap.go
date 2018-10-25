@@ -4,6 +4,7 @@
 package lab6
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -23,7 +24,6 @@ type StatusChange struct {
 }
 
 type ChZap struct {
-	DateTime time.Time // Is this needed?
 	Time     time.Time
 	IP       string
 	ToChan   string
@@ -34,7 +34,6 @@ type ChZap struct {
 
 func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 	// TODO write this method (5p)
-
 	// Input string format ChZap:
 	//{"2010/12/22, 20:22:32, 10.213.223.232, NRK2, NRK1", "20:22:32"} len = 5
 
@@ -50,29 +49,32 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 		// it is a ChZap
 		// Do we need error handeling?
 		// format string to Datetime object
-		eventDate, err := time.Parse(timeFormat, eventStr[0])
+		eventTime, err := time.Parse(timeFormat, eventStr[0]+","+eventStr[1])
+		// fmt.Printf("\nEventDate: %q\n", eventDate)
 		if err != nil {
-			// handle error
+			err = fmt.Errorf("NewSTBEvent: failed to parse timestamp")
+			return nil, nil, err
 		}
-		eventTime, err := time.Parse(dateFormat, eventStr[1])
-		if err != nil {
-			// handle error
-		}
-		chZap := ChZap{DateTime: eventDate, Time: eventTime, IP: eventStr[2], ToChan: eventStr[3], FromChan: eventStr[4]}
-		return &chZap, nil, nil
+		chZap := ChZap{Time: eventTime, IP: eventStr[2], ToChan: eventStr[3], FromChan: eventStr[4]}
+		return &chZap, nil, err
 	case 4:
 		// it is a StatusChange
-		eventTime, err := time.Parse(timeFormat, eventStr[0])
+		eventTime, err := time.Parse(timeFormat, eventStr[0]+","+eventStr[1])
+		fmt.Printf("\neventTime %q\n", eventTime)
 		if err != nil {
-			// handle error
+			err = fmt.Errorf("NewSTBEvent: failed to parse timestamp")
+			return nil, nil, err
 		}
-
 		staCha := StatusChange{Time: eventTime, Volume: eventStr[1], MuteStatus: eventStr[2], HDMIStatus: eventStr[3]}
 		return nil, &staCha, nil
 	case 3:
 		// wrong input
+		err := fmt.Errorf("NewSTBEvent: event with too few fields: %s,%s,%s", eventStr[0], eventStr[1], eventStr[2])
+		return nil, nil, err
 	case 2:
 		// wrong input
+		err := fmt.Errorf("NewSTBEvent: too short event string: %s,%s", eventStr[0], eventStr[1])
+		return nil, nil, err
 	default:
 
 	}
