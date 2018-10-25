@@ -52,11 +52,13 @@ func startServer() {
 	if err != nil {
 		fmt.Println("NewUDPServer: Error creating UDP connection")
 	}
+	go runServer(UDPConn)
+}
 
-	// Serve UDPServer
+func runServer(conn *net.UDPConn) {
 	for {
-		buf := make([]byte, 1024)           // Make a buffer used to store bytes read from UDP
-		n, _, _ := UDPConn.ReadFromUDP(buf) // n = Number of bytes read, addr = UDP connection address, err = Error
+		buf := make([]byte, 1024)        // Make a buffer used to store bytes read from UDP
+		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read, addr = UDP connection address, err = Error
 		txt := string(buf[:n])
 		fmt.Printf("New response: %v\n", txt)
 	}
