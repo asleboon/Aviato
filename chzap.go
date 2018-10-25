@@ -32,8 +32,8 @@ type ChZap struct {
 	//TODO finish this struct (1p)
 }
 
+// Do we need to worry about wrong inputs?
 func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
-	// TODO write this method (5p)
 	// Input string format ChZap:
 	//{"2010/12/22, 20:22:32, 10.213.223.232, NRK2, NRK1", "20:22:32"} len = 5
 
@@ -41,16 +41,13 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 	// "2013/07/20, 21:57:42, 203.124.29.72, Volume: 50"} len = 4
 
 	// Split it into substrings
+	// case 5 is ChZap, case 4 is StatusChange
+	// casees 3 & 2 are errors
+	// implementet to handle the tests
 	eventStr := strings.Split(event, ",")
-	// Teste om det er en statusChange eller en ChZap
-	// Do we need to worry about wrong inputs?
 	switch len(eventStr) {
 	case 5:
-		// it is a ChZap
-		// Do we need error handeling?
-		// format string to Datetime object
 		eventTime, err := time.Parse(timeFormat, eventStr[0]+","+eventStr[1])
-		// fmt.Printf("\nEventDate: %q\n", eventDate)
 		if err != nil {
 			err = fmt.Errorf("NewSTBEvent: failed to parse timestamp")
 			return nil, nil, err
@@ -58,9 +55,7 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 		chZap := ChZap{Time: eventTime, IP: eventStr[2], ToChan: eventStr[3], FromChan: eventStr[4]}
 		return &chZap, nil, err
 	case 4:
-		// it is a StatusChange
 		eventTime, err := time.Parse(timeFormat, eventStr[0]+","+eventStr[1])
-		fmt.Printf("\neventTime %q\n", eventTime)
 		if err != nil {
 			err = fmt.Errorf("NewSTBEvent: failed to parse timestamp")
 			return nil, nil, err
@@ -68,14 +63,13 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 		staCha := StatusChange{Time: eventTime, Volume: eventStr[1], MuteStatus: eventStr[2], HDMIStatus: eventStr[3]}
 		return nil, &staCha, nil
 	case 3:
-		// wrong input
 		err := fmt.Errorf("NewSTBEvent: event with too few fields: %s,%s,%s", eventStr[0], eventStr[1], eventStr[2])
 		return nil, nil, err
 	case 2:
-		// wrong input
 		err := fmt.Errorf("NewSTBEvent: too short event string: %s,%s", eventStr[0], eventStr[1])
 		return nil, nil, err
 	default:
+		// What is default case?
 
 	}
 
@@ -83,23 +77,18 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 }
 
 func (zap ChZap) String() string {
-	//TODO write this method (2p)
-
-	return ""
+	return fmt.Sprintf("%s%s%s%s", zap.Time, zap.IP, zap.ToChan, zap.FromChan)
 }
 
 func (schg StatusChange) String() string {
-	//TODO write this method (1p)
-	return ""
+	return fmt.Sprintf("%s%s%s%s", schg.Time, schg.Volume, schg.MuteStatus, schg.HDMIStatus)
 }
 
 // The duration between receiving (this) zap event and the provided event
 func (zap ChZap) Duration(provided ChZap) time.Duration {
-	//TODO write this method (1p)
-	return time.Duration(0)
+	return zap.Time.Sub(provided.Time)
 }
 
 func (zap ChZap) Date() string {
-	//TODO write this method (1p)
-	return ""
+	return zap.Time.Format("2006/02/01")
 }
