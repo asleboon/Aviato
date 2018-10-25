@@ -59,6 +59,6 @@ func startServer() {
 		buf := make([]byte, 1024)           // Make a buffer used to store bytes read from UDP
 		n, _, _ := UDPConn.ReadFromUDP(buf) // n = Number of bytes read, addr = UDP connection address, err = Error
 		txt := string(buf[:n])
-		fmt.Printf("New response: %v", txt)
+		fmt.Printf("New response: %v\n", txt)
 	}
 }
