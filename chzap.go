@@ -13,12 +13,20 @@ const timeOnly = "15:04:05"
 const timeLen = len(timeFormat)
 
 type StatusChange struct {
-	Time time.Time
+	// Exported or Unexported?
+	Volume     int
+	MuteStatus int
+	HDMIStatus int
 	//TODO finish this struct (1p)
 }
 
 type ChZap struct {
-	Time time.Time
+	Date         time.Time // trenger vi denne?
+	Time         time.Time
+	IP           string
+	ToChan       string
+	FromChan     string
+	StatusChange StatusChange // skal det være status change object
 	//TODO finish this struct (1p)
 }
 
