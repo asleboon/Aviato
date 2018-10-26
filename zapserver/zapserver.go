@@ -63,3 +63,5 @@ func runServer(conn *net.UDPConn) {
 		fmt.Printf("New response: %v\n", txt)
 	}
 }
+
+// Implement computeviewers per second method
