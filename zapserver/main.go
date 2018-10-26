@@ -1,4 +1,5 @@
 // Zap Collection Server
+// Run cmd: go run *.go -lab c1
 package main
 
 import (
@@ -14,7 +15,7 @@ import (
 
 var (
 	maddr      = flag.String("mcast", "224.0.1.130:10000", "multicast ip:port")
-	labnum     = flag.String("lab", "c2", "which lab exercise to run")
+	labnum     = flag.String("lab", "c1", "which lab exercise to run")
 	showHelp   = flag.Bool("h", false, "show this help message and exit")
 	memprofile = flag.String("memprofile", "", "write memory profile to this file")
 )

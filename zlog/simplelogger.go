@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/uis-dat320-fall18/assignments/lab6"
+	. "github.com/uis-dat320-fall18/Aviato"
+	//. "github.com/uis-dat320-fall18/assignments/lab6" Remove?
 )
 
 type Zaps []ChZap
@@ -33,15 +34,15 @@ func (zs *Zaps) String() string {
 func (zs *Zaps) Viewers(chName string) int {
 	defer TimeElapsed(time.Now(), "simple.Viewers")
 	viewers := 0
-	//TODO uncomment this code when ToChan and FromChan added to ChZap struct
-	// for _, v := range *zs {
-	// 	if v.ToChan == chName {
-	// 		viewers++
-	// 	}
-	// 	if v.FromChan == chName {
-	// 		viewers--
-	// 	}
-	// }
+	// TODO uncomment this code when ToChan and FromChan added to ChZap struct
+	for _, v := range *zs {
+		if v.ToChan == chName {
+			viewers++
+		}
+		if v.FromChan == chName {
+			viewers--
+		}
+	}
 	return viewers
 }
 

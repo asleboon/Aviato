@@ -32,6 +32,8 @@ func runLab() {
 		// go showViewers("NRK1")
 	case "c2":
 		//TODO write code for task c2
+		// go recordAll()
+		// go showViewers("TV2 Norge")
 	case "d":
 		//TODO write code for task d
 	case "e":
@@ -58,10 +60,17 @@ func startServer() {
 func runServer(conn *net.UDPConn) {
 	for {
 		buf := make([]byte, 1024)        // Make a buffer used to store bytes read from UDP
-		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read, addr = UDP connection address, err = Error
+		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read
 		txt := string(buf[:n])
 		fmt.Printf("New response: %v\n", txt)
 	}
 }
 
-// Implement computeviewers per second method
+func recordAll() {
+
+}
+
+// showViewers compute number of viewers on channel and prints to console
+func showViewers(chName string) {
+
+}
