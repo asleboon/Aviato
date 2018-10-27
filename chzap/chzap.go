@@ -1,7 +1,7 @@
 // +build !solution
 
 // Leave an empty line above this comment.
-package lab6
+package chzap
 
 import (
 	"fmt"
