@@ -17,6 +17,7 @@ import (
 )
 
 var conn *net.UDPConn
+var err error
 
 // REMARK: This function should return (i.e. it should not block)
 func runLab() {
@@ -37,8 +38,8 @@ func runLab() {
 		go showViewers("NRK1")
 	case "c2":
 		//TODO write code for task c2
-		// go recordAll()
-		// go showViewers("TV2 Norge")
+		go recordAll()
+		go showViewers("TV2 Norge")
 	case "d":
 		//TODO write code for task d
 	case "e":
@@ -55,7 +56,7 @@ func startServer() {
 	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
 
 	// Create connection
-	conn, err := net.ListenMulticastUDP("udp", nil, addr)
+	conn, err = net.ListenMulticastUDP("udp", nil, addr)
 	if err != nil {
 		fmt.Println("NewUDPServer: Error creating UDP connection")
 	}
@@ -87,8 +88,16 @@ func recordAll() {
 		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read
 		eventStr := string(buf[:n])
 		fmt.Printf("Recorded response: %v\n", eventStr)
-		event := chzap.ChZap.NewSTBevent(eventStr)
-		ztore.LogZap(event)
+		chZap, _, err := chzap.NewSTBEvent(eventStr) // Don't care about statuschange
+
+		// Check for error before processing zap event
+		if err != nil {
+			fmt.Printf("Error: %v", err)
+		} else {
+			if chZap != nil {
+				ztore.LogZap(*chZap) // Make a copy of pointer value
+			}
+		}
 	}
 }
 
@@ -99,7 +108,8 @@ func showViewers(chName string) {
 	defer tickChan.Stop()
 
 	for tick := range tickChan.C {
+		fmt.Printf("Tick: %v\n", tick)
 		views := ztore.Viewers(chName)
-		fmt.Printf("%v", views)
+		fmt.Printf("Views: %v\n", views)
 	}
 }
