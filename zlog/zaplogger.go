@@ -3,13 +3,12 @@ package zlog
 import (
 	"fmt"
 
-	//. "github.com/uis-dat320-fall18/Aviato"
-	// . "github.com/uis-dat320-fall18/assignments/lab6"
-	. "github.com/uis-dat320-fall18/Aviato/chzap"
+	// . "github.com/uis-dat320-fall18/assignments/lab6" REMOVE
+	"github.com/uis-dat320-fall18/Aviato/chzap"
 )
 
 type ZapLogger interface {
-	LogZap(z ChZap)
+	LogZap(z chzap.ChZap)
 	Entries() int
 	Viewers(channelName string) int
 	Channels() []string

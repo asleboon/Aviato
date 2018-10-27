@@ -13,7 +13,7 @@ import (
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
-	//"github.com/uis-dat320-fall18/assignments/lab6/zlog"
+	//"github.com/uis-dat320-fall18/assignments/lab6/zlog" REMOVE
 )
 
 var conn *net.UDPConn
@@ -30,14 +30,11 @@ func runLab() {
 	}
 	switch *labnum {
 	case "a":
-		//TODO write code for dumping zap events to console
 		go dumpAll()
 	case "c1":
-		//TODO write code for recording and showing # of viewers on NRK1
 		go recordAll()
 		go showViewers("NRK1")
 	case "c2":
-		//TODO write code for task c2
 		go recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
@@ -62,40 +59,41 @@ func startServer() {
 	}
 }
 
-// func runServer(conn *net.UDPConn) {
-// 	for {
-// 		buf := make([]byte, 1024)        // Make a buffer used to store bytes read from UDP
-// 		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read
-// 		txt := string(buf[:n])
-// 		fmt.Printf("New response: %v\n", txt)
-// 	}
-// }
+func readFromUDP() (string, error) {
+	buf := make([]byte, 1024)          // Make a buffer used to store bytes read from UDP
+	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
+	str := string(buf[:n])
+	return str, err
+}
 
 // dumpAll reads new STB events and prints to console
 func dumpAll() {
 	for {
-		buf := make([]byte, 1024)        // Make a buffer used to store bytes read from UDP
-		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read
-		eventStr := string(buf[:n])
-		fmt.Printf("Dumped response: %v\n", eventStr)
+		eventStr, err := readFromUDP()
+		if err == nil { // ReadFromUDP error check
+			fmt.Printf("ReadFromUDP: error: %v\n", err)
+		} else {
+			fmt.Printf("Dumped response: %v\n", eventStr)
+		}
 	}
 }
 
 // recordAll processes and stores new viewers in Zaplogger
 func recordAll() {
 	for {
-		buf := make([]byte, 1024)        // Make a buffer used to store bytes read from UDP
-		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read
-		eventStr := string(buf[:n])
-		fmt.Printf("Recorded response: %v\n", eventStr)
-		chZap, _, err := chzap.NewSTBEvent(eventStr) // Don't care about statuschange
-
-		// Check for error before processing zap event
-		if err != nil {
-			fmt.Printf("Error: %v", err)
+		eventStr, err := readFromUDP()
+		if err == nil { // ReadFromUDP error check
+			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
-			if chZap != nil {
-				ztore.LogZap(*chZap) // Make a copy of pointer value
+			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
+
+			if err == nil { // NewSTBEvent error check
+				fmt.Printf("Error: %v\n", err)
+			} else {
+				if chZap != nil {
+					ztore.LogZap(*chZap) // Make a copy of pointer value
+					fmt.Printf("Stored zap: %v\n", eventStr)
+				}
 			}
 		}
 	}
@@ -103,13 +101,11 @@ func recordAll() {
 
 // showViewers compute number of viewers on channel and prints to console every second
 func showViewers(chName string) {
-	// Ticker sends the time every second. Also adjust intervals for slow recievers
 	tickChan := time.NewTicker(time.Second)
 	defer tickChan.Stop()
 
-	for tick := range tickChan.C {
-		fmt.Printf("Tick: %v\n", tick)
+	for range tickChan.C { // Runs code inside loop ~ every second
 		views := ztore.Viewers(chName)
-		fmt.Printf("Views: %v\n", views)
+		fmt.Printf("No. of viewers on %s is now %d\n", chName, views)
 	}
 }
