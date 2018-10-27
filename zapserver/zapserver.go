@@ -11,8 +11,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
-	//"github.com/uis-dat320-fall18/Aviato/chzap"
 	//"github.com/uis-dat320-fall18/assignments/lab6/zlog"
 )
 
@@ -87,7 +87,7 @@ func recordAll() {
 		n, _, _ := conn.ReadFromUDP(buf) // n = Number of bytes read
 		eventStr := string(buf[:n])
 		fmt.Printf("Recorded response: %v\n", eventStr)
-		event := NewSTBevent(eventStr)
+		event := chzap.ChZap.NewSTBevent(eventStr)
 		ztore.LogZap(event)
 	}
 }

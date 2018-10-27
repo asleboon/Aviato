@@ -10,7 +10,8 @@ import (
 	"os/signal"
 	"runtime/pprof"
 
-	"github.com/uis-dat320-fall18/assignments/lab6/zlog"
+	"github.com/uis-dat320-fall18/Aviato/zlog"
+	// "github.com/uis-dat320-fall18/assignments/lab6/zlog"
 )
 
 var (

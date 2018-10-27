@@ -7,18 +7,19 @@ import (
 	"fmt"
 	"time"
 
-	//. "github.com/uis-dat320-fall18/Aviato"
-	. "github.com/uis-dat320-fall18/assignments/lab6"
+	"github.com/uis-dat320-fall18/Aviato/chzap"
+	"github.com/uis-dat320-fall18/Aviato/util"
+	//. "github.com/uis-dat320-fall18/assignments/lab6"
 )
 
-type Zaps []ChZap
+type Zaps []chzap.ChZap
 
 func NewSimpleZapLogger() ZapLogger {
 	zs := make(Zaps, 0)
 	return &zs
 }
 
-func (zs *Zaps) LogZap(z ChZap) {
+func (zs *Zaps) LogZap(z chzap.ChZap) {
 	*zs = append(*zs, z)
 }
 
@@ -32,7 +33,7 @@ func (zs *Zaps) String() string {
 
 // Viewers() returns the current number of viewers for a channel.
 func (zs *Zaps) Viewers(chName string) int {
-	defer TimeElapsed(time.Now(), "simple.Viewers")
+	defer util.TimeElapsed(time.Now(), "simple.Viewers")
 	viewers := 0
 	// TODO uncomment this code when ToChan and FromChan added to ChZap struct
 	for _, v := range *zs {
@@ -48,7 +49,7 @@ func (zs *Zaps) Viewers(chName string) int {
 
 // Channels() creates a slice of the channels found in the zaps(both to and from).
 func (zs *Zaps) Channels() []string {
-	defer TimeElapsed(time.Now(), "simple.Channels")
+	defer util.TimeElapsed(time.Now(), "simple.Channels")
 	//TODO write this method (5p)
 	return nil
 }
@@ -56,7 +57,7 @@ func (zs *Zaps) Channels() []string {
 // ChannelsViewers() creates a slice of ChannelViewers, which is defined in zaplogger.go.
 // This is the number of viewers for each channel.
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
-	defer TimeElapsed(time.Now(), "simple.ChannelsViewers")
+	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
 	//TODO write this method (5p)
 	//fmt.Sprintf("%s: %d", cv.Channel, cv.Viewers)
 	return nil

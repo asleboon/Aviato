@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	//. "github.com/uis-dat320-fall18/Aviato"
-	. "github.com/uis-dat320-fall18/assignments/lab6"
+	// . "github.com/uis-dat320-fall18/assignments/lab6"
+	. "github.com/uis-dat320-fall18/Aviato/chzap"
 )
 
 type ZapLogger interface {
