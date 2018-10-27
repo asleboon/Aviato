@@ -7,19 +7,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/uis-dat320-fall18/Aviato/chzap"
-	"github.com/uis-dat320-fall18/Aviato/util"
+	. "github.com/uis-dat320-fall18/Aviato/chzap"
+	. "github.com/uis-dat320-fall18/Aviato/util"
 	//. "github.com/uis-dat320-fall18/assignments/lab6"
 )
 
-type Zaps []chzap.ChZap
+type Zaps []ChZap
 
 func NewSimpleZapLogger() ZapLogger {
 	zs := make(Zaps, 0)
 	return &zs
 }
 
-func (zs *Zaps) LogZap(z chzap.ChZap) {
+func (zs *Zaps) LogZap(z ChZap) {
 	*zs = append(*zs, z)
 }
 
