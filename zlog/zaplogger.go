@@ -3,8 +3,8 @@ package zlog
 import (
 	"fmt"
 
-	. "github.com/uis-dat320-fall18/Aviato"
-	//. "github.com/uis-dat320-fall18/assignments/lab6" Remove?
+	//. "github.com/uis-dat320-fall18/Aviato"
+	. "github.com/uis-dat320-fall18/assignments/lab6"
 )
 
 type ZapLogger interface {

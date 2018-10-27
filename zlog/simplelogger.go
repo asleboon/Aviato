@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/uis-dat320-fall18/Aviato"
-	//. "github.com/uis-dat320-fall18/assignments/lab6" Remove?
+	//. "github.com/uis-dat320-fall18/Aviato"
+	. "github.com/uis-dat320-fall18/assignments/lab6"
 )
 
 type Zaps []ChZap
@@ -58,5 +58,6 @@ func (zs *Zaps) Channels() []string {
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer TimeElapsed(time.Now(), "simple.ChannelsViewers")
 	//TODO write this method (5p)
+	//fmt.Sprintf("%s: %d", cv.Channel, cv.Viewers)
 	return nil
 }
