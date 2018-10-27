@@ -33,7 +33,7 @@ func (zs *Zaps) String() string {
 
 // Viewers() returns the current number of viewers for a channel.
 func (zs *Zaps) Viewers(chName string) int {
-	defer util.TimeElapsed(time.Now(), "simple.Viewers")
+	defer TimeElapsed(time.Now(), "simple.Viewers")
 	viewers := 0
 	// TODO uncomment this code when ToChan and FromChan added to ChZap struct
 	for _, v := range *zs {
@@ -49,7 +49,7 @@ func (zs *Zaps) Viewers(chName string) int {
 
 // Channels() creates a slice of the channels found in the zaps(both to and from).
 func (zs *Zaps) Channels() []string {
-	defer util.TimeElapsed(time.Now(), "simple.Channels")
+	defer TimeElapsed(time.Now(), "simple.Channels")
 	//TODO write this method (5p)
 	return nil
 }
@@ -57,7 +57,7 @@ func (zs *Zaps) Channels() []string {
 // ChannelsViewers() creates a slice of ChannelViewers, which is defined in zaplogger.go.
 // This is the number of viewers for each channel.
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
-	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
+	defer TimeElapsed(time.Now(), "simple.ChannelsViewers")
 	//TODO write this method (5p)
 	//fmt.Sprintf("%s: %d", cv.Channel, cv.Viewers)
 	return nil
