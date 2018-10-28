@@ -262,4 +262,12 @@ Policy](https://github.com/uis-dat320-fall18/course-info/blob/master/policy.md)
 document for additional information.
 
 ## How to run
-go run 
+Run from zapserver folder (main).
+### Flag
+- `lab`: Which lab exercise to run
+- `mcast`: Specify multicast address, ip:port
+- `memprofile`: Write memory prfiel to this file
+- `help`: Show help messages
+```
+go run *.go [-lab {tasknum}] [mcast {addr}] [-memprofile {filename}] [-h]
+```
