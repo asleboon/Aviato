@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sort"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
@@ -19,7 +20,6 @@ import (
 var conn *net.UDPConn
 var err error
 
-// REMARK: This function should return (i.e. it should not block)
 func runLab() {
 	switch *labnum {
 	case "a", "c1", "c2", "d", "e":
@@ -40,7 +40,6 @@ func runLab() {
 	case "d":
 		//TODO write code for task d ???
 	case "e":
-		//TODO write code for task e
 		go recordAll()
 		go top10Viewers()
 	case "f":
@@ -48,7 +47,6 @@ func runLab() {
 	}
 }
 
-// REMARK: This function should return (i.e. it should not block)
 func startServer() {
 	log.Println("Starting ZapServer...")
 	// Build UDP address
@@ -61,7 +59,7 @@ func startServer() {
 	}
 }
 
-func readFromUDP() (string, error) {
+func readFromUDP() (string, error) { // Change number of bytes in buffer??
 	buf := make([]byte, 1024)          // Make a buffer used to store bytes read from UDP
 	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
 	str := string(buf[:n])
@@ -101,7 +99,7 @@ func recordAll() {
 	}
 }
 
-// showViewers compute number of viewers on channel and prints to console every second
+// showViewers compute number of viewers on channel and prints every second
 func showViewers(chName string) {
 	tickChan := time.NewTicker(time.Second)
 	defer tickChan.Stop()
@@ -112,8 +110,34 @@ func showViewers(chName string) {
 	}
 }
 
-// top10Viewers compute
+// top10Viewers prints top 10 channel views list every second
 func top10Viewers() {
-	channels := ztore.Channels()
-	fmt.Println(channels)
+	tickChan := time.NewTicker(time.Second)
+	defer tickChan.Stop()
+
+	for range tickChan.C { // Runs code inside loop ~ every second
+		channels := calculateTop10()
+
+		fmt.Println("Top 10 channels with most viewers:")
+		for i, c := range channels {
+			fmt.Printf("%d. %v\n", i+1, c)
+		}
+	}
+
+}
+
+// calculatTop10 computes top 10 views list
+func calculateTop10() []*zlog.ChannelViewers {
+	channels := ztore.ChannelsViewers()
+
+	// Sort the channelviews, descending
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].Viewers > channels[j].Viewers
+	})
+
+	if len(channels) > 10 { // Only want top 10
+		channels = append(channels[:10], channels[0:]...)
+	}
+
+	return channels
 }

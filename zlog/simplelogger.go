@@ -35,7 +35,7 @@ func (zs *Zaps) String() string {
 func (zs *Zaps) Viewers(chName string) int {
 	defer util.TimeElapsed(time.Now(), "simple.Viewers")
 	viewers := 0
-	// TODO uncomment this code when ToChan and FromChan added to ChZap struct
+
 	for _, v := range *zs {
 		if v.ToChan == chName {
 			viewers++
@@ -44,12 +44,10 @@ func (zs *Zaps) Viewers(chName string) int {
 			viewers--
 		}
 	}
-
 	return viewers
 }
 
 // Channels creates a slice of the channels found in the zaps(both to and from).
-// ChZap format: {"2010/12/22, 20:22:32, 10.213.223.232, NRK2, NRK1", "20:22:32"}
 func (zs *Zaps) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "simple.Channels")
 	channels := make([]string, len(*zs))
@@ -64,10 +62,31 @@ func (zs *Zaps) Channels() []string {
 // This is the number of viewers for each channel.
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
-	//TODO write this method (5p)
-	// 	type ChannelViewers struct {
-	// 		Channel string
-	// 		Viewers int
-	// }
-	return nil
+
+	// Create dictionary with channel name and viewcount
+	m := make(map[string]int)
+	for _, channel := range *zs {
+		viewers, exists := m[channel.ToChan]
+		if exists {
+			m[channel.ToChan] = viewers + 1
+		} else {
+			m[channel.ToChan] = 1
+		}
+
+		viewers, exists = m[channel.FromChan]
+		if exists {
+			m[channel.FromChan] = viewers - 1
+		} else {
+			m[channel.FromChan] = -1
+		}
+	}
+
+	// Create a []*ChannelViewers slice from the dict
+	s := make([]*ChannelViewers, len(m))
+	for c, v := range m {
+		channelViewer := ChannelViewers{Channel: c, Viewers: v}
+		s = append(s, &channelViewer)
+	}
+
+	return s
 }
