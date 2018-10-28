@@ -1,5 +1,4 @@
 // Zap Collection Server
-// Run cmd: go run *.go -lab c1
 package main
 
 import (

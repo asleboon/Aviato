@@ -38,9 +38,11 @@ func runLab() {
 		go recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
-		//TODO write code for task d
+		//TODO write code for task d ???
 	case "e":
 		//TODO write code for task e
+		// go recordAll()
+		// go top10Viewers()
 	case "f":
 		//TODO write code for task f
 	}
@@ -108,4 +110,9 @@ func showViewers(chName string) {
 		views := ztore.Viewers(chName)
 		fmt.Printf("No. of viewers on %s is now %d\n", chName, views)
 	}
+}
+
+// top10Viewers compute
+func top10Viewers() {
+	ztore.Channels()
 }

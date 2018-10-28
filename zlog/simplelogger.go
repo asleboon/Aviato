@@ -31,7 +31,7 @@ func (zs *Zaps) String() string {
 	return fmt.Sprintf("SS: %d", len(*zs))
 }
 
-// Viewers() returns the current number of viewers for a channel.
+// Viewers returns the current number of viewers for a channel.
 func (zs *Zaps) Viewers(chName string) int {
 	defer util.TimeElapsed(time.Now(), "simple.Viewers")
 	viewers := 0
@@ -48,14 +48,18 @@ func (zs *Zaps) Viewers(chName string) int {
 	return viewers
 }
 
-// Channels() creates a slice of the channels found in the zaps(both to and from).
+// Channels creates a slice of the channels found in the zaps(both to and from).
 func (zs *Zaps) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "simple.Channels")
 	//TODO write this method (5p)
+	fmt.Println("Running channels method")
+	for _, channel := range *zs {
+		fmt.Printf("Channel: %v\n", channel)
+	}
 	return nil
 }
 
-// ChannelsViewers() creates a slice of ChannelViewers, which is defined in zaplogger.go.
+// ChannelsViewers creates a slice of ChannelViewers, which is defined in zaplogger.go.
 // This is the number of viewers for each channel.
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
