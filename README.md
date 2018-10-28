@@ -262,7 +262,7 @@ Policy](https://github.com/uis-dat320-fall18/course-info/blob/master/policy.md)
 document for additional information.
 
 ## How to run
-Run from zapserver folder (main).
+Run from zapserver folder (package main).
 ### Flag
 - `lab`: Which lab exercise to run
 - `mcast`: Specify multicast address, ip:port. Default: 224.0.1.130:10000
