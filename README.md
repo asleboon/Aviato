@@ -270,5 +270,8 @@ Run from zapserver folder (main).
 - `help`: Show help messages
 ```
 go run *.go [-lab {tasknum}] [mcast {addr}] [-memprofile {filename}] [-h]
-E.g. go run *.go -lab c1
+```
+E.g.
+```
+go run *.go -lab c1
 ```
