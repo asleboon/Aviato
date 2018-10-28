@@ -18,6 +18,7 @@
 4. [Building a Zap Event Processing Server](#building-a-zap-event-processing-server)
 5. [Publish/Subscribe RPC Client and Server](#publishsubscribe-grpc-client-and-server)
 6. [Lab Approval](#lab-approval)
+6. [How to run](#how-to-run)
 
 ## Introduction
 
@@ -259,3 +260,6 @@ assignment.
 Also see the [Grading and Collaboration
 Policy](https://github.com/uis-dat320-fall18/course-info/blob/master/policy.md)
 document for additional information.
+
+## How to run
+go run 
