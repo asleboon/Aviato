@@ -265,9 +265,10 @@ document for additional information.
 Run from zapserver folder (main).
 ### Flag
 - `lab`: Which lab exercise to run
-- `mcast`: Specify multicast address, ip:port
-- `memprofile`: Write memory prfiel to this file
+- `mcast`: Specify multicast address, ip:port. Default: 224.0.1.130:10000
+- `memprofile`: Write memory profile to this file
 - `help`: Show help messages
 ```
 go run *.go [-lab {tasknum}] [mcast {addr}] [-memprofile {filename}] [-h]
+E.g. go run *.go -lab c1
 ```
