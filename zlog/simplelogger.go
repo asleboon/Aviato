@@ -49,14 +49,15 @@ func (zs *Zaps) Viewers(chName string) int {
 }
 
 // Channels creates a slice of the channels found in the zaps(both to and from).
+// ChZap format: {"2010/12/22, 20:22:32, 10.213.223.232, NRK2, NRK1", "20:22:32"}
 func (zs *Zaps) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "simple.Channels")
-	//TODO write this method (5p)
-	fmt.Println("Running channels method")
+	channels := make([]string, len(*zs))
 	for _, channel := range *zs {
-		fmt.Printf("Channel: %v\n", channel)
+		channels = append(channels, channel.ToChan)
+		channels = append(channels, channel.FromChan)
 	}
-	return nil
+	return channels
 }
 
 // ChannelsViewers creates a slice of ChannelViewers, which is defined in zaplogger.go.
@@ -64,6 +65,9 @@ func (zs *Zaps) Channels() []string {
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
 	//TODO write this method (5p)
-	//fmt.Sprintf("%s: %d", cv.Channel, cv.Viewers)
+	// 	type ChannelViewers struct {
+	// 		Channel string
+	// 		Viewers int
+	// }
 	return nil
 }

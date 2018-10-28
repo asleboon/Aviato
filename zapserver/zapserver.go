@@ -41,8 +41,8 @@ func runLab() {
 		//TODO write code for task d ???
 	case "e":
 		//TODO write code for task e
-		// go recordAll()
-		// go top10Viewers()
+		go recordAll()
+		go top10Viewers()
 	case "f":
 		//TODO write code for task f
 	}
@@ -114,5 +114,6 @@ func showViewers(chName string) {
 
 // top10Viewers compute
 func top10Viewers() {
-	ztore.Channels()
+	channels := ztore.Channels()
+	fmt.Println(channels)
 }
