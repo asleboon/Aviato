@@ -33,10 +33,10 @@ func runLab() {
 		go dumpAll()
 	case "c1":
 		go recordAll()
-		go showViewers("NRK1")
+		go showViewers(" NRK1")
 	case "c2":
 		go recordAll()
-		go showViewers("TV2 Norge")
+		go showViewers(" TV2 Norge")
 	case "d":
 		//TODO write code for task d ???
 	case "e":
