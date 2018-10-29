@@ -47,15 +47,27 @@ func (zs *Zaps) Viewers(chName string) int {
 }
 
 // Channels creates a slice of the channels found in the zaps(both to and from).
-// TODO The returned slice should not include duplicates
 func (zs *Zaps) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "simple.Channels")
-	// Create a copy of zaps slice?
-	channels := make([]string, len(*zs))
-	for _, channel := range *zs {
-		channels = append(channels, channel.ToChan)
-		channels = append(channels, channel.FromChan)
+
+	m := make(map[string]bool)    // Key: Channel name. To prevent duplicates.
+	for _, channel := range *zs { // Creates copy of zaps slice and range trough
+		_, exists := m[channel.ToChan]
+		if exists == false {
+			m[channel.ToChan] = true
+		}
+		_, exists = m[channel.FromChan]
+		if exists == false {
+			m[channel.FromChan] = true
+		}
 	}
+
+	// Create slice with unique channel names
+	channels := make([]string, 0)
+	for channel := range m {
+		channels = append(channels, channel)
+	}
+
 	return channels
 }
 
@@ -64,8 +76,7 @@ func (zs *Zaps) Channels() []string {
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
 
-	// Create map with channel name as key and viewcount as value
-	m := make(map[string]int)
+	m := make(map[string]int) // Key: Channel name Value: Viewcount
 	for _, channel := range *zs {
 		viewers, exists := m[channel.ToChan]
 		if exists {
