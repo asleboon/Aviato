@@ -40,10 +40,6 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 	// StatusChange format: "2013/07/20, 21:57:42, 203.124.29.72, Volume: 50"}
 
 	eventeSlice := strings.Split(event, ",")
-	for _, str := range eventeSlice {
-		strings.Trim(str, " ")
-	}
-
 	switch len(eventeSlice) {
 	case 5: // ChZap
 		eventTime, err := time.Parse(timeFormat, eventeSlice[0]+","+eventeSlice[1])
@@ -77,11 +73,11 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 }
 
 func (zap ChZap) String() string {
-	return fmt.Sprintf("%s %s %s %s", zap.Time, zap.IP, zap.ToChan, zap.FromChan)
+	return fmt.Sprintf("%s%s%s%s", zap.Time, zap.IP, zap.ToChan, zap.FromChan)
 }
 
 func (schg StatusChange) String() string {
-	return fmt.Sprintf("%s %s %s %s", schg.Time, schg.Volume, schg.MuteStatus, schg.HDMIStatus)
+	return fmt.Sprintf("%s%s%s%s", schg.Time, schg.Volume, schg.MuteStatus, schg.HDMIStatus)
 }
 
 // Duration returns between two zap events: The receiving (this) zap event and the provided event.
