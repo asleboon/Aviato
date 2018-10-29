@@ -82,7 +82,7 @@ func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	}
 
 	// Create a []*ChannelViewers slice from the dict
-	s := make([]*ChannelViewers, len(m))
+	s := make([]*ChannelViewers, 0)
 	for c, v := range m {
 		channelViewer := ChannelViewers{Channel: c, Viewers: v}
 		s = append(s, &channelViewer)
