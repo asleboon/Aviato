@@ -105,7 +105,6 @@ func showViewers(chName string) {
 	defer tickChan.Stop()
 
 	for range tickChan.C { // Runs code inside loop ~ every second
-		fmt.Printf("'%v'\n", chName)
 		views := ztore.Viewers(chName)
 		fmt.Printf("No. of viewers on %s is now %d\n", chName, views)
 	}
