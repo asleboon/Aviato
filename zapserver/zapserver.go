@@ -81,18 +81,21 @@ func dumpAll() {
 // recordAll processes and stores new viewers in Zaplogger
 func recordAll() {
 	for {
-		eventStr, err := readFromUDP()
+		fmt.Printf("test\n")
+		eventStr, err := readFromUDP() // Something wrong with readFromUDP
+
 		if err != nil { // ReadFromUDP error check
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
 			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
-
+			fmt.Printf("chZap: %v\n", chZap)
 			if err != nil { // NewSTBEvent error check
 				fmt.Printf("Error: %v\n", err)
 			} else {
+				fmt.Printf("chZap: %v\n", chZap)
 				if chZap != nil {
 					ztore.LogZap(*chZap) // Make a copy of pointer value
-					fmt.Printf("Stored zap: %v\n", eventStr)
+					//fmt.Printf("Stored zap: %v\n", eventStr)
 				}
 			}
 		}
@@ -105,6 +108,7 @@ func showViewers(chName string) {
 	defer tickChan.Stop()
 
 	for range tickChan.C { // Runs code inside loop ~ every second
+		fmt.Printf("'%v'\n", chName)
 		views := ztore.Viewers(chName)
 		fmt.Printf("No. of viewers on %s is now %d\n", chName, views)
 	}
