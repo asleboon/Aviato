@@ -59,10 +59,9 @@ func startServer() {
 }
 
 func readFromUDP() (string, error) {
-	buf := make([]byte, 1024)          // Make a buffer used to store bytes read from UDP
+	buf := make([]byte, 256)           // UDP packages usually ~50-70 bytes
 	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
 	str := string(buf[:n])
-	fmt.Printf("readFromUDP # of bytes: %d", n) // Check number of bytes
 	return str, err
 }
 
