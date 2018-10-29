@@ -14,7 +14,6 @@ import (
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
-	//"github.com/uis-dat320-fall18/assignments/lab6/zlog" REMOVE
 )
 
 var conn *net.UDPConn
@@ -38,7 +37,7 @@ func runLab() {
 		go recordAll()
 		go showViewers(" TV2 Norge")
 	case "d":
-		//TODO write code for task d ???
+		//TODO Comment task d
 	case "e":
 		go recordAll()
 		go top10Viewers()
@@ -59,10 +58,11 @@ func startServer() {
 	}
 }
 
-func readFromUDP() (string, error) { // Change number of bytes in buffer??
+func readFromUDP() (string, error) {
 	buf := make([]byte, 1024)          // Make a buffer used to store bytes read from UDP
 	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
 	str := string(buf[:n])
+	fmt.Printf("readFromUDP # of bytes: %d", n) // Check number of bytes
 	return str, err
 }
 
@@ -92,7 +92,6 @@ func recordAll() {
 			} else {
 				if chZap != nil {
 					ztore.LogZap(*chZap) // Make a copy of pointer value
-					//fmt.Printf("Stored zap: %v\n", eventStr)
 				}
 			}
 		}
@@ -122,6 +121,7 @@ func top10Viewers() {
 		for i, c := range channels {
 			fmt.Printf("%d. %v\n", i+1, c)
 		}
+		fmt.Println()
 	}
 }
 
@@ -136,7 +136,6 @@ func calculateTop10() []*zlog.ChannelViewers {
 
 	if len(channels) > 10 { // Only want top 10
 		channels = channels[:10]
-		//channels = append(channels[:10], channels[11:]...)
 	}
 
 	return channels

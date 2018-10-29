@@ -15,6 +15,7 @@ const timeOnly = "15:04:05"
 const timeLen = len(timeFormat)
 
 // StatusChange represents a change in status on a set-top box.
+// TODO Add Status field: 	Status     string // Volume: 10, Mutestatus: 0 etc.
 type StatusChange struct {
 	// Exported or Unexported?
 	Time       time.Time
@@ -31,8 +32,6 @@ type ChZap struct {
 	ToChan   string
 	FromChan string
 }
-
-// Do we need to worry about wrong inputs? Wrong input should result in a error.
 
 // NewSTBEvent creates a new set-top box(STB) event which can be either a ChZap or StatusChange
 func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
@@ -63,11 +62,6 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 	case 2: // Error
 		err := fmt.Errorf("NewSTBEvent: too short event string: %s,%s", eventeSlice[0], eventeSlice[1])
 		return nil, nil, err
-	default:
-		// What is default case?
-		// Maybe nil, nil, err: Unknown error ?
-		// Or nil, nil, nil ?
-		// Or no default case since nil, nil, nil is return if no case is triggered
 	}
 	return nil, nil, nil
 }
@@ -87,5 +81,5 @@ func (zap ChZap) Duration(provided ChZap) time.Duration {
 
 // Date returns date of zap event in desired date format
 func (zap ChZap) Date() string {
-	return zap.Time.Format("2006/02/01")
+	return zap.Time.Format(dateFormat)
 }

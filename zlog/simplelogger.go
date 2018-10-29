@@ -9,7 +9,6 @@ import (
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/util"
-	//. "github.com/uis-dat320-fall18/assignments/lab6" REMOVE
 )
 
 type Zaps []chzap.ChZap
@@ -48,8 +47,10 @@ func (zs *Zaps) Viewers(chName string) int {
 }
 
 // Channels creates a slice of the channels found in the zaps(both to and from).
+// TODO The returned slice should not include duplicates
 func (zs *Zaps) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "simple.Channels")
+	// Create a copy of zaps slice?
 	channels := make([]string, len(*zs))
 	for _, channel := range *zs {
 		channels = append(channels, channel.ToChan)
@@ -63,7 +64,7 @@ func (zs *Zaps) Channels() []string {
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
 
-	// Create dictionary with channel name and viewcount
+	// Create map with channel name as key and viewcount as value
 	m := make(map[string]int)
 	for _, channel := range *zs {
 		viewers, exists := m[channel.ToChan]
@@ -81,12 +82,11 @@ func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 		}
 	}
 
-	// Create a []*ChannelViewers slice from the dict
+	// Create a []*ChannelViewers slice from the map
 	s := make([]*ChannelViewers, 0)
 	for c, v := range m {
 		channelViewer := ChannelViewers{Channel: c, Viewers: v}
 		s = append(s, &channelViewer)
 	}
-
 	return s
 }
