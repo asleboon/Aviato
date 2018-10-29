@@ -70,7 +70,7 @@ func readFromUDP() (string, error) { // Change number of bytes in buffer??
 func dumpAll() {
 	for {
 		eventStr, err := readFromUDP()
-		if err == nil { // ReadFromUDP error check
+		if err != nil { // ReadFromUDP error check
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
 			fmt.Printf("Dumped response: %v\n", eventStr)
@@ -82,7 +82,7 @@ func dumpAll() {
 func recordAll() {
 	for {
 		eventStr, err := readFromUDP()
-		if err == nil { // ReadFromUDP error check
+		if err != nil { // ReadFromUDP error check
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
 			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
