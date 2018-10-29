@@ -37,7 +37,6 @@ func (zs *Zaps) Viewers(chName string) int {
 	viewers := 0
 
 	for _, v := range *zs {
-		fmt.Printf("'ToChan: %v, FromChan: %v'\n", v.ToChan, v.FromChan)
 		if v.ToChan == chName {
 			viewers++
 		}
