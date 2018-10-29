@@ -87,7 +87,7 @@ func recordAll() {
 		} else {
 			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
 
-			if err == nil { // NewSTBEvent error check
+			if err != nil { // NewSTBEvent error check
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
