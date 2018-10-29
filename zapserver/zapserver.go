@@ -135,7 +135,7 @@ func calculateTop10() []*zlog.ChannelViewers {
 	})
 
 	if len(channels) > 10 { // Only want top 10
-		channels = append(channels[:10], channels[0:]...)
+		channels = append(channels[:10], channels[11:]...)
 	}
 
 	return channels
