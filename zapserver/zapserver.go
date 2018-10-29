@@ -130,14 +130,17 @@ func top10Viewers() {
 func calculateTop10() []*zlog.ChannelViewers {
 	channels := ztore.ChannelsViewers()
 
+	fmt.Printf("Unsorted: %v", channels)
 	// Sort the channelviews, descending
 	sort.Slice(channels, func(i, j int) bool {
 		return channels[i].Viewers > channels[j].Viewers
 	})
+	fmt.Printf("Sorted: %v", channels)
 
 	if len(channels) > 10 { // Only want top 10
 		channels = append(channels[:10], channels[0:]...)
 	}
+	fmt.Printf("Top 10: %v", channels)
 
 	return channels
 }
