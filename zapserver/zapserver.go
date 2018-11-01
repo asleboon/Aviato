@@ -41,7 +41,8 @@ func runLab() {
 		go recordAll()
 		go top10Viewers()
 	case "f":
-		//TODO write code for task f
+		go recordAll()
+		go top10Viewers()
 	}
 }
 
