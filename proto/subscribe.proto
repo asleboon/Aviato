@@ -2,14 +2,18 @@ syntax = "proto3";
 
 package proto;
 
+
+// Takes a stream of messages, from different subscribers
+// returns a stream of messagas including the top10 list
 service Subscription {
 	rpc Subscribe(stream SubscribeMessage) returns (stream NotificationMessage) {}
 }
 
+// message keyword will generate a struct in golang
 message SubscribeMessage {
-	// TODO: Add the variable(s) in the subscribe message
+	uint32 refreshRate = 1;
 }
 
 message NotificationMessage {
-	// TODO: Add the variable(s) in the notification message
+	string notification = 1;
 }
