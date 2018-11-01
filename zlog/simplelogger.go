@@ -46,23 +46,24 @@ func (zs *Zaps) Viewers(chName string) int {
 	return viewers
 }
 
-// Channels creates a slice of the channels found in the zaps(both to and from).
+// Channels creates a slice of the (unique) channels found in the zaps(both to and from).
 func (zs *Zaps) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "simple.Channels")
 
-	m := make(map[string]bool)    // Key: Channel name. To prevent duplicates.
-	for _, channel := range *zs { // Creates copy of zaps slice and range trough
+	m := make(map[string]bool)    // Key: Channelname. To prevent duplicates.
+	for _, channel := range *zs { // Create copy of zaps slice and range trough
 		_, exists := m[channel.ToChan]
 		if exists == false {
 			m[channel.ToChan] = true
 		}
+
 		_, exists = m[channel.FromChan]
 		if exists == false {
 			m[channel.FromChan] = true
 		}
 	}
 
-	// Create slice with unique channel names
+	// Create slice with unique channelnames
 	channels := make([]string, 0)
 	for channel := range m {
 		channels = append(channels, channel)
@@ -71,33 +72,32 @@ func (zs *Zaps) Channels() []string {
 	return channels
 }
 
-// ChannelsViewers creates a slice of ChannelViewers, which is defined in zaplogger.go.
-// This is the number of viewers for each channel.
+// ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
 
-	m := make(map[string]int) // Key: Channel name Value: Viewcount
+	m := make(map[string]int) // Key: Channelname. Value: Viewcount
 	for _, channel := range *zs {
-		viewers, exists := m[channel.ToChan]
+		count, exists := m[channel.ToChan]
 		if exists {
-			m[channel.ToChan] = viewers + 1
+			m[channel.ToChan] = count + 1
 		} else {
 			m[channel.ToChan] = 1
 		}
 
-		viewers, exists = m[channel.FromChan]
+		count, exists = m[channel.FromChan]
 		if exists {
-			m[channel.FromChan] = viewers - 1
+			m[channel.FromChan] = count - 1
 		} else {
 			m[channel.FromChan] = -1
 		}
 	}
 
 	// Create a []*ChannelViewers slice from the map
-	s := make([]*ChannelViewers, 0)
-	for c, v := range m {
-		channelViewer := ChannelViewers{Channel: c, Viewers: v}
-		s = append(s, &channelViewer)
+	res := make([]*ChannelViewers, 0)
+	for channel, viewers := range m {
+		channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
+		res = append(res, &channelViewer)
 	}
-	return s
+	return res
 }

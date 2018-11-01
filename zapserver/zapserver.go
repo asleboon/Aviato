@@ -24,8 +24,7 @@ func runLab() {
 	case "a", "c1", "c2", "d", "e":
 		ztore = zlog.NewSimpleZapLogger()
 	case "f":
-		// TODO activate with new ZapLogger data structure (task f)
-		// ztore = zlog.NewViewersZapLogger()
+		ztore = zlog.NewViewersZapLogger()
 	}
 	switch *labnum {
 	case "a":
