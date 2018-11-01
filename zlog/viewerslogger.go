@@ -1,7 +1,10 @@
 package zlog
 
 import (
+	"time"
+
 	"github.com/uis-dat320-fall18/Aviato/chzap"
+	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
 // Viewers contains a map with Key: Channelname, Value: Viewers
@@ -56,6 +59,8 @@ func (vs *Viewers) Channels() []string {
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
+	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
+
 	res := make([]*ChannelViewers, 0)
 	for channel, viewers := range *vs {
 		channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
