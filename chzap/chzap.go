@@ -42,7 +42,7 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 
 	switch len(eventSlice) {
 	case 5: // ChZap
-		ip, toChan, fromChan := eventSlice[1], eventSlice[2], eventSlice[3]
+		ip, toChan, fromChan := eventSlice[2], eventSlice[3], eventSlice[4]
 		time, err := time.Parse(timeFormat, eventSlice[0]+", "+eventSlice[1])
 		if err != nil {
 			err = fmt.Errorf("NewSTBEvent: failed to parse timestamp")
