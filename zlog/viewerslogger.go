@@ -41,6 +41,8 @@ func (vs *Viewers) Entries() int {
 
 // Viewers return number of viewers for a channel
 func (vs *Viewers) Viewers(channelName string) int {
+	defer util.TimeElapsed(time.Now(), "Viewers")
+
 	count, exists := (*vs)[channelName]
 	if exists {
 		return count
@@ -50,6 +52,8 @@ func (vs *Viewers) Viewers(channelName string) int {
 
 // Channels creates a list of channels in the viewers.
 func (vs *Viewers) Channels() []string {
+	defer util.TimeElapsed(time.Now(), "Channels")
+
 	channels := make([]string, 0)
 	for channel := range *vs {
 		channels = append(channels, channel)
@@ -59,7 +63,7 @@ func (vs *Viewers) Channels() []string {
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
-	defer util.TimeElapsed(time.Now(), "simple.ChannelsViewers")
+	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	res := make([]*ChannelViewers, 0)
 	for channel, viewers := range *vs {
