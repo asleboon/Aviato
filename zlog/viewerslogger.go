@@ -1,6 +1,7 @@
 package zlog
 
 import (
+	"sync"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
@@ -9,41 +10,62 @@ import (
 
 // Viewers contains a map with Key: Channelname, Value: Viewers
 // Remark: Full zap info not stored here. Use simplelogger for that.
-type Viewers map[string]int
+// TODO: Implement mutex lock on map to prevent errors when running go routines concurrently accessing the map.
+//type Viewers map[string]int
+
+type Viewers struct {
+	zaps  []chzap.ChZap //??
+	views map[string]int
+	lock  sync.Mutex
+}
+
+// data
+// lock
 
 // NewViewersZapLogger initializes a new map for storing views per channel. Adheres Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
-	vs := make(Viewers, 0)
+	vs := Viewers{views: make(map[string]int, 0)}
 	return &vs
 }
 
 // LogZap updates count for the two channels in the zap
 func (vs *Viewers) LogZap(z chzap.ChZap) {
-	count, exists := (*vs)[z.ToChan]
+	(*vs).lock.Lock()
+	defer (*vs).lock.Unlock()
+
+	// Log zap
+	(*vs).zaps = append((*vs).zaps, z)
+
+	// Log views
+	count, exists := (*vs).views[z.ToChan]
 	if exists {
-		(*vs)[z.ToChan] = count + 1
+		(*vs).views[z.ToChan] = count + 1
 	} else {
-		(*vs)[z.ToChan] = 1
+		(*vs).views[z.ToChan] = 1
 	}
 
-	count, exists = (*vs)[z.FromChan]
+	count, exists = (*vs).views[z.FromChan]
 	if exists {
-		(*vs)[z.FromChan] = count - 1
+		(*vs).views[z.FromChan] = count - 1
 	} else {
-		(*vs)[z.FromChan] = -1
+		(*vs).views[z.FromChan] = -1
 	}
 }
 
 // Entries returns the length og the Viewers map (# of channnels)
 func (vs *Viewers) Entries() int {
-	return len(*vs)
+	(*vs).lock.Lock()
+	defer (*vs).lock.Unlock()
+	return len((*vs).zaps)
 }
 
 // Viewers return number of viewers for a channel
 func (vs *Viewers) Viewers(channelName string) int {
+	(*vs).lock.Lock()
+	defer (*vs).lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Viewers")
 
-	count, exists := (*vs)[channelName]
+	count, exists := (*vs).views[channelName]
 	if exists {
 		return count
 	}
@@ -52,10 +74,12 @@ func (vs *Viewers) Viewers(channelName string) int {
 
 // Channels creates a list of channels in the viewers.
 func (vs *Viewers) Channels() []string {
+	(*vs).lock.Lock()
+	defer (*vs).lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
-	for channel := range *vs {
+	for channel := range (*vs).views {
 		channels = append(channels, channel)
 	}
 	return channels
@@ -63,10 +87,12 @@ func (vs *Viewers) Channels() []string {
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
+	(*vs).lock.Lock()
+	defer (*vs).lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	res := make([]*ChannelViewers, 0)
-	for channel, viewers := range *vs {
+	for channel, viewers := range (*vs).views {
 		channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
 		res = append(res, &channelViewer)
 	}
