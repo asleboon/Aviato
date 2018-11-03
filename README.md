@@ -261,7 +261,7 @@ Also see the [Grading and Collaboration
 Policy](https://github.com/uis-dat320-fall18/course-info/blob/master/policy.md)
 document for additional information.
 
-## How to run
+## How to run - Zapserver
 Run from zapserver folder (package main).
 ### Flag
 - `lab`: Which lab exercise to run
@@ -276,3 +276,10 @@ go run *.go [-lab {tasknum}] [mcast {addr}] [-memprofile {filename}] [-h]
 ```
 go run *.go -lab c1
 ```
+
+## How to run - grpc
+### Server
+Run from grpc/server folder
+#### Flag
+- `endpoint`: Endpoint on which server runs or to which client connects
+- `help`: Show usage help
