@@ -265,16 +265,16 @@ document for additional information.
 ## How to run Zapserver
 
 Run from zapserver folder (package main).
-### Flag
+#### Flag
 - `lab`: Which lab exercise to run
 - `mcast`: Specify multicast address, ip:port. Default: 224.0.1.130:10000
 - `memprofile`: Write memory profile to this file
 - `help`: Show help messages
-### Command
+#### Command
 ```
-go run *.go [-lab {tasknum}] [mcast {addr}] [-memprofile {filename}] [-h]
+go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-h]
 ```
-### Example
+#### Example
 ```
 go run *.go -lab c1
 ```
@@ -284,5 +284,13 @@ go run *.go -lab c1
 ### Server
 Run from grpc/server folder
 #### Flag
-- `endpoint`: Endpoint on which server runs or to which client connects
+- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:12111
 - `help`: Show usage help
+#### Command
+```
+go run *.go [-endpoint {addr}] [-help]
+```
+#### Example
+```
+go run *.go -endpoint localhost:12121
+```
