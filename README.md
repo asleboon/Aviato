@@ -18,7 +18,7 @@
 4. [Building a Zap Event Processing Server](#building-a-zap-event-processing-server)
 5. [Publish/Subscribe RPC Client and Server](#publishsubscribe-grpc-client-and-server)
 6. [Lab Approval](#lab-approval)
-7. [How to run - Zapserver](#how-to-run-zapserver)
+7. [How to run](#how-to-run)
 8. [How to run - grpc](#how-to-run-grpc)
 
 ## Introduction
@@ -262,7 +262,7 @@ Also see the [Grading and Collaboration
 Policy](https://github.com/uis-dat320-fall18/course-info/blob/master/policy.md)
 document for additional information.
 
-## How to run - Zapserver
+## How to run
 
 Run from zapserver folder (package main).
 ### Flag
