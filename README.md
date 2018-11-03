@@ -19,7 +19,7 @@
 5. [Publish/Subscribe RPC Client and Server](#publishsubscribe-grpc-client-and-server)
 6. [Lab Approval](#lab-approval)
 7. [How to run - Zapserver](#how-to-run-zapserver)
-8. [How to run - grpc] (#how-to-run-grpc)
+8. [How to run - grpc](#how-to-run-grpc)
 
 ## Introduction
 
