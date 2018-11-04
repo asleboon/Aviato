@@ -288,12 +288,23 @@ Run from grpc/server folder
 - `help`: Show usage help
 #### Command
 ```
-go run *.go [-endpoint {addr}] [-help]
+go run subscribeServer.go [-endpoint {addr}] [-help]
 ```
 #### Example
 ```
-go run *.go -endpoint localhost:12111
+go run subscribeServer.go -endpoint localhost:12111
 ```
 
 ### Client
 Run from grpc/client folder
+#### Flag
+- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:12111
+- `help`: Show usage help
+#### Command
+```
+go run subscribeClient.go [-endpoint {addr}] [-help]
+```
+#### Example
+```
+go run subscribeClient.go -endpoint localhost:12111
+```
