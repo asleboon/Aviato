@@ -19,7 +19,7 @@
 5. [Publish/Subscribe RPC Client and Server](#publishsubscribe-grpc-client-and-server)
 6. [Lab Approval](#lab-approval)
 7. [How to run Zapserver](#how-to-run-zapserver)
-8. [How to run grpc](#how-to-run-grpc)
+8. [How to run gRPC](#how-to-run-grpc)
 
 ## Introduction
 
@@ -279,7 +279,7 @@ go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-h]
 go run *.go -lab c1
 ```
 
-## How to run grpc
+## How to run gRPC
 
 ### Server
 Run from grpc/server folder
@@ -294,3 +294,6 @@ go run *.go [-endpoint {addr}] [-help]
 ```
 go run *.go -endpoint localhost:12111
 ```
+
+### Client
+Run from grpc/client folder
