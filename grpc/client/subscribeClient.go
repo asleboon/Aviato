@@ -2,14 +2,33 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"google.golang.org/grpc"
 )
 
-const addr = "localhost:12111"
+var (
+	help = flag.Bool(
+		"help",
+		false,
+		"Show usage help",
+	)
+	endpoint = flag.String(
+		"endpoint",
+		"localhost:12111",
+		"Endpoint to which client connects",
+	)
+)
+
+func Usage() {
+	fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS]\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "\nOptions:\n")
+	flag.PrintDefaults()
+}
 
 /* Remove?
 func subscribe(s pb.SubscriptionClient, ch string, rate int) (string, error) {
@@ -68,9 +87,16 @@ func (x *subscriptionSubscribeClient) Recv() (*pb.NotificationMessage, error) {
 
 // Main func inspired by lab3
 func main() {
+	flag.Usage = Usage
+	flag.Parse()
+	if *help {
+		flag.Usage()
+		return
+	}
+
 	// reader := bufio.NewReader(os.Stdin)               // Why do we need a reader?
 	// fmt.Printf("reader: %q", reader)                  // And why is this needed?
-	conn, err := grpc.Dial(addr, grpc.WithInsecure()) // WithInsecure: Disable transport security connection
+	conn, err := grpc.Dial(*endpoint, grpc.WithInsecure()) // WithInsecure: Disable transport security connection
 	if err != nil {
 		log.Fatalf("Error with creating connection to gRPC server: %v", err)
 	}
