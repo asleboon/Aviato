@@ -3,18 +3,23 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
+	"log"
 	"net"
 	"os"
 	"sync"
+	"time"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
+	"github.com/uis-dat320-fall18/Aviato/zlog"
 	"google.golang.org/grpc"
 )
 
 // SubscribeServer exported? Or not exported?
 type SubscribeServer struct {
-	kv    map[string]int // store channels and number of viewers?
-	mutex sync.Mutex
+	// kvMap map[string]int // store channels and number of viewers?
+	logger zlog.ZapLogger
+	lock   sync.Mutex
 }
 
 var (
@@ -26,7 +31,7 @@ var (
 	endpoint = flag.String(
 		"endpoint",
 		"localhost:12111",
-		"Endpoint on which server runs or to which client connects",
+		"Endpoint on which server runs",
 	)
 )
 
@@ -36,49 +41,23 @@ func Usage() {
 	flag.PrintDefaults()
 }
 
-/* Remove?
-// subscribe.proto: rpc Subscribe(stream SubscribeMessage) returns (stream NotificationMessage)
-func (ss *SubscribeServer) Subscribe(ctx context.Context, req *pb.SubscribeMessage) (*pb.NotificationMessage, error) {
-	return nil, nil
-}
-*/
-
-// Look at SubscriptionServer API in subscribe.pb.go
-type SubscriptionServer interface {
-	Subscribe(Subscription_SubscribeServer) error
-}
-
-func RegisterSubscriptionServer(s *grpc.Server, srv SubscriptionServer) {
-	// s.RegisterService(&_Subscription_serviceDesc, srv)
-}
-
-func _Subscription_Subscribe_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(SubscriptionServer).Subscribe(&subscriptionSubscribeServer{stream})
-}
-
-type Subscription_SubscribeServer interface {
-	// Send(*NotificationMessage) error
-	// Recv() (*SubscribeMessage, error)
-	grpc.ServerStream
-}
-
-type subscriptionSubscribeServer struct {
-	grpc.ServerStream
-}
-
-func (x *subscriptionSubscribeServer) Send(m *pb.NotificationMessage) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *subscriptionSubscribeServer) Recv() (*pb.SubscribeMessage, error) {
-	m := new(pb.SubscribeMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
+func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		tickChan := time.NewTicker(time.Second) //* in.RefreshRate
+		defer tickChan.Stop()
+		for range tickChan.C { // Runs code inside loop ~ every second
+			fmt.Printf(in.String())
+		}
 	}
-	return m, nil
 }
 
-// Main func inspired by lab3
 func main() {
 	flag.Usage = Usage
 	flag.Parse()
@@ -87,23 +66,18 @@ func main() {
 		return
 	}
 
+	grpcServer := grpc.NewServer()
+	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
+	pb.RegisterSubscriptionServer(grpcServer, server)
+
 	listener, err := net.Listen("tcp", *endpoint)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	} else {
-		fmt.Printf("Listener started on %v\n", *endpoint)
+		log.Fatalf("Error: %v\n", err)
 	}
 
-	server := new(SubscribeServer)
-	server.kv = make(map[string]int)
-	grpcServer := grpc.NewServer()
-
-	// Must create proto first. cmd: protoc --go_out=plugins=grpc:. subscribe.proto
-	//pb.RegisterKeyValueServiceServer(grpcServer, server)
-
-	fmt.Printf("Preparing to serve incoming requests.\n")
+	fmt.Printf("Preparing to serve incoming requests...\n")
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Error with grpc serve: %v\n", err)
 	}
 }
