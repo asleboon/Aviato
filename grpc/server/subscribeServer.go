@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/exec"
 	"sync"
 	"time"
 
@@ -46,14 +47,15 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		in, err := stream.Recv()
 		if err == io.EOF {
 			return nil
-		}
-		if err != nil {
+		} else if err != nil {
 			return err
 		}
-		tickChan := time.NewTicker(time.Second) //* in.RefreshRate
+
+		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
-		for range tickChan.C { // Runs code inside loop ~ every second
-			fmt.Printf(in.String())
+		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
+			// TODO: Send top 10 list
+			fmt.Printf(in.String()) // Only for debug, remove afterwards
 		}
 	}
 }
@@ -67,17 +69,24 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
+
+	// TODO: Finish. Remove .Output() ?
+	// Start zapserver and top 10 calculation
+	output, err := exec.Command("go", "run", "-lab f", "../../zapserver").Output()
+	if err == nil {
+		fmt.Printf("%v", output)
+	}
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
 	pb.RegisterSubscriptionServer(grpcServer, server)
 
 	listener, err := net.Listen("tcp", *endpoint)
 	if err != nil {
-		log.Fatalf("Error: %v\n", err)
+		log.Fatalf("net.listen error: %v\n", err)
 	}
 
 	fmt.Printf("Preparing to serve incoming requests...\n")
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		fmt.Printf("Error with grpc serve: %v\n", err)
+		fmt.Printf("Error with gRPC serve. Quitting...")
 	}
 }
