@@ -8,19 +8,10 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// Viewers contains a map with Key: Channelname, Value: Viewers
-// Remark: Full zap info not stored here. Use simplelogger for that.
-// TODO: Implement mutex lock on map to prevent errors when running go routines concurrently accessing the map.
-//type Viewers map[string]int
-
 type Viewers struct {
-	zaps  []chzap.ChZap //??
-	views map[string]int
+	views map[string]int // Key: Channelname, Value: Viewers
 	lock  sync.Mutex
 }
-
-// data
-// lock
 
 // NewViewersZapLogger initializes a new map for storing views per channel. Adheres Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
@@ -32,9 +23,6 @@ func NewViewersZapLogger() ZapLogger {
 func (vs *Viewers) LogZap(z chzap.ChZap) {
 	(*vs).lock.Lock()
 	defer (*vs).lock.Unlock()
-
-	// Log zap
-	(*vs).zaps = append((*vs).zaps, z)
 
 	// Log views
 	count, exists := (*vs).views[z.ToChan]
@@ -52,11 +40,11 @@ func (vs *Viewers) LogZap(z chzap.ChZap) {
 	}
 }
 
-// Entries returns the length og the Viewers map (# of channnels)
+// Entries returns the length of views map (# of channnels)
 func (vs *Viewers) Entries() int {
 	(*vs).lock.Lock()
 	defer (*vs).lock.Unlock()
-	return len((*vs).zaps)
+	return len((*vs).views)
 }
 
 // Viewers return number of viewers for a channel
