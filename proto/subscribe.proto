@@ -10,8 +10,9 @@ service Subscription {
 }
 
 // message keyword will generate a struct in golang
+// Changed to uint 64 and compiled
 message SubscribeMessage {
-	uint32 refreshRate = 1;
+	uint64 refreshRate = 1;
 }
 
 message NotificationMessage {
