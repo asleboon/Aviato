@@ -126,6 +126,8 @@ func main() {
 
 	// Create new server with logger
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
+	go server.recordAll()
+
 	pb.RegisterSubscriptionServer(grpcServer, server)
 
 	listener, err := net.Listen("tcp", *endpoint)
