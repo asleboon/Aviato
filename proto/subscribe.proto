@@ -16,5 +16,5 @@ message SubscribeMessage {
 }
 
 message NotificationMessage {
-	string notification = 1;
+	repeated string top10 = 1;
 }

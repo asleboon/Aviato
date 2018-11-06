@@ -131,7 +131,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				str += v.Channel
 				str += ". Viewers: "
 				str += string(v.Viewers)
-				msg += str + "\n"
+				msg += str + ", "
 				//msg = append(msg, str)
 				counter++
 			}
