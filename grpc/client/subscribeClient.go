@@ -7,10 +7,14 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"google.golang.org/grpc"
 )
+
+// TODO: Refactor code when everything is working
+// TODO: Implement flags for specifying refreshrate
 
 var (
 	help = flag.Bool(
@@ -36,21 +40,6 @@ func Usage() {
 	flag.PrintDefaults()
 }
 
-/*
-func subTop10(client pb.NewSubscriptionClient, rate uint32) {
-	stream, err := client.Subscribe(context.Background())
-	waitc := make(chan struct{})
-	msg := &pb.SubscribeMessage{RefreshRate: rate}
-	for {
-		fmt.Println("sleeping")
-		time.Sleep(2 * time.Second)
-		fmt.Println("sending msg...")
-		stream.Send(msg)
-	}
-	<-waitc
-	stream.CloseSend()
-}*/
-
 func main() {
 	flag.Usage = Usage
 	flag.Parse()
@@ -68,16 +57,15 @@ func main() {
 
 	client := pb.NewSubscriptionClient(conn)
 
-	// go subTop10()
-
 	stream, err := client.Subscribe(context.Background())
-	// rate, _ := strconv.ParseUint((*refreshRate), 10, 32) TODO: Change proto to uint64 instead of 32 to use flag.
-	msg := &pb.SubscribeMessage{RefreshRate: 5} // Send a subscribe request
-	stream.Send(msg)                            // Does this send message on send stream or
+	rate, _ := strconv.ParseUint((*refreshRate), 10, 0)
+	msg := &pb.SubscribeMessage{RefreshRate: rate}
+	stream.Send(msg)
 
-	for { // Wait for top 10 calc from server
-		fmt.Println("Waiting for top 10 from server...")
+	for {
+		fmt.Println("Waiting for top 10 from server...\n")
 		top10, err := stream.Recv()
+		// TODO: Notification message handling here!
 		if err == io.EOF {
 			fmt.Printf("End of file received. Client quitting...")
 			return

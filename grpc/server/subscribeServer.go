@@ -16,6 +16,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO: Top 10 calc
+// TODO: Format code
+
 // SubscribeServer exported? Or not exported?
 type SubscribeServer struct {
 	// kvMap map[string]int // store channels and number of viewers?
@@ -105,11 +108,11 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			// TODO: Send top 10 list
-			fmt.Printf("%v\n", in.String()) // Only for debug, remove afterwards
-			top := s.logger
-			fmt.Println("Top: ", top)
-			fmt.Println("top.ChannelViewers(): ", top.ChannelsViewers())
+			// Create a top 10 map
+			viewers := s.logger.ChannelsViewers()
+			fmt.Printf("%v", viewers) // Only for debug, remove afterwards
+
+			// Send top 10 to subscriber
 			stream.Send(&pb.NotificationMessage{Notification: "test"})
 		}
 	}
@@ -119,14 +122,11 @@ func main() {
 	parseFlags()
 
 	grpcServer := grpc.NewServer()
+	startServer() // Start zapserver
 
-	// TODO: Finish. Remove .Output() ?
-	// Start zapserver and top 10 calculation
-	startServer()
-
-	// Create new server with logger
+	// Create new server with viewerslogger
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
-	go server.recordAll()
+	go server.recordAll() // Record all zaps and store in logger
 
 	pb.RegisterSubscriptionServer(grpcServer, server)
 
