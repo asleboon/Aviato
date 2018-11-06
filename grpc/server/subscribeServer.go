@@ -38,7 +38,7 @@ var (
 	)
 	endpoint = flag.String(
 		"endpoint",
-		"localhost:12111",
+		"localhost:1994",
 		"Endpoint on which server runs",
 	)
 )
