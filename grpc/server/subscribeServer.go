@@ -7,10 +7,10 @@ import (
 	"log"
 	"net"
 	"os"
-	"os/exec"
 	"sync"
 	"time"
 
+	"github.com/uis-dat320-fall18/Aviato/chzap"
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
 	"google.golang.org/grpc"
@@ -22,6 +22,9 @@ type SubscribeServer struct {
 	logger zlog.ZapLogger
 	lock   sync.Mutex
 }
+
+var conn *net.UDPConn
+var err error
 
 var (
 	help = flag.Bool(
@@ -51,6 +54,45 @@ func parseFlags() {
 	}
 }
 
+func startServer() {
+	log.Println("Starting ZapServer...")
+	// Build UDP address
+	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
+
+	// Create connection
+	conn, err = net.ListenMulticastUDP("udp", nil, addr)
+	if err != nil {
+		fmt.Println("NewUDPServer: Error creating UDP connection")
+	}
+}
+
+func readFromUDP() (string, error) {
+	buf := make([]byte, 256)           // UDP packages usually ~50-70 bytes
+	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
+	str := string(buf[:n])
+	return str, err
+}
+
+// recordAll processes and stores new viewers in Zaplogger
+func (s *SubscribeServer) recordAll() {
+	for {
+		eventStr, err := readFromUDP() // Something wrong with readFromUDP
+
+		if err != nil { // ReadFromUDP error check
+			fmt.Printf("ReadFromUDP: error: %v\n", err)
+		} else {
+			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
+			if err != nil {                              // NewSTBEvent error check
+				fmt.Printf("Error: %v\n", err)
+			} else {
+				if chZap != nil {
+					s.logger.LogZap(*chZap) // Make a copy of pointer value
+				}
+			}
+		}
+	}
+}
+
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()
@@ -68,7 +110,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			top := s.logger
 			fmt.Println("Top: ", top)
 			fmt.Println("top.ChannelViewers(): ", top.ChannelsViewers())
-			stream.Send(&pb.NotificationMessage{Notification: "test"})
+			stream.Send(&pb.NotificationMessage{Notification: top.Channels()[0]})
 		}
 	}
 }
@@ -80,15 +122,9 @@ func main() {
 
 	// TODO: Finish. Remove .Output() ?
 	// Start zapserver and top 10 calculation
-	output, error := exec.Command("go", "run", "-lab a", "go/src/github.com/uis-dat320-fall18/Aviato/zapserver").Output()
-	if error != nil {
-		fmt.Printf("Zapserver started successfully...\n")
-		fmt.Printf("%v", output)
-	} else {
-		fmt.Printf("Error: %v", error)
-	}
-	//error = exec.Command("go", "run", "../client")
+	startServer()
 
+	// Create new server with logger
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
 	pb.RegisterSubscriptionServer(grpcServer, server)
 
