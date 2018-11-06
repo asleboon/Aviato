@@ -80,13 +80,14 @@ func main() {
 
 	// TODO: Finish. Remove .Output() ?
 	// Start zapserver and top 10 calculation
-	error := exec.Command("go", "run", "-lab a", "../../zapserver")
+	output, error := exec.Command("go", "run", "-lab a", "go/src/github.com/uis-dat320-fall18/Aviato/zapserver").Output()
 	if error != nil {
 		fmt.Printf("Zapserver started successfully...\n")
+		fmt.Printf("%v", output)
 	} else {
 		fmt.Printf("Error: %v", error)
 	}
-	error = exec.Command("go", "run", "../client")
+	//error = exec.Command("go", "run", "../client")
 
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
 	pb.RegisterSubscriptionServer(grpcServer, server)
