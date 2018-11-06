@@ -56,12 +56,10 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
 			// TODO: Send top 10 list
 			fmt.Printf("%v\n", in.String()) // Only for debug, remove afterwards
-			top := s.logger.ChannelsViewers()
-			fmt.Println(top)
-
-			for i, c := range top {
-				fmt.Printf("%d. %v", i, c)
-			}
+			top := s.logger
+			fmt.Println("Top: ", top)
+			fmt.Println("top.ChannelViewers(): ", top.ChannelsViewers())
+			stream.Send(&pb.NotificationMessage{Notification: "test"})
 		}
 	}
 }
@@ -84,6 +82,8 @@ func main() {
 	} else {
 		fmt.Printf("Error: %v", error)
 	}
+	error = exec.Command("go", "run", "../client")
+
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
 	pb.RegisterSubscriptionServer(grpcServer, server)
 
