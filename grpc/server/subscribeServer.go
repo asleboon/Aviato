@@ -121,10 +121,22 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			if len(channels) > 10 { // Only want top 10
 				channels = channels[:10]
 			}
+			//msg := make([]string, 0)
+			msg := ""
 			// Create a string slice with top 10 ??
-
+			counter := 1
+			for k, v := range channels {
+				fmt.Printf("%v", k)
+				str := string(counter) + ". "
+				str += v.Channel
+				str += ". Viewers: "
+				str += string(v.Viewers)
+				msg += str + "\n"
+				//msg = append(msg, str)
+				counter++
+			}
 			// Send top 10 to subscriber
-			stream.Send(&pb.NotificationMessage{Notification: "test"})
+			stream.Send(&pb.NotificationMessage{Notification: msg})
 		}
 	}
 }
