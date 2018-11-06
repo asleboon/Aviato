@@ -13,9 +13,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// TODO: Refactor code when everything is working
-// TODO: Implement flags for specifying refreshrate
-
 var (
 	help = flag.Bool(
 		"help",
@@ -40,6 +37,9 @@ func Usage() {
 	flag.PrintDefaults()
 }
 
+func dumpTop10() {	// input stream w/ appropriate input type
+}
+
 func main() {
 	flag.Usage = Usage
 	flag.Parse()
@@ -52,7 +52,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error with creating connection to gRPC server: %v", err)
 	}
-	fmt.Printf("Connection to gRPC server created: %v", conn)
+	fmt.Printf("Connection to gRPC server created\n")
 	defer conn.Close()
 
 	client := pb.NewSubscriptionClient(conn)
@@ -62,19 +62,23 @@ func main() {
 	msg := &pb.SubscribeMessage{RefreshRate: rate}
 	stream.Send(msg)
 
-	for {
-		fmt.Println("Waiting for top 10 from server...\n")
-		top10, err := stream.Recv()
-		// TODO: Notification message handling here!
-		if err == io.EOF {
-			fmt.Printf("End of file received. Client quitting...")
-			return
-		} else if err != nil {
-			fmt.Printf("Error: %v", err)
-			return
+	waitchan := make(chan struct{})	// Wait channel
+	// go dumpTop10(stream)
+	// TODO: Refactor, create named func
+	go func() {
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				fmt.Printf("End of file received. Client quitting...")
+				return
+			} else if err != nil {
+				fmt.Printf("Error: %v", err)
+				return
+			}
+			log.Printf("Top 10")
+			fmt.Printf("%v", in.Top10)
 		}
-		fmt.Printf("%v", top10)
-	}
-	// stream.CloseSend() Unreachable code
-
+	}()
+	stream.CloseSend()	// Need this?
+	<-waitchan
 }

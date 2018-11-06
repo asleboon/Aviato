@@ -122,8 +122,12 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			// Create top 10 string 
 			top10Str := ""
 			for count, v := range channels {
-				top10Str += fmt.Sprintf("%v. %v, # of viewers: %v \n", count, v.Channel, v.Viewers)
+				if count != 0 {
+					top10Str += "\n"
+				}
+				top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Viewers)
 			}
+			top10Str += "\n\n"	// Easy way to create space between top 10 prints 
 			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
 			if err != nil {
 				return err
