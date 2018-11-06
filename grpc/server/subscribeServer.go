@@ -110,7 +110,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			top := s.logger
 			fmt.Println("Top: ", top)
 			fmt.Println("top.ChannelViewers(): ", top.ChannelsViewers())
-			stream.Send(&pb.NotificationMessage{Notification: top.Channels()[0]})
+			stream.Send(&pb.NotificationMessage{Notification: "test"})
 		}
 	}
 }
