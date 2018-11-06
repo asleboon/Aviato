@@ -42,6 +42,15 @@ func Usage() {
 	flag.PrintDefaults()
 }
 
+func parseFlags() {
+	flag.Usage = Usage
+	flag.Parse()
+	if *showHelp {
+		flag.Usage()
+		os.Exit(0)
+	}
+}
+
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()
@@ -65,18 +74,13 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 }
 
 func main() {
-	flag.Usage = Usage
-	flag.Parse()
-	if *help {
-		flag.Usage()
-		return
-	}
+	parseFlags()
 
 	grpcServer := grpc.NewServer()
 
 	// TODO: Finish. Remove .Output() ?
 	// Start zapserver and top 10 calculation
-	error := exec.Command("go", "run", "-lab f", "../../zapserver")
+	error := exec.Command("go", "run", "-lab a", "../../zapserver")
 	if error != nil {
 		fmt.Printf("Zapserver started successfully...\n")
 	} else {
