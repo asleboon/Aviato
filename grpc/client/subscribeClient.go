@@ -24,7 +24,7 @@ var (
 	)
 	endpoint = flag.String(
 		"endpoint",
-		"localhost:1994",
+		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
 		"Endpoint to which client connects",
 	)
 	refreshRate = flag.String(
@@ -53,7 +53,7 @@ func main() {
 		log.Fatalf("Error with creating connection to gRPC server: %v", err)
 	}
 	fmt.Printf("Connection to gRPC server created: %v", conn)
-	defer conn.Close() // Closing connection when the surrounding function return
+	defer conn.Close()
 
 	client := pb.NewSubscriptionClient(conn)
 

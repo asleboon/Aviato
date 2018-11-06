@@ -13,7 +13,8 @@ type Viewers struct {
 	lock  sync.Mutex
 }
 
-// NewViewersZapLogger initializes a new map for storing views per channel. Adheres Zaplogger interface.
+// NewViewersZapLogger initializes a new map for storing views per channel.
+// Adheres Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
 	vs := Viewers{views: make(map[string]int, 0)}
 	return &vs

@@ -17,7 +17,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// TODO: Top 10 calc
 // TODO: Reformat code
 
 // SubscribeServer exported? Or not exported?
@@ -38,8 +37,8 @@ var (
 	)
 	endpoint = flag.String(
 		"endpoint",
-		"localhost:1994",
-		"Endpoint on which server runs",
+		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
+		"Endpoint on which server runs. Preferable",
 	)
 )
 
@@ -100,7 +99,7 @@ func (s *SubscribeServer) recordAll() {
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()
-		if err == io.EOF {
+		if err == io.EOF { // Do we need this?
 			return nil
 		} else if err != nil {
 			return err
@@ -109,11 +108,9 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			// Create a top 10 map
-			channels := s.logger.ChannelsViewers()
-			fmt.Printf("%v", channels) // Only for debug, remove afterwards
+			channels := s.logger.ChannelsViewers() // Top 10 map
 
-			// Sort the channelviews, descending
+			// Sort channels by views, descending
 			sort.Slice(channels, func(i, j int) bool {
 				return channels[i].Viewers > channels[j].Viewers
 			})
@@ -121,22 +118,16 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			if len(channels) > 10 { // Only want top 10
 				channels = channels[:10]
 			}
-			//msg := make([]string, 0)
-			msg := ""
-			// Create a string slice with top 10 ??
-			counter := 1
-			for k, v := range channels {
-				fmt.Printf("%v", k)
-				str := string(counter) + ". "
-				str += v.Channel
-				str += ". Viewers: "
-				str += string(v.Viewers)
-				msg += str + ", "
-				//msg = append(msg, str)
-				counter++
+			
+			// Create top 10 string 
+			top10Str := ""
+			for count, v := range channels {
+				top10Str += fmt.Sprintf("%v. %v, # of viewers: %v \n", count, v.Channel, v.Viewers)
 			}
-			// Send top 10 to subscriber
-			stream.Send(&pb.NotificationMessage{Notification: msg})
+			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
+			if err != nil {
+				return err
+			}
 		}
 	}
 }
@@ -147,7 +138,6 @@ func main() {
 	grpcServer := grpc.NewServer()
 	startServer() // Start zapserver
 
-	// Create new server with viewerslogger
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
 	go server.recordAll() // Record all zaps and store in logger
 
