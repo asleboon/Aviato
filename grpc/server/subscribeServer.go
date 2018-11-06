@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"sort"
 	"sync"
 	"time"
 
@@ -17,7 +18,7 @@ import (
 )
 
 // TODO: Top 10 calc
-// TODO: Format code
+// TODO: Reformat code
 
 // SubscribeServer exported? Or not exported?
 type SubscribeServer struct {
@@ -109,8 +110,18 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
 			// Create a top 10 map
-			viewers := s.logger.ChannelsViewers()
-			fmt.Printf("%v", viewers) // Only for debug, remove afterwards
+			channels := s.logger.ChannelsViewers()
+			fmt.Printf("%v", channels) // Only for debug, remove afterwards
+
+			// Sort the channelviews, descending
+			sort.Slice(channels, func(i, j int) bool {
+				return channels[i].Viewers > channels[j].Viewers
+			})
+
+			if len(channels) > 10 { // Only want top 10
+				channels = channels[:10]
+			}
+			// Create a string slice with top 10 ??
 
 			// Send top 10 to subscriber
 			stream.Send(&pb.NotificationMessage{Notification: "test"})

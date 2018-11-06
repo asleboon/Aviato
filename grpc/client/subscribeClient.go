@@ -75,9 +75,6 @@ func main() {
 		}
 		fmt.Printf("%v", top10)
 	}
-	stream.CloseSend()
-
-	// reader := bufio.NewReader(os.Stdin)               // Why do we need a reader?
-	// fmt.Printf("reader: %q", reader)                  // And why is this needed?
+	// stream.CloseSend() Unreachable code
 
 }
