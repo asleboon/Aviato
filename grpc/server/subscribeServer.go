@@ -45,7 +45,7 @@ func Usage() {
 func parseFlags() {
 	flag.Usage = Usage
 	flag.Parse()
-	if *showHelp {
+	if *help {
 		flag.Usage()
 		os.Exit(0)
 	}
