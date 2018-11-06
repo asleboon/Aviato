@@ -55,7 +55,13 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
 			// TODO: Send top 10 list
-			fmt.Printf(in.String()) // Only for debug, remove afterwards
+			fmt.Printf("%v\n", in.String()) // Only for debug, remove afterwards
+			top := s.logger.ChannelsViewers()
+			fmt.Println(top)
+
+			for i, c := range top {
+				fmt.Printf("%d. %v", i, c)
+			}
 		}
 	}
 }
@@ -72,9 +78,11 @@ func main() {
 
 	// TODO: Finish. Remove .Output() ?
 	// Start zapserver and top 10 calculation
-	output, err := exec.Command("go", "run", "-lab f", "../../zapserver").Output()
-	if err == nil {
-		fmt.Printf("%v", output)
+	error := exec.Command("go", "run", "-lab f", "../../zapserver")
+	if error != nil {
+		fmt.Printf("Zapserver started successfully...\n")
+	} else {
+		fmt.Printf("Error: %v", error)
 	}
 	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
 	pb.RegisterSubscriptionServer(grpcServer, server)
