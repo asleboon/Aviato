@@ -1,24 +1,39 @@
 package zlog
 
 import (
-	"sync"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// Exported or unexported?
-type Viewers struct {
-	views map[string]int // Key: Channelname, value: Viewers
-	lock  sync.Mutex
+// Do we need to implement locks?
+
+// lastZap pointer or not pointer?
+type lastZapChan map[string]*lastZap // Key: IP address, value: channel name and start time
+type lastZap struct {
+	channel string
+	start   time.Time
 }
 
-// NewViewersZapLogger initializes a new map for storing views per channel.
+// Pointer or not pointer?
+type totDurChan map[string]*channelStats // Key: channel name, value: total duration(viewtime) and viewers(current)
+type channelStats struct {
+	duration time.Time
+	viewers  int
+}
+
+type globalStats struct {
+	duration time.Time // Total duration(viewtime)
+	zaps     int       // Total number of zaps
+}
+
+// NewDurationZapLogger duration logger data structure
 // Adheres Zaplogger interface.
-func NewViewersZapLogger() ZapLogger {
-	vs := Viewers{views: make(map[string]int, 0)}
-	return &vs
+func NewDurationZapLogger() ZapLogger {
+	// vs := Viewers{views: make(map[string]int, 0)} REMOVE
+	// return &vs REMOVE
+	return nil
 }
 
 // LogZap updates count for the two channels in the zap
