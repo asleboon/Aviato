@@ -284,7 +284,7 @@ go run *.go -lab c1
 ### Server
 Run from grpc/server folder
 #### Flag
-- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:12111
+- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
 #### Command
 ```
@@ -292,13 +292,13 @@ go run subscribeServer.go [-endpoint {addr}] [-help]
 ```
 #### Example
 ```
-go run subscribeServer.go -endpoint localhost:12111
+go run subscribeServer.go -endpoint localhost:1994
 ```
 
 ### Client
 Run from grpc/client folder
 #### Flag
-- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:12111
+- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
 #### Command
 ```
@@ -306,5 +306,5 @@ go run subscribeClient.go [-endpoint {addr}] [-help]
 ```
 #### Example
 ```
-go run subscribeClient.go -endpoint localhost:12111
+go run subscribeClient.go -endpoint localhost:1994
 ```
