@@ -8,6 +8,9 @@ import (
 )
 
 // Do we need to implement locks?
+// TODO: Discuss data structure
+// TODO: Implement in grpc server:
+// Run duration logger and add extra field in Subscribe msg
 
 // lastZap pointer or not pointer?
 type lastZapChan map[string]*lastZap // Key: IP address, value: channel name and start time
