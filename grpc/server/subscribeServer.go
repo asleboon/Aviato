@@ -8,7 +8,6 @@ import (
 	"net"
 	"os"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
@@ -17,13 +16,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-// TODO: Reformat code
-
-// SubscribeServer exported? Or not exported?
 type SubscribeServer struct {
-	// kvMap map[string]int // store channels and number of viewers?
-	logger zlog.ZapLogger
-	lock   sync.Mutex
+	viewerslogger zlog.ZapLogger
 }
 
 var conn *net.UDPConn
@@ -57,7 +51,9 @@ func parseFlags() {
 	}
 }
 
-func startServer() {
+// TODO: The gRPC server and the zapserver part receiving zap events should be implemented as 
+// separate goroutines, PREFERABLY IN SEPERATE FILES.
+func startZapServer() {
 	log.Println("Starting ZapServer...")
 	// Build UDP address
 	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
@@ -89,7 +85,7 @@ func (s *SubscribeServer) recordAll() {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
-					s.logger.LogZap(*chZap) // Make a copy of pointer value
+					s.viewerslogger.LogZap(*chZap) // Make a copy of pointer value
 				}
 			}
 		}
@@ -108,7 +104,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			channels := s.logger.ChannelsViewers() // Top 10 map
+			channels := s.viewerslogger.ChannelsViewers() // Top 10 map
 
 			// Sort channels by views, descending
 			sort.Slice(channels, func(i, j int) bool {
@@ -128,6 +124,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Viewers)
 			}
 			top10Str += "\n\n"	// Easy way to create space between top 10 prints 
+			
 			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
 			if err != nil {
 				return err
@@ -138,11 +135,10 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 
 func main() {
 	parseFlags()
-
 	grpcServer := grpc.NewServer()
-	startServer() // Start zapserver
+	startZapServer()
 
-	server := &SubscribeServer{logger: zlog.NewViewersZapLogger()}
+	server := &SubscribeServer{viewerslogger: zlog.NewViewersZapLogger()}
 	go server.recordAll() // Record all zaps and store in logger
 
 	pb.RegisterSubscriptionServer(grpcServer, server)

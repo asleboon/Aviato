@@ -37,48 +37,52 @@ func Usage() {
 	flag.PrintDefaults()
 }
 
-func dumpTop10() {	// input stream w/ appropriate input type
-}
-
-func main() {
+func parseFlags() {
 	flag.Usage = Usage
 	flag.Parse()
 	if *help {
 		flag.Usage()
-		return
+		os.Exit(0)
 	}
+}
+
+// dumpTop10 receives stream values and prints
+func dumpTop10(stream pb.Subscription_SubscribeClient) {
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			fmt.Printf("End of file received. Client quitting...")
+			return
+		} else if err != nil {
+			fmt.Printf("Error: %v", err)
+			return
+		}
+		log.Printf("Top 10")
+		fmt.Printf("%v", in.Top10)
+	}
+}
+
+func main() {
+	parseFlags()
+	rate, _ := strconv.ParseUint((*refreshRate), 10, 0) // Parse refreshRate to uint64
 
 	conn, err := grpc.Dial(*endpoint, grpc.WithInsecure()) // WithInsecure: Disable transport security connection
 	if err != nil {
 		log.Fatalf("Error with creating connection to gRPC server: %v", err)
 	}
-	fmt.Printf("Connection to gRPC server created\n")
+	fmt.Printf("\nConnection to gRPC server created\n\n")
 	defer conn.Close()
 
 	client := pb.NewSubscriptionClient(conn)
+	stream, err := client.Subscribe(context.Background()) // context.Background(): Non-nil, empty Context
+	if err != nil {
+		log.Fatalf("Client failed to subscribe: %v", err)
+	}
 
-	stream, err := client.Subscribe(context.Background())
-	rate, _ := strconv.ParseUint((*refreshRate), 10, 0)
-	msg := &pb.SubscribeMessage{RefreshRate: rate}
-	stream.Send(msg)
+	err = stream.Send(&pb.SubscribeMessage{RefreshRate: rate}) // Send subscribe msg to gRPC server
+	stream.CloseSend() // Client will not send more messages on the stream
 
-	waitchan := make(chan struct{})	// Wait channel
-	// go dumpTop10(stream)
-	// TODO: Refactor, create named func
-	go func() {
-		for {
-			in, err := stream.Recv()
-			if err == io.EOF {
-				fmt.Printf("End of file received. Client quitting...")
-				return
-			} else if err != nil {
-				fmt.Printf("Error: %v", err)
-				return
-			}
-			log.Printf("Top 10")
-			fmt.Printf("%v", in.Top10)
-		}
-	}()
-	stream.CloseSend()	// Need this?
+	waitchan := make(chan struct{})	// Wait channel so main does not return
+	go dumpTop10(stream)
 	<-waitchan
 }

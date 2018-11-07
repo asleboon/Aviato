@@ -36,12 +36,7 @@ func runLab() {
 		go recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
-		// Take note of the measurements obtained for the Viewers() function over time.
-		// What does these results show?
-		//   The time used to calculate top increases for every calculation.
-		// What could be the cause of the observed problem?
-		//   Problem is that the zap slice grows quickly. Every top 10 calculation need to run trough
-		// 	 whole zap slice, wich is obviously not ideal and increases calculation time.
+		// See answer in serparate document. 
 	case "e":
 		go recordAll()
 		go top10Viewers()
