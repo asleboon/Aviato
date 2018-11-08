@@ -36,7 +36,7 @@ func runLab() {
 		go recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
-		// See answer in serparate document. 
+		// See answer in serparate document.
 	case "e":
 		go recordAll()
 		go top10Viewers()
@@ -80,13 +80,13 @@ func dumpAll() {
 // recordAll processes and stores new viewers in Zaplogger
 func recordAll() {
 	for {
-		eventStr, err := readFromUDP() // Something wrong with readFromUDP
+		eventStr, err := readFromUDP()
 
-		if err != nil { // ReadFromUDP error check
+		if err != nil {
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
-			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
-			if err != nil {                              // NewSTBEvent error check
+			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange here
+			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {

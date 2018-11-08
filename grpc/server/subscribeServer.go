@@ -75,23 +75,27 @@ func readFromUDP() (string, error) {
 // recordAll processes and stores new viewers in Zaplogger
 func (s *SubscribeServer) recordAll() {
 	for {
-		eventStr, err := readFromUDP() // Something wrong with readFromUDP
+		eventStr, err := readFromUDP()
 
 		if err != nil { // ReadFromUDP error check
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
-			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
-			if err != nil {                              // NewSTBEvent error check
+			chZap, stChange, err := chzap.NewSTBEvent(eventStr)
+			if err != nil {
 				fmt.Printf("Error: %v\n", err)
-			} else {
-				if chZap != nil {
-					s.viewerslogger.LogZap(*chZap) // Make a copy of pointer value
-				}
+			} else if chZap != nil {
+				s.viewerslogger.LogZap(*chZap) // Make a copy of pointer value
+				// TODO: Uncomment when durationlogger is finished
+				// s.durationlogger.LogZap(*stChange)
+			} else if stChange != nil {
+				// TODO: Uncomment when durationlogger is finished
+				// s.durationlogger.LogDuration(*stChange)
 			}
 		}
 	}
 }
 
+// Subscribe handles a client subscription request
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()

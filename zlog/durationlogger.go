@@ -22,7 +22,7 @@ type DurationChan struct {
 
 // prevZap stores previous channel
 type prevZapIP struct {
-	prevZap map[string]zap // Key: IP address, value: channel name and start time
+	prevZap map[string]chzap.ChZap // Key: IP address, value: prev zap
 	lock    sync.Mutex
 }
 
@@ -45,39 +45,30 @@ var prev *prevZapIP
 // DurationChan adheres Zaplogger interface.
 func NewDurationZapLogger() ZapLogger {
 	du := DurationChan{duration: make(map[string]time.Time, 0)}
-	prev = &prevZapIP{prevZap: make(map[string]zap, 0)}
+	prev = &prevZapIP{prevZap: make(map[string]chzap.ChZap, 0)}
 	global = &globalStats{}
 	return &du
 }
 
-// LogZap updates count for the two channels in the zap
+// LogZap updates duration counter
 func (du *DurationChan) LogZap(z chzap.ChZap) {
-	//(*du).lock.Lock()
-	//defer (*vs).lock.Unlock()
+	(*du).lock.Lock()
+	defer (*du).lock.Unlock()
+	// TODO: Implement
+}
 
-	// Log views
-	/*count, exists := (*vs).views[z.ToChan]
-	if exists {
-		(*vs).views[z.ToChan] = count + 1
-	} else {
-		(*vs).views[z.ToChan] = 1
-	}
-
-	count, exists = (*vs).views[z.FromChan]
-	if exists {
-		(*vs).views[z.FromChan] = count - 1
-	} else {
-		(*vs).views[z.FromChan] = -1
-	}
-	*/
+// Log status removes previous zap from IP address if TV is turned off
+func (du *DurationChan) LogStatus(s chzap.StatusChange) {
+	(*du).lock.Lock()
+	defer (*du).lock.Unlock()
+	// TODO: Implement
 }
 
 // Entries returns the length of views map (# of channnels)
 func (du *DurationChan) Entries() int {
-	//(*vs).lock.Lock()
-	//defer (*vs).lock.Unlock()
-	//return len((*vs).views)
-	return 0
+	(*du).lock.Lock()
+	defer (*du).lock.Unlock()
+	return len((*du).duration)
 }
 
 // Viewers return number of viewers for a channel
