@@ -15,6 +15,7 @@ import (
 // We should use pointers if the map is accessed concurrently
 // Don't use it unless it is necessesary.
 // https://bit.ly/2Qyj5Zr
+
 // DurationChan stores total viewtime per channel
 type DurationChan struct {
 	duration map[string]time.Time // Key: channel name, value: total duration(viewtime)
