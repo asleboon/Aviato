@@ -19,7 +19,7 @@ type DurationChan struct {
 }
 
 // prevZap stores previous channel
-type prevZapIP struct {
+type PrevZapIP struct {
 	prevZap map[string]chzap.ChZap // Key: IP address, value: prev zap
 	lock    sync.Mutex
 }
@@ -58,6 +58,19 @@ func (du *DurationChan) LogZap(z chzap.ChZap) {
 	}
 
 	prev.prevZap[z.IP] = z // Update prevZap to include new zap event for IP
+}
+
+func (du *DurationMuted) LogMuted(s chzap.StatusChange) {
+	prev.lock.Lock()
+	defer prev.lock.Unlock()
+	pZap, exists := prev.prevZap[s.IP]
+	if s.Status == "Volume: 0" {
+		// This will not work uless
+		(*du).lock.Lock()
+		defer (*du).lock.Unlock()
+		(*du).duration[pZap.ToChan] += newDur // Add duration for channel
+		delete(prev.prevZap, s.IP)            // Remove prevZap froom this IP
+	}
 }
 
 // LogStatus stores duration and removes previous zap from IP address if TV is turned off

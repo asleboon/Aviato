@@ -139,3 +139,19 @@ func calculateTop10() []*zlog.ChannelViewers {
 
 	return channels
 }
+
+// calculatTop10 computes top 10 views list
+func calculateTop10Muted() []*zlog.ChannelViewers {
+	channels := ztore.ChannelsViewers()
+
+	// Sort the channelviews, descending
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].Viewers > channels[j].Viewers
+	})
+
+	if len(channels) > 10 { // Only want top 10
+		channels = channels[:10]
+	}
+
+	return channels
+}

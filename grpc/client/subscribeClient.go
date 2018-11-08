@@ -32,7 +32,7 @@ var (
 	statisticsType = flag.String(
 		"statisticsType",
 		"viewership",
-		"Statistics type for which this client want to subscribe for. Options: viewership (default) or duration."
+		"Statistics type for which this client want to subscribe for. Options: viewership (default) , muted or duration."
 	)
 )
 
@@ -66,6 +66,21 @@ func dumpTop10(stream pb.Subscription_SubscribeClient) {
 		fmt.Printf("%v", in.Top10)
 	}
 }
+
+// func dumpTop10Muted(stream pb.Subscription_SubscribeClient) {
+// 	for {
+// 		in, err := stream.Recv()
+// 		if err == io.EOF {
+// 			fmt.Printf("End of file received. Client quitting...")
+// 			return
+// 		} else if err != nil {
+// 			fmt.Printf("Error: %v", err)
+// 			return
+// 		}
+// 		log.Printf("Top 10 Muted Channels")
+// 		fmt.Printf("%v", in.Top10)
+// 	}
+// }
 
 func main() {
 	parseFlags()
