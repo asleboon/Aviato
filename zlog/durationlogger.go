@@ -100,29 +100,28 @@ func (du *DurationChan) Viewers(channelName string) int {
 // Channels creates a list of channels in the prevChannels map.
 // Doesn´t really make sense here
 func (du *DurationChan) Channels() []string {
-	/*(*du).lock.Lock()
-	defer (*du).lock.Unlock()
-	defer util.TimeElapsed(time.Now(), "Channels")
+	// (*du).lock.Lock()
+	// defer (*du).lock.Unlock()
+	// defer util.TimeElapsed(time.Now(), "Channels")
 
-	channels := make([]string, 0)
-	for channel := range (*du).duration {
-		channels = append(channels, channel)
-	}
-	return channels*/
-	return nil
+	// channels := make([]string, 0)
+	// for channel := range (*du).duration {
+	// 	channels = append(channels, channel)
+	// }
+	return nil //channels
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (du *DurationChan) ChannelsViewers() []*ChannelViewers {
-	// (*vs).lock.Lock()
-	// defer (*vs).lock.Unlock()
+	// (*du).lock.Lock()
+	// defer (*du).lock.Unlock()
 	// defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	// res := make([]*ChannelViewers, 0)
-	// for channel, viewers := range (*vs).views {
+	// for channel, duration := range (*du).duration {
+
 	// 	channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
 	// 	res = append(res, &channelViewer)
 	// }
-	// return res
-	return nil
+	return nil // return res
 }
