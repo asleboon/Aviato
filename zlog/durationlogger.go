@@ -12,6 +12,9 @@ import (
 // TODO: Implement in grpc server:
 // Run duration logger and add extra field in Subscribe msg
 
+// We should use pointers if the map is accessed concurrently
+// Don't use it unless it is necessesary.
+// https://bit.ly/2Qyj5Zr
 // DurationChan stores total viewtime per channel
 type DurationChan struct {
 	duration map[string]time.Time // Key: channel name, value: total duration(viewtime)
@@ -33,9 +36,9 @@ type globalStats struct {
 // NewDurationZapLogger duration logger data structure
 // Adheres Zaplogger interface.
 func NewDurationZapLogger() ZapLogger {
-	// vs := Viewers{views: make(map[string]int, 0)} REMOVE
-	// return &vs REMOVE
-	return nil
+	du := DurationChan{duration: make(map[string]time.Time, 0)}
+	//prevZap{}
+	return &du
 }
 
 // LogZap updates count for the two channels in the zap
