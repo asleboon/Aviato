@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
-	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
 // TODO: Implement locks
@@ -63,11 +62,21 @@ func (du *DurationChan) LogZap(z chzap.ChZap) {
 }
 
 // LogStatus stores duration and removes previous zap from IP address if TV is turned off
-func (du *DurationChan) LogStatus(s chzap.StatusChange) {
-	(*du).lock.Lock()
-	defer (*du).lock.Unlock()
+func (du *DurationChan) LogStatus(s chzap.StatusChange, z chzap.ChZap) {
+	prev.lock.Lock()
+	defer prev.lock.Unlock()
+	pZap, exists := prev.prevZap[z.IP]
 	if s.Status == "HDMI_Status: 0" {
+		if exists {
+			newDur := z.Duration(pZap.Time)
 
+			(*du).lock.Lock()
+			defer (*du).lock.Unlock()
+			(*du).duration[pZap.ToChan] += newDur
+
+			// remove previous zap
+			prev.prevZap[z.IP] = chzap.ChZap{}
+		}
 	}
 }
 
@@ -94,28 +103,28 @@ func (du *DurationChan) Viewers(channelName string) int {
 // Channels creates a list of channels in the prevChannels map.
 // Doesn´t really make sense here
 func (du *DurationChan) Channels() []string {
-	(*du).lock.Lock()
-	defer (*du).lock.Unlock()
-	defer util.TimeElapsed(time.Now(), "Channels")
+	// (*du).lock.Lock()
+	// defer (*du).lock.Unlock()
+	// defer util.TimeElapsed(time.Now(), "Channels")
 
-	channels := make([]string, 0)
-	for channel := range (*du).duration {
-		channels = append(channels, channel)
-	}
-	return channels
+	// channels := make([]string, 0)
+	// for channel := range (*du).duration {
+	// 	channels = append(channels, channel)
+	// }
+	return nil //channels
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (du *DurationChan) ChannelsViewers() []*ChannelViewers {
-	// (*vs).lock.Lock()
-	// defer (*vs).lock.Unlock()
+	// (*du).lock.Lock()
+	// defer (*du).lock.Unlock()
 	// defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	// res := make([]*ChannelViewers, 0)
-	// for channel, viewers := range (*vs).views {
+	// for channel, duration := range (*du).duration {
+
 	// 	channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
 	// 	res = append(res, &channelViewer)
 	// }
-	// return res
-	return nil
+	return nil // return res
 }
