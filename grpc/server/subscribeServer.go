@@ -51,7 +51,7 @@ func parseFlags() {
 	}
 }
 
-// TODO: The gRPC server and the zapserver part receiving zap events should be implemented as 
+// TODO: The gRPC server and the zapserver part receiving zap events should be implemented as
 // separate goroutines, PREFERABLY IN SEPERATE FILES.
 func startZapServer() {
 	log.Println("Starting ZapServer...")
@@ -114,8 +114,8 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			if len(channels) > 10 { // Only want top 10
 				channels = channels[:10]
 			}
-			
-			// Create top 10 string 
+
+			// Create top 10 string
 			top10Str := ""
 			for count, v := range channels {
 				if count != 0 {
@@ -123,8 +123,8 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				}
 				top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Viewers)
 			}
-			top10Str += "\n\n"	// Easy way to create space between top 10 prints 
-			
+			top10Str += "\n\n" // Easy way to create space between top 10 prints
+
 			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
 			if err != nil {
 				return err

@@ -12,6 +12,9 @@ import (
 // TODO: Implement in grpc server:
 // Run duration logger and add extra field in Subscribe msg
 
+// We should use pointers if the map is accessed concurrently
+// Don't use it unless it is necessesary.
+// https://bit.ly/2Qyj5Zr
 // lastZap pointer or not pointer?
 type lastZapChan map[string]*lastZap // Key: IP address, value: channel name and start time
 type lastZap struct {
