@@ -24,10 +24,15 @@ var (
 		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
 		"Endpoint to which client connects",
 	)
-	refreshRate = flag.String(
+	refreshRate = flag.Uint64(
 		"refreshRate",
 		"1",
-		"Refresh rate at which the client will get a top 10 channel response from the server",
+		"Refresh rate at which the client will get a top 10 channel response from the server. Default: 1 second.",
+	)
+	statisticsType = flag.String(
+		"statisticsType",
+		"viewership",
+		"Statistics type for which this client want to subscribe for. Options: viewership (default) or duration."
 	)
 )
 
@@ -64,7 +69,6 @@ func dumpTop10(stream pb.Subscription_SubscribeClient) {
 
 func main() {
 	parseFlags()
-	rate, _ := strconv.ParseUint((*refreshRate), 10, 0) // Parse refreshRate to uint64
 
 	conn, err := grpc.Dial(*endpoint, grpc.WithInsecure()) // WithInsecure: Disable transport security connection
 	if err != nil {
@@ -79,7 +83,7 @@ func main() {
 		log.Fatalf("Client failed to subscribe: %v", err)
 	}
 
-	err = stream.Send(&pb.SubscribeMessage{RefreshRate: rate}) // Send subscribe msg to gRPC server
+	err = stream.Send(&pb.SubscribeMessage{RefreshRate: *refreshRate, StatisticsType: *statisticsType}) // Send subscribe msg to gRPC server
 	stream.CloseSend() // Client will not send more messages on the stream
 
 	waitchan := make(chan struct{})	// Wait channel so main does not return

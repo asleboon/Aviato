@@ -7,9 +7,7 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 )
 
-// TODO: Implement locks
-// TODO: Implement in grpc server:
-// Run duration logger and add extra field in Subscribe msg
+// TODO: Move durationlogger to viewerslogger and rename to advancedlogger
 
 // Use pointers and locks when data is access concurrently
 // https://bit.ly/2Qyj5Zr
@@ -45,7 +43,7 @@ func NewDurationZapLogger() ZapLogger {
 	return &du
 }
 
-// LogZap updates duration counter
+// LogZap updates duration counter and prevZap based on new zap event
 func (du *DurationChan) LogZap(z chzap.ChZap) {
 	prev.lock.Lock()
 	defer prev.lock.Unlock()
@@ -58,24 +56,23 @@ func (du *DurationChan) LogZap(z chzap.ChZap) {
 		defer (*du).lock.Unlock()
 		(*du).duration[pZap.ToChan] += newDur // Add duration for channel
 	}
-	prev.prevZap[z.IP] = z
+
+	prev.prevZap[z.IP] = z // Update prevZap to include new zap event for IP
 }
 
 // LogStatus stores duration and removes previous zap from IP address if TV is turned off
-func (du *DurationChan) LogStatus(s chzap.StatusChange, z chzap.ChZap) {
-	prev.lock.Lock()
-	defer prev.lock.Unlock()
-	pZap, exists := prev.prevZap[z.IP]
+func (du *DurationChan) LogStatus(s chzap.StatusChange) {
 	if s.Status == "HDMI_Status: 0" {
+		prev.lock.Lock()
+		defer prev.lock.Unlock()
+		pZap, exists := prev.prevZap[s.IP]
 		if exists {
-			newDur := z.Duration(pZap.Time)
+			newDur := pZap.Duration(s.Time)
 
 			(*du).lock.Lock()
 			defer (*du).lock.Unlock()
-			(*du).duration[pZap.ToChan] += newDur
-
-			// remove previous zap
-			prev.prevZap[z.IP] = chzap.ChZap{}
+			(*du).duration[pZap.ToChan] += newDur // Add duration for channel
+			delete(prev.prevZap, s.IP)            // Remove prevZap froom this IP
 		}
 	}
 }
