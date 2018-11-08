@@ -46,6 +46,7 @@ func (vs *Viewers) LogZap(z chzap.ChZap) {
 func (vs *Viewers) Entries() int {
 	(*vs).lock.Lock()
 	defer (*vs).lock.Unlock()
+	defer util.TimeElapsed(time.Now(), "Entries")
 	return len((*vs).views)
 }
 

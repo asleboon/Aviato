@@ -13,6 +13,8 @@ service Subscription {
 // Changed to uint 64 and compiled
 message SubscribeMessage {
 	uint64 refreshRate = 1;
+	string type = 2;
+	uint64 windowLength = 3;
 }
 
 message NotificationMessage {

@@ -60,7 +60,7 @@ func NewSTBEvent(event string) (*ChZap, *StatusChange, error) {
 		staCha := StatusChange{time, ip, status}
 		return nil, &staCha, nil
 	case 3: // Error
-		err := fmt.Errorf("NewSTBEvent: event with too few fields: %s, %s, %s", eventSlice[0], eventSlice[1], eventSlice[2])
+		err := fmt.Errorf("NewSTBEvent: event with too few fields: %s, %s, %s ", eventSlice[0], eventSlice[1], eventSlice[2])
 		return nil, nil, err
 	case 2: // Error
 		err := fmt.Errorf("NewSTBEvent: too short event string: %s, %s", eventSlice[0], eventSlice[1])
@@ -78,8 +78,8 @@ func (schg StatusChange) String() string {
 }
 
 // Duration returns between two zap events: The receiving (this) zap event and the provided event.
-func (zap ChZap) Duration(provided ChZap) time.Duration {
-	return zap.Time.Sub(provided.Time)
+func (zap ChZap) Duration(provided time.Time) time.Duration {
+	return zap.Time.Sub(provided)
 }
 
 // Date returns date of zap event in desired date format

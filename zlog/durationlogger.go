@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
+	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
 // TODO: Implement locks
@@ -16,7 +17,7 @@ import (
 
 // DurationChan stores total viewtime per channel
 type DurationChan struct {
-	duration map[string]time.Time // Key: channel name, value: total duration(viewtime)
+	duration map[string]time.Duration // Key: channel name, value: total duration(viewtime)
 	lock     sync.Mutex
 }
 
@@ -24,11 +25,6 @@ type DurationChan struct {
 type prevZapIP struct {
 	prevZap map[string]chzap.ChZap // Key: IP address, value: prev zap
 	lock    sync.Mutex
-}
-
-type zap struct {
-	channel string
-	start   time.Time
 }
 
 type globalStats struct {
@@ -44,7 +40,7 @@ var prev *prevZapIP
 // NewDurationZapLogger duration logger data structure
 // DurationChan adheres Zaplogger interface.
 func NewDurationZapLogger() ZapLogger {
-	du := DurationChan{duration: make(map[string]time.Time, 0)}
+	du := DurationChan{duration: make(map[string]time.Duration, 0)}
 	prev = &prevZapIP{prevZap: make(map[string]chzap.ChZap, 0)}
 	global = &globalStats{}
 	return &du
@@ -52,19 +48,30 @@ func NewDurationZapLogger() ZapLogger {
 
 // LogZap updates duration counter
 func (du *DurationChan) LogZap(z chzap.ChZap) {
-	(*du).lock.Lock()
-	defer (*du).lock.Unlock()
-	// TODO: Implement
+	prev.lock.Lock()
+	defer prev.lock.Unlock()
+	pZap, exists := prev.prevZap[z.IP]
+
+	if exists {
+		newDur := z.Duration(pZap.Time) // Duration between previous and this zap on IP
+
+		(*du).lock.Lock()
+		defer (*du).lock.Unlock()
+		(*du).duration[pZap.ToChan] += newDur // Add duration for channel
+	}
+	prev.prevZap[z.IP] = z
 }
 
-// Log status removes previous zap from IP address if TV is turned off
+// LogStatus stores duration and removes previous zap from IP address if TV is turned off
 func (du *DurationChan) LogStatus(s chzap.StatusChange) {
 	(*du).lock.Lock()
 	defer (*du).lock.Unlock()
-	// TODO: Implement
+	if s.Status == "HDMI_Status: 0" {
+
+	}
 }
 
-// Entries returns the length of views map (# of channnels)
+// Entries returns the length of views map (# of channels)
 func (du *DurationChan) Entries() int {
 	(*du).lock.Lock()
 	defer (*du).lock.Unlock()
@@ -73,8 +80,8 @@ func (du *DurationChan) Entries() int {
 
 // Viewers return number of viewers for a channel
 func (du *DurationChan) Viewers(channelName string) int {
-	//(*vs).lock.Lock()
-	//defer (*vs).lock.Unlock()
+	//(*du).lock.Lock()
+	//defer (*du).lock.Unlock()
 	/*defer util.TimeElapsed(time.Now(), "Viewers")
 
 	count, exists := (*vs).views[channelName]
@@ -84,18 +91,18 @@ func (du *DurationChan) Viewers(channelName string) int {
 	return 0
 }
 
-// Channels creates a list of channels in the viewers.
+// Channels creates a list of channels in the prevChannels map.
+// Doesn´t really make sense here
 func (du *DurationChan) Channels() []string {
-	//(*vs).lock.Lock()
-	//defer (*vs).lock.Unlock()
-	/*defer util.TimeElapsed(time.Now(), "Channels")
+	(*du).lock.Lock()
+	defer (*du).lock.Unlock()
+	defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
-	for channel := range (*vs).views {
+	for channel := range (*du).duration {
 		channels = append(channels, channel)
 	}
-	return channels*/
-	return nil
+	return channels
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
