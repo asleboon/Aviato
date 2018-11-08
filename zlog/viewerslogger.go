@@ -59,7 +59,7 @@ func (vs *Viewers) Viewers(channelName string) int {
 	if exists {
 		return count
 	}
-	return 0
+	return 0 // Not found in views map = 0 zaps
 }
 
 // Channels creates a list of channels in the viewers.

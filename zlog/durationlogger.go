@@ -1,10 +1,10 @@
 package zlog
 
 import (
+	"sync"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
-	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
 // Do we need to implement locks?
@@ -12,18 +12,17 @@ import (
 // TODO: Implement in grpc server:
 // Run duration logger and add extra field in Subscribe msg
 
-// lastZap pointer or not pointer?
-type lastZapChan map[string]*lastZap // Key: IP address, value: channel name and start time
-type lastZap struct {
-	channel string
-	start   time.Time
+// DurationChan stores total viewtime per channel
+type DurationChan struct {
+	duration map[string]time.Time // Key: channel name, value: total duration(viewtime)
+	lock     sync.Mutex
 }
 
-// Pointer or not pointer?
-type totDurChan map[string]*channelStats // Key: channel name, value: total duration(viewtime) and viewers(current)
-type channelStats struct {
-	duration time.Time
-	viewers  int
+// prevZap stores previous channel
+type prevZapIP map[string]*prevZap // Key: IP address, value: channel name and start time
+type prevZap struct {
+	channel string
+	start   time.Time
 }
 
 type globalStats struct {
@@ -40,12 +39,12 @@ func NewDurationZapLogger() ZapLogger {
 }
 
 // LogZap updates count for the two channels in the zap
-func (vs *Viewers) LogZap(z chzap.ChZap) {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
+func (du *DurationChan) LogZap(z chzap.ChZap) {
+	//(*du).lock.Lock()
+	//defer (*vs).lock.Unlock()
 
 	// Log views
-	count, exists := (*vs).views[z.ToChan]
+	/*count, exists := (*vs).views[z.ToChan]
 	if exists {
 		(*vs).views[z.ToChan] = count + 1
 	} else {
@@ -58,51 +57,55 @@ func (vs *Viewers) LogZap(z chzap.ChZap) {
 	} else {
 		(*vs).views[z.FromChan] = -1
 	}
+	*/
 }
 
 // Entries returns the length of views map (# of channnels)
-func (vs *Viewers) Entries() int {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
-	return len((*vs).views)
+func (du *DurationChan) Entries() int {
+	//(*vs).lock.Lock()
+	//defer (*vs).lock.Unlock()
+	//return len((*vs).views)
+	return 0
 }
 
 // Viewers return number of viewers for a channel
-func (vs *Viewers) Viewers(channelName string) int {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
-	defer util.TimeElapsed(time.Now(), "Viewers")
+func (du *DurationChan) Viewers(channelName string) int {
+	//(*vs).lock.Lock()
+	//defer (*vs).lock.Unlock()
+	/*defer util.TimeElapsed(time.Now(), "Viewers")
 
 	count, exists := (*vs).views[channelName]
 	if exists {
 		return count
-	}
+	}*/
 	return 0
 }
 
 // Channels creates a list of channels in the viewers.
-func (vs *Viewers) Channels() []string {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
-	defer util.TimeElapsed(time.Now(), "Channels")
+func (du *DurationChan) Channels() []string {
+	//(*vs).lock.Lock()
+	//defer (*vs).lock.Unlock()
+	/*defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
 	for channel := range (*vs).views {
 		channels = append(channels, channel)
 	}
-	return channels
+	return channels*/
+	return nil
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
-func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
-	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
+func (du *DurationChan) ChannelsViewers() []*ChannelViewers {
+	// (*vs).lock.Lock()
+	// defer (*vs).lock.Unlock()
+	// defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
-	res := make([]*ChannelViewers, 0)
-	for channel, viewers := range (*vs).views {
-		channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
-		res = append(res, &channelViewer)
-	}
-	return res
+	// res := make([]*ChannelViewers, 0)
+	// for channel, viewers := range (*vs).views {
+	// 	channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
+	// 	res = append(res, &channelViewer)
+	// }
+	// return res
+	return nil
 }
