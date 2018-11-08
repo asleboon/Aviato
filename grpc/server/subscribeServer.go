@@ -109,6 +109,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			return err
 		}
 
+		//if in.statisticsType == "viewership" {
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
@@ -138,6 +139,9 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				return err
 			}
 		}
+		//} else if in.statisticsType == "duration" {
+
+		//}
 	}
 }
 
