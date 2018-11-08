@@ -5,12 +5,9 @@ import (
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
-	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// TODO: Implement locks
-// TODO: Implement in grpc server:
-// Run duration logger and add extra field in Subscribe msg
+// TODO: Move durationlogger to viewerslogger and rename to advancedlogger
 
 // Use pointers and locks when data is access concurrently
 // https://bit.ly/2Qyj5Zr
@@ -46,7 +43,7 @@ func NewDurationZapLogger() ZapLogger {
 	return &du
 }
 
-// LogZap updates duration counter
+// LogZap updates duration counter and prevZap based on new zap event
 func (du *DurationChan) LogZap(z chzap.ChZap) {
 	prev.lock.Lock()
 	defer prev.lock.Unlock()
@@ -59,15 +56,24 @@ func (du *DurationChan) LogZap(z chzap.ChZap) {
 		defer (*du).lock.Unlock()
 		(*du).duration[pZap.ToChan] += newDur // Add duration for channel
 	}
-	prev.prevZap[z.IP] = z
+
+	prev.prevZap[z.IP] = z // Update prevZap to include new zap event for IP
 }
 
 // LogStatus stores duration and removes previous zap from IP address if TV is turned off
 func (du *DurationChan) LogStatus(s chzap.StatusChange) {
-	(*du).lock.Lock()
-	defer (*du).lock.Unlock()
 	if s.Status == "HDMI_Status: 0" {
+		prev.lock.Lock()
+		defer prev.lock.Unlock()
+		pZap, exists := prev.prevZap[s.IP]
+		if exists {
+			newDur := pZap.Duration(s.Time)
 
+			(*du).lock.Lock()
+			defer (*du).lock.Unlock()
+			(*du).duration[pZap.ToChan] += newDur // Add duration for channel
+			delete(prev.prevZap, s.IP)            // Remove prevZap froom this IP
+		}
 	}
 }
 
@@ -94,7 +100,7 @@ func (du *DurationChan) Viewers(channelName string) int {
 // Channels creates a list of channels in the prevChannels map.
 // Doesn´t really make sense here
 func (du *DurationChan) Channels() []string {
-	(*du).lock.Lock()
+	/*(*du).lock.Lock()
 	defer (*du).lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Channels")
 
@@ -102,7 +108,8 @@ func (du *DurationChan) Channels() []string {
 	for channel := range (*du).duration {
 		channels = append(channels, channel)
 	}
-	return channels
+	return channels*/
+	return nil
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)

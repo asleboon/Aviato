@@ -85,9 +85,11 @@ func (s *SubscribeServer) recordAll() {
 				fmt.Printf("Error: %v\n", err)
 			} else if chZap != nil {
 				s.viewerslogger.LogZap(*chZap) // Make a copy of pointer value
+				// s.advancedlogger(*chZap) instead??
 				// TODO: Uncomment when durationlogger is finished
 				// s.durationlogger.LogZap(*stChange)
 			} else if stChange != nil {
+				// s.advancedlogger.LogStatus(*stChange) instead??
 				// TODO: Uncomment when durationlogger is finished
 				// s.durationlogger.LogDuration(*stChange)
 			}
@@ -97,6 +99,8 @@ func (s *SubscribeServer) recordAll() {
 
 // Subscribe handles a client subscription request
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
+	// TODO: Implenent subscribe handling based on what subscribe-event is transferred
+	// TODO: Recompile proto with new fields
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF { // Do we need this?
