@@ -15,7 +15,7 @@ type Viewers struct {
 }
 
 // NewViewersZapLogger initializes a new map for storing views per channel.
-// Adheres Zaplogger interface.
+// Viewers adhere Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
 	vs := Viewers{views: make(map[string]int, 0)}
 	return &vs

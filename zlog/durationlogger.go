@@ -7,13 +7,11 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 )
 
-// Do we need to implement locks?
-// TODO: Discuss data structure
+// TODO: Implement locks
 // TODO: Implement in grpc server:
 // Run duration logger and add extra field in Subscribe msg
 
-// We should use pointers if the map is accessed concurrently
-// Don't use it unless it is necessesary.
+// Use pointers and locks when data is access concurrently
 // https://bit.ly/2Qyj5Zr
 
 // DurationChan stores total viewtime per channel
@@ -23,22 +21,32 @@ type DurationChan struct {
 }
 
 // prevZap stores previous channel
-type prevZapIP map[string]*prevZap // Key: IP address, value: channel name and start time
-type prevZap struct {
+type prevZapIP struct {
+	prevZap map[string]zap // Key: IP address, value: channel name and start time
+	lock    sync.Mutex
+}
+
+type zap struct {
 	channel string
 	start   time.Time
 }
 
 type globalStats struct {
-	duration time.Time // Total duration(viewtime)
-	zaps     int       // Total number of zaps
+	duration time.Duration // Total duration(viewtime)
+	zaps     int           // Total number of zaps
+	lock     sync.Mutex
 }
 
+// Global variables
+var global *globalStats
+var prev *prevZapIP
+
 // NewDurationZapLogger duration logger data structure
-// Adheres Zaplogger interface.
+// DurationChan adheres Zaplogger interface.
 func NewDurationZapLogger() ZapLogger {
 	du := DurationChan{duration: make(map[string]time.Time, 0)}
-	//prevZap{}
+	prev = &prevZapIP{prevZap: make(map[string]zap, 0)}
+	global = &globalStats{}
 	return &du
 }
 
