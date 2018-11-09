@@ -1,6 +1,8 @@
 package zlog
 
 import (
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -25,40 +27,75 @@ type channelMute struct {
 }
 
 type viewerVolume struct {
-	duration map[string]prevVal // Key: IP address
-	lock     sync.Mutex
+	viewer map[string]*val // Key: IP address
+	lock   sync.Mutex
 }
 
-type prevVal struct {
-	volume int // Previous volume value
-	mute   int // Previous mute value
+type val struct {
+	channel string // Previous channel watched
+	volume  int    // Previous volume value
+	mute    int    // Previous mute value
 }
+
+// Global variables
+var prevVol *viewerVolume
 
 // NewViewersZapLogger initializes a new map for storing views per channel.
 // Viewers adhere Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
 	dm := DurationMuted{duration: make(map[string]channelMute, 0)}
+	prevVol = &viewerVolume{viewer: make(map[string]*val, 0)}
 	return &dm
 }
 
 // LogStatus handles a status chnage
 func (dm *DurationMuted) LogStatus(s chzap.StatusChange) {
-	// 1. If statuschange is Mute_Status: 1 and prev volume > 0 --> New muted viewer on channel
-	if s.Status == "Mute_Status: 1" {
-		// count, exists := (*ms).mutes[s.IP]
-
+	prev, exists := prevVol.viewer[s.IP]
+	if exists {
+		prevVolume := prev.volume // Remove?
+		prevMute := prev.mute     // Remove?
 	}
 
-	// 2. If statuschange is Volume = 0 and prev Mute_Status = 0 --> One more muted viewer on channel
+	statusType, statusValue := strings.Split(s.Status, ":")[0], strings.Split(s.Status, ":")[1]
+	statusValue = strings.TrimSpace(statusValue)
+	statusValueInt, err := strconv.Atoi(strings.TrimSpace(statusValue))
 
-	// 3. If statuschange is Mute_Status = 0 and prev volume > 0 --> One less muted viewer on channel
+	switch statusType {
 
-	// 4. If statuschange is HDMI_Status = 0 and (prev volume = 0 or mute_status = 1) --> One less muted viewer on channel
+	case "Mute_Status":
+		// Case 1, s.Status == "Mute_Status: 1"
+		// And not in viewersIP slice --> New muted viewer on channel
+		if statusValueInt == 1 {
+			prevVol.viewer[s.IP].mute = 1
 
-	// 5. If statuschange is HDMI_Status = 1 and (prev volume = 0 or mute_status = 1) --> New muted viewer on channel
+			// Case 2, s.Status == "Mute_Status: 0"
+			// 3. If statuschange is Mute_Status = 0 and prev volume > 0 --> One less muted viewer on channel
+		} else if statusValueInt == 0 {
+			prevVol.viewer[s.IP].mute = 0
+		}
 
-	// 6. If statuschange is Volume > 0 and prev volume = 0 and prev mutestatus = 0 --> One less muted viewer on channel
+	case "HDMI_Status":
+		// Case 3, s.Status == "HDMI_Status: 1"
+		// And (prev volume = 0 or mute_status = 1) --> New muted viewer on channel
+		if statusValueInt == 1 {
 
+			// Case 4, s.Status == "HDMI_Status: 0"
+			// And (prev volume = 0 or mute_status = 1) --> One less muted viewer on channel
+		} else if statusValueInt == 0 {
+
+		}
+
+	case "Volume":
+		// Case 5, s.Status == "Volume: >0"
+		// And prev volume = 0 and prev mutestatus = 0 --> One less muted viewer on channel
+		if statusValueInt > 0 && statusValueInt <= 100 {
+
+			// Case 6, s.Status == "Volume: 0"
+			// And prev Mute_Status = 0 --> One more muted viewer on channel
+		} else if statusValueInt == 0 {
+
+		}
+	}
 }
 
 // LogZap moves current viewer between channels in DurationMuted if muted

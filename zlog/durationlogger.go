@@ -21,7 +21,7 @@ type DurationViewtime struct {
 
 // prevZap stores previous channel
 type prevZapIP struct {
-	prevZap map[string]chzap.ChZap // Key: IP address, value: prev zap
+	prevZap map[string]chzap.ChZap // Key: IP address, value: previous zap
 	lock    sync.Mutex
 }
 
@@ -32,7 +32,7 @@ type globalStats struct {
 }
 
 // Global variables
-var global *globalStats
+var globalDur *globalStats
 var prev *prevZapIP
 
 // NewDurationZapLogger duration logger data structure
@@ -40,7 +40,7 @@ var prev *prevZapIP
 func NewDurationZapLogger() ZapLogger {
 	du := DurationViewtime{duration: make(map[string]time.Duration, 0)}
 	prev = &prevZapIP{prevZap: make(map[string]chzap.ChZap, 0)}
-	global = &globalStats{}
+	globalDur = &globalStats{}
 	return &du
 }
 
