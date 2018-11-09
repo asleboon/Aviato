@@ -12,6 +12,7 @@ import (
 
 // TODO: Move mutelogger to viewerslogger and rename to advancedlogger??
 // TODO: Implement handling in gRPC server and client
+// TODO: Save HDMI-status? Don't think it is needed
 
 type DurationMuted struct {
 	duration map[string]channelMute // Key: channel name
@@ -61,7 +62,6 @@ func (dm *DurationMuted) LogStatus(s chzap.StatusChange) {
 	statusValueInt, err := strconv.Atoi(strings.TrimSpace(statusValue))
 
 	switch statusType {
-
 	case "Mute_Status":
 		// Case 1, s.Status == "Mute_Status: 1"
 		// And not in viewersIP slice --> New muted viewer on channel
@@ -89,10 +89,12 @@ func (dm *DurationMuted) LogStatus(s chzap.StatusChange) {
 		// Case 5, s.Status == "Volume: >0"
 		// And prev volume = 0 and prev mutestatus = 0 --> One less muted viewer on channel
 		if statusValueInt > 0 && statusValueInt <= 100 {
+			prevVol.viewer[s.IP].volume = statusValueInt
 
 			// Case 6, s.Status == "Volume: 0"
 			// And prev Mute_Status = 0 --> One more muted viewer on channel
 		} else if statusValueInt == 0 {
+			prevVol.viewer[s.IP].volume = 0
 
 		}
 	}
