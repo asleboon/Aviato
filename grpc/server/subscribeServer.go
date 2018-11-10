@@ -17,7 +17,7 @@ import (
 )
 
 type SubscribeServer struct {
-	advanced zlog.ZapLogger
+	logger zlog.ZapLogger
 }
 
 var conn *net.UDPConn
@@ -84,14 +84,9 @@ func (s *SubscribeServer) recordAll() {
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			} else if chZap != nil {
-				s.viewerslogger.LogZap(*chZap) // Make a copy of pointer value
-				// s.advancedlogger(*chZap) instead??
-				// TODO: Uncomment when durationlogger is finished
-				// s.durationlogger.LogZap(*stChange)
+				s.logger.LogZap(*chZap) // Pass a copy of pointer value
 			} else if stChange != nil {
-				// s.advancedlogger.LogStatus(*stChange) instead??
-				// TODO: Uncomment when durationlogger is finished
-				// s.durationlogger.LogDuration(*stChange)
+				s.logger.LogStatus(*stChange)
 			}
 		}
 	}
@@ -150,7 +145,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	startZapServer()
 
-	server := &SubscribeServer{viewerslogger: zlog.NewAdvancedZaplogger()}
+	server := &SubscribeServer{logger: zlog.NewAdvancedZapLogger()}
 	go server.recordAll() // Record all zaps and store in logger
 
 	pb.RegisterSubscriptionServer(grpcServer, server)
