@@ -2,18 +2,15 @@ package zlog
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
-	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
 // TODO: Move mutelogger to viewerslogger and rename to advancedlogger??
 // TODO: Implement handling in gRPC server and client
-// TODO: Save HDMI-status? Don't think it is needed
 
 type DurationMuted struct {
 	duration map[string]*channelMute // Key: channel name
@@ -21,7 +18,6 @@ type DurationMuted struct {
 }
 
 type channelMute struct {
-	// viewersIP  []string   	// Slice of muted IP address watching the channel. Don't think this is needed
 	duration      time.Duration // Total mute duration
 	viewers       int           // Current number of viewers
 	maxMutedTime  time.Time     // Date and time with highest number of muted views
@@ -29,131 +25,150 @@ type channelMute struct {
 	numberOfMuted int           // Current number of muted viewers
 }
 
-type viewerVolume struct {
+type viewerStats struct {
 	viewer map[string]*val // Key: IP address
 	lock   sync.Mutex
 }
 
 type val struct {
 	channel   string    // Previous channel watched
-	volume    int       // Previous volume value
-	mute      int       // Previous mute value
+	volume    string    // Previous volume value
+	mute      string    // Previous mute value
 	muteStart time.Time // Time when mute was started
 }
 
 // Global variables
-var prevVol *viewerVolume
+var prevVol *viewerStats
 
 // NewViewersZapLogger initializes a new map for storing views per channel.
 // Viewers adhere Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
 	dm := DurationMuted{duration: make(map[string]*channelMute, 0)}
-	prevVol = &viewerVolume{viewer: make(map[string]*val, 0)}
+	prevVol = &viewerStats{viewer: make(map[string]*val, 0)}
 	return &dm
 }
 
 // LogStatus handles a status chnage
 func (dm *DurationMuted) LogStatus(s chzap.StatusChange) {
-	//
+	prevVol.lock.Lock()
+	defer prevVol.lock.Unlock()
 	prev, ipExists := prevVol.viewer[s.IP]
+	if !ipExists { // Create new entry if IP never been logged before
+		prevVol.viewer[s.IP] = &val{}
+		prev = prevVol.viewer[s.IP]
+	}
+
+	dm.lock.Lock()
+	defer dm.lock.Unlock()
 	channelStats, channelExists := dm.duration[prev.channel]
 
 	statusType, statusValue := strings.Split(s.Status, ":")[0], strings.Split(s.Status, ":")[1]
 	statusValue = strings.TrimSpace(statusValue)
-	statusValueInt, err := strconv.Atoi(strings.TrimSpace(statusValue))
 
 	switch statusType {
 	case "Mute_Status":
-		if statusValueInt == 1 { // s.Status == "Mute_Status: 1"
-			if ipExists {
-				prev.mute = 1
-				// If previous channel is known - Update channel stats
-				if prev.channel != "" {
-					// Set mute start time of not already set on this channel
-					if prev.muteStart.IsZero() {
-						prev.muteStart = s.Time
-					}
-					if channelExists {
-						channelStats.numberOfMuted++
-						if channelStats.numberOfMuted > channelStats.maxMutedNum {
-							channelStats.maxMutedTime = s.Time
-							channelStats.maxMutedNum = channelStats.numberOfMuted
-						}
-					} else { // Should never happen
-						fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
-					}
+		if statusValue == "1" { // TV muted
+			prev.mute = "1"
+			// If previous channel is known - Update channel stats
+			if prev.channel != "" {
+				// Set mute start time of not already set on this channel
+				if prev.muteStart.IsZero() {
+					prev.muteStart = s.Time
 				}
-			} else { // IP address not previously encountered
-				prevVol.viewer[s.IP] = &val{mute: 1}
+				if channelExists {
+					channelStats.numberOfMuted++
+					if channelStats.numberOfMuted > channelStats.maxMutedNum {
+						channelStats.maxMutedTime = s.Time
+						channelStats.maxMutedNum = channelStats.numberOfMuted
+					}
+				} else { // Should never happen
+					fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
+				}
 			}
-		} else if statusValueInt == 0 { // s.Status == "Mute_Status: 0"
-			if ipExists {
-				prev.mute = 0
-				// If previous channel is known - Update channel stats
-				if prev.channel != "" {
-					if channelExists {
-						if prev.volume > 0 { // Is this check needed?
-							channelStats.numberOfMuted--
+		} else if statusValue == "0" { // TV unmuted
+			prev.mute = "0"
+			// If previous channel is known - Update channel stats
+			if prev.channel != "" {
+				if channelExists {
+					if prev.volume != "0" || prev.volume != "" { // Is this check needed?
+						channelStats.numberOfMuted--
+						if !prev.muteStart.IsZero() { // If this is not true, muteStart never set
 							channelStats.duration += prev.muteStart.Sub(s.Time)
 						}
-					} else { // Should never happen
-						fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
 					}
-					prev.muteStart = time.Time{} // Reset mute start time
+				} else { // Should never happen
+					fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
 				}
-			} else { // IP address not previously encountered
-				prevVol.viewer[s.IP] = &val{mute: 0}
+				prev.muteStart = time.Time{} // Reset mute start time
 			}
 		}
 	case "HDMI_Status":
-		if statusValueInt == 1 { // s.Status == "HDMI_Status: 1"
+		if statusValue == "1" { // TV connected
 			// If channel exists and (prev.volume == 0 || prev.mute == 1)
 			// --> New muted viewer on channel
-		} else if statusValueInt == 0 { // s.Status == "HDMI_Status: 0"
+		} else if statusValue == "0" { // TV disconnected
 			// If channel exists and (prev.volume == 0 || prev.mute == 1)
 			// --> One less muted viewer on channel
 		}
 
 	case "Volume":
-		if statusValueInt > 0 && statusValueInt <= 100 { // s.Status == "Volume: >0"
-			// If channel exists and (prev.volume == 0 || prev.mute == 0)
-			// --> One less muted viewer on channel
-		} else if statusValueInt == 0 { // s.Status == "Volume: 0"
+		if statusValue == "0" { // Volume adjusted to 0
 			// If channel exists and (prev.mute == 0)
 			// --> New muted viewer on channel
+		} else { // Volume adjusted to 1-100
+			// If channel exists and (prev.volume == 0 || prev.mute == 0)
+			// --> One less muted viewer on channel
 		}
 	}
 }
 
-// LogZap moves current viewer between channels in DurationMuted if muted
+// LogZap updates muted statistics if TV is muted
 func (dm *DurationMuted) LogZap(z chzap.ChZap) {
-	// TODO: Implement
-	// If IP in muted list for fromChan, move mute to toChan
-	// (*vs).lock.Lock()
-	// defer (*vs).lock.Unlock()
-}
+	prevVol.lock.Lock()
+	defer prevVol.lock.Unlock()
+	prev, ipExists := prevVol.viewer[z.IP]
+	if !ipExists {
+		prevVol.viewer[z.IP] = &val{}
+		prev = prevVol.viewer[z.IP]
+	}
 
-// func (du *DurationMuted) LogMuted(s chzap.StatusChange) {
-// 	prev.lock.Lock()
-// 	defer prev.lock.Unlock()
-// 	pZap, exists := prev.prevZap[s.IP]
-// 	if s.Status == "Volume: 0" {
-// 		// This will not work uless
-// 		(*du).lock.Lock()
-// 		defer (*du).lock.Unlock()
-// 		(*du).duration[pZap.ToChan] += newDur // Add duration for channel
-// 		delete(prev.prevZap, s.IP)            // Remove prevZap froom this IP
-// 	}
-// }
+	dm.lock.Lock()
+	defer dm.lock.Unlock()
+	fromChannelStats, channelExists := dm.duration[z.FromChan]
+	if channelExists {
+		fromChannelStats.viewers--
+		if prev.mute == "1" || prev.volume == "0" {
+			fromChannelStats.numberOfMuted--
+			fromChannelStats.duration += z.Duration(prev.muteStart)
+		}
+	} else {
+		dm.duration[z.ToChan] = &channelMute{viewers: -1}
+	}
+
+	toChannelStats, channelExists := dm.duration[z.ToChan]
+	if channelExists {
+		toChannelStats.viewers++
+		prev.channel = z.ToChan
+		if prev.mute == "1" || prev.volume == "0" {
+			fromChannelStats.numberOfMuted++
+			if prev.muteStart.IsZero() {
+				prev.muteStart = z.Time
+			}
+		}
+	} else {
+		dm.duration[z.ToChan] = &channelMute{viewers: 1}
+	}
+}
 
 // --------------------------------------------------------------------
 
 // Entries returns the length of views map (# of channnels)
 func (dm *DurationMuted) Entries() int {
-	(*dm).lock.Lock()
-	defer (*dm).lock.Unlock()
-	defer util.TimeElapsed(time.Now(), "Entries")
-	return len((*vs).views)
+	//(*dm).lock.Lock()
+	//defer (*dm).lock.Unlock()
+	//defer util.TimeElapsed(time.Now(), "Entries")
+	//return len((*vs).views)
+	return 0
 }
 
 // Viewers return number of viewers for a channel
