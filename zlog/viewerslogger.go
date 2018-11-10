@@ -41,6 +41,9 @@ func (vs *Viewers) LogZap(z chzap.ChZap) {
 		(*vs).views[z.FromChan] = -1
 	}
 }
+func (vs *Viewers) LogStatus(z chzap.StatusChange) {
+
+}
 
 // Entries returns the length of views map (# of channnels)
 func (vs *Viewers) Entries() int {
