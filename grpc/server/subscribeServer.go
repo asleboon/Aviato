@@ -86,16 +86,42 @@ func (s *SubscribeServer) recordAll() {
 			} else if chZap != nil {
 				s.logger.LogZap(*chZap) // Pass a copy of pointer value
 			} else if stChange != nil {
-				s.logger.LogStatus(*stChange)
+				s.logger.LogStatus(*stChange) // Pass a copy of pointer value
 			}
 		}
 	}
 }
 
+func (s *SubscribeServer) top10Viewers(stream *grpc.ServerStream) string {
+	channels := s.logger.ChannelsViewers() // Map of all channels with number of viewers
+
+	// Sort channels by views, descending
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].Viewers > channels[j].Viewers
+	})
+
+	if len(channels) > 10 { // Only want top 10 channels
+		channels = channels[:10]
+	}
+
+	// Create top 10 string
+	top10Str := ""
+	for count, v := range channels {
+		if count != 0 {
+			top10Str += "\n"
+		}
+		top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Viewers)
+	}
+	top10Str += "\n\n" // Easy way to create space between top 10 prints
+	return top10Str
+}
+
+func (s *SubscribeServer) top10Muted(stream *grpc.ServerStream) string {
+
+}
+
 // Subscribe handles a client subscription request
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
-	// TODO: Implenent subscribe handling based on what subscribe-event is transferred
-	// TODO: Recompile proto with new fields
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF { // Do we need this?
@@ -104,39 +130,22 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			return err
 		}
 
-		//if in.statisticsType == "viewership" {
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			channels := s.viewerslogger.ChannelsViewers() // Top 10 map
-
-			// Sort channels by views, descending
-			sort.Slice(channels, func(i, j int) bool {
-				return channels[i].Viewers > channels[j].Viewers
-			})
-
-			if len(channels) > 10 { // Only want top 10
-				channels = channels[:10]
+			if in.StatisticsType == "viewership" {
+				top10Str = top10Viewers(stream)
+			} else if in.StatisticsType == "duration" {
+				// TODO: Choose statistics, create method and send to client
+			} else if in.StatisticsType == "mute" {
+				top10Str = top10Muted(stream)
 			}
-
-			// Create top 10 string
-			top10Str := ""
-			for count, v := range channels {
-				if count != 0 {
-					top10Str += "\n"
-				}
-				top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Viewers)
-			}
-			top10Str += "\n\n" // Easy way to create space between top 10 prints
 
 			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
 			if err != nil {
 				return err
 			}
 		}
-		//} else if in.statisticsType == "duration" {
-
-		//}
 	}
 }
 

@@ -52,7 +52,7 @@ func parseFlags() {
 }
 
 // dumpTop10 receives stream values and prints
-func dumpTop10(stream pb.Subscription_SubscribeClient) {
+func dumpTop10(stream pb.Subscription_SubscribeClient, sType string) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -62,25 +62,10 @@ func dumpTop10(stream pb.Subscription_SubscribeClient) {
 			fmt.Printf("Error: %v", err)
 			return
 		}
-		log.Printf("Top 10")
+		log.Printf("Top 10: " + sType)
 		fmt.Printf("%v", in.Top10)
 	}
 }
-
-// func dumpTop10Muted(stream pb.Subscription_SubscribeClient) {
-// 	for {
-// 		in, err := stream.Recv()
-// 		if err == io.EOF {
-// 			fmt.Printf("End of file received. Client quitting...")
-// 			return
-// 		} else if err != nil {
-// 			fmt.Printf("Error: %v", err)
-// 			return
-// 		}
-// 		log.Printf("Top 10 Muted Channels")
-// 		fmt.Printf("%v", in.Top10)
-// 	}
-// }
 
 func main() {
 	parseFlags()
@@ -102,6 +87,6 @@ func main() {
 	stream.CloseSend() // Client will not send more messages on the stream
 
 	waitchan := make(chan struct{})	// Wait channel so main does not return
-	go dumpTop10(stream)
+	go dumpTop10(stream, *statisticsType)
 	<-waitchan
 }

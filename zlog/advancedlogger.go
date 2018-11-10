@@ -57,16 +57,16 @@ func (lg *Logger) LogZap(z chzap.ChZap) {
 func logZapViewers(z chzap.ChZap, lg *Logger) {
 	count, exists := (*lg).viewers[z.ToChan]
 	if exists {
-		(*lg).viewers[z.ToChan] = count + 1
+		lg.viewers[z.ToChan] = count + 1
 	} else {
-		(*lg).viewers[z.ToChan] = 1
+		lg.viewers[z.ToChan] = 1
 	}
 
-	count, exists = (*lg).viewers[z.FromChan]
+	count, exists = lg.viewers[z.FromChan]
 	if exists {
-		(*lg).viewers[z.FromChan] = count - 1
+		lg.viewers[z.FromChan] = count - 1
 	} else {
-		(*lg).viewers[z.FromChan] = -1
+		lg.viewers[z.FromChan] = -1
 	}
 }
 
@@ -132,19 +132,19 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 
 // Entries returns the length of the views map (# of channels)
 func (lg *Logger) Entries() int {
-	(*lg).lock.Lock()
-	defer (*lg).lock.Unlock()
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Entries")
-	return len((*lg).viewers)
+	return len(lg.viewers)
 }
 
 // Viewers return number of viewers for a channel
 func (lg *Logger) Viewers(channelName string) int {
-	(*lg).lock.Lock()
-	defer (*lg).lock.Unlock()
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Viewers")
 
-	count, exists := (*lg).viewers[channelName]
+	count, exists := lg.viewers[channelName]
 	if exists {
 		return count
 	}
@@ -153,12 +153,12 @@ func (lg *Logger) Viewers(channelName string) int {
 
 // Channels creates a list of channels in the viewers.
 func (lg *Logger) Channels() []string {
-	(*lg).lock.Lock()
-	defer (*lg).lock.Unlock()
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
-	for channel := range (*lg).viewers {
+	for channel := range lg.viewers {
 		channels = append(channels, channel)
 	}
 	return channels
@@ -166,8 +166,8 @@ func (lg *Logger) Channels() []string {
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (lg *Logger) ChannelsViewers() []*ChannelViewers {
-	(*lg).lock.Lock()
-	defer (*lg).lock.Unlock()
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	res := make([]*ChannelViewers, 0)
