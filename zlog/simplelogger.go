@@ -21,6 +21,9 @@ func NewSimpleZapLogger() ZapLogger {
 func (zs *Zaps) LogZap(z chzap.ChZap) {
 	*zs = append(*zs, z)
 }
+func (zs *Zaps) LogStatus(z chzap.StatusChange) {
+
+}
 
 func (zs *Zaps) Entries() int {
 	return len(*zs)
