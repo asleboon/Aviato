@@ -1,6 +1,7 @@
 package zlog
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -15,15 +16,16 @@ import (
 // TODO: Save HDMI-status? Don't think it is needed
 
 type DurationMuted struct {
-	duration map[string]channelMute // Key: channel name
+	duration map[string]*channelMute // Key: channel name
 	lock     sync.Mutex
 }
 
 type channelMute struct {
-	viewersIP     []string      // Slice of muted IP address watching the channel
+	// viewersIP  []string   	// Slice of muted IP address watching the channel. Don't think this is needed
 	duration      time.Duration // Total mute duration
 	viewers       int           // Current number of viewers
-	maxMuted      time.Time     // Time with highest number of muted views
+	maxMutedTime  time.Time     // Date and time with highest number of muted views
+	maxMutedNum   int           // Time with highest number of muted views
 	numberOfMuted int           // Current number of muted viewers
 }
 
@@ -33,9 +35,10 @@ type viewerVolume struct {
 }
 
 type val struct {
-	channel string // Previous channel watched
-	volume  int    // Previous volume value
-	mute    int    // Previous mute value
+	channel   string    // Previous channel watched
+	volume    int       // Previous volume value
+	mute      int       // Previous mute value
+	muteStart time.Time // Time when mute was started
 }
 
 // Global variables
@@ -44,18 +47,16 @@ var prevVol *viewerVolume
 // NewViewersZapLogger initializes a new map for storing views per channel.
 // Viewers adhere Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
-	dm := DurationMuted{duration: make(map[string]channelMute, 0)}
+	dm := DurationMuted{duration: make(map[string]*channelMute, 0)}
 	prevVol = &viewerVolume{viewer: make(map[string]*val, 0)}
 	return &dm
 }
 
 // LogStatus handles a status chnage
 func (dm *DurationMuted) LogStatus(s chzap.StatusChange) {
-	prev, exists := prevVol.viewer[s.IP]
-	if exists {
-		prevVolume := prev.volume // Remove?
-		prevMute := prev.mute     // Remove?
-	}
+	//
+	prev, ipExists := prevVol.viewer[s.IP]
+	channelStats, channelExists := dm.duration[prev.channel]
 
 	statusType, statusValue := strings.Split(s.Status, ":")[0], strings.Split(s.Status, ":")[1]
 	statusValue = strings.TrimSpace(statusValue)
@@ -63,39 +64,63 @@ func (dm *DurationMuted) LogStatus(s chzap.StatusChange) {
 
 	switch statusType {
 	case "Mute_Status":
-		// Case 1, s.Status == "Mute_Status: 1"
-		// And not in viewersIP slice --> New muted viewer on channel
-		if statusValueInt == 1 {
-			prevVol.viewer[s.IP].mute = 1
-
-			// Case 2, s.Status == "Mute_Status: 0"
-			// 3. If statuschange is Mute_Status = 0 and prev volume > 0 --> One less muted viewer on channel
-		} else if statusValueInt == 0 {
-			prevVol.viewer[s.IP].mute = 0
+		if statusValueInt == 1 { // s.Status == "Mute_Status: 1"
+			if ipExists {
+				prev.mute = 1
+				// If previous channel is known - Update channel stats
+				if prev.channel != "" {
+					// Set mute start time of not already set on this channel
+					if prev.muteStart.IsZero() {
+						prev.muteStart = s.Time
+					}
+					if channelExists {
+						channelStats.numberOfMuted++
+						if channelStats.numberOfMuted > channelStats.maxMutedNum {
+							channelStats.maxMutedTime = s.Time
+							channelStats.maxMutedNum = channelStats.numberOfMuted
+						}
+					} else { // Should never happen
+						fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
+					}
+				}
+			} else { // IP address not previously encountered
+				prevVol.viewer[s.IP] = &val{mute: 1}
+			}
+		} else if statusValueInt == 0 { // s.Status == "Mute_Status: 0"
+			if ipExists {
+				prev.mute = 0
+				// If previous channel is known - Update channel stats
+				if prev.channel != "" {
+					if channelExists {
+						if prev.volume > 0 { // Is this check needed?
+							channelStats.numberOfMuted--
+							channelStats.duration += prev.muteStart.Sub(s.Time)
+						}
+					} else { // Should never happen
+						fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
+					}
+					prev.muteStart = time.Time{} // Reset mute start time
+				}
+			} else { // IP address not previously encountered
+				prevVol.viewer[s.IP] = &val{mute: 0}
+			}
 		}
-
 	case "HDMI_Status":
-		// Case 3, s.Status == "HDMI_Status: 1"
-		// And (prev volume = 0 or mute_status = 1) --> New muted viewer on channel
-		if statusValueInt == 1 {
-
-			// Case 4, s.Status == "HDMI_Status: 0"
-			// And (prev volume = 0 or mute_status = 1) --> One less muted viewer on channel
-		} else if statusValueInt == 0 {
-
+		if statusValueInt == 1 { // s.Status == "HDMI_Status: 1"
+			// If channel exists and (prev.volume == 0 || prev.mute == 1)
+			// --> New muted viewer on channel
+		} else if statusValueInt == 0 { // s.Status == "HDMI_Status: 0"
+			// If channel exists and (prev.volume == 0 || prev.mute == 1)
+			// --> One less muted viewer on channel
 		}
 
 	case "Volume":
-		// Case 5, s.Status == "Volume: >0"
-		// And prev volume = 0 and prev mutestatus = 0 --> One less muted viewer on channel
-		if statusValueInt > 0 && statusValueInt <= 100 {
-			prevVol.viewer[s.IP].volume = statusValueInt
-
-			// Case 6, s.Status == "Volume: 0"
-			// And prev Mute_Status = 0 --> One more muted viewer on channel
-		} else if statusValueInt == 0 {
-			prevVol.viewer[s.IP].volume = 0
-
+		if statusValueInt > 0 && statusValueInt <= 100 { // s.Status == "Volume: >0"
+			// If channel exists and (prev.volume == 0 || prev.mute == 0)
+			// --> One less muted viewer on channel
+		} else if statusValueInt == 0 { // s.Status == "Volume: 0"
+			// If channel exists and (prev.mute == 0)
+			// --> New muted viewer on channel
 		}
 	}
 }

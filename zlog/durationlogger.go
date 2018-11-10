@@ -9,6 +9,7 @@ import (
 
 // TODO: Move durationlogger to viewerslogger and rename to advancedlogger??
 // TODO: Implement or remove global stats
+// TODO: More clever naming in prevZapIP struxt
 
 // Use pointers and locks when data is access concurrently
 // https://bit.ly/2Qyj5Zr
@@ -53,9 +54,9 @@ func (dw *DurationViewtime) LogZap(z chzap.ChZap) {
 	if exists {
 		newDur := z.Duration(pZap.Time) // Duration between previous and this zap on IP
 
-		(*dw).lock.Lock()
-		defer (*dw).lock.Unlock()
-		(*dw).duration[pZap.ToChan] += newDur // Add duration for channel
+		dw.lock.Lock()
+		defer dw.lock.Unlock()
+		dw.duration[pZap.ToChan] += newDur // Add duration for channel
 	}
 
 	prev.prevZap[z.IP] = z // Update prevZap to include new zap event for IP
@@ -70,10 +71,10 @@ func (dw *DurationViewtime) LogStatus(s chzap.StatusChange) {
 		if exists {
 			newDur := pZap.Duration(s.Time)
 
-			(*dw).lock.Lock()
-			defer (*dw).lock.Unlock()
-			(*dw).duration[pZap.ToChan] += newDur // Add duration for channel
-			delete(prev.prevZap, s.IP)            // Remove prevZap froom this IP
+			dw.lock.Lock()
+			defer dw.lock.Unlock()
+			dw.duration[pZap.ToChan] += newDur // Add duration for channel
+			delete(prev.prevZap, s.IP)         // Remove prevZap froom this IP
 		}
 	}
 	if s.Status == "HDMI_Status: 1" {
@@ -86,9 +87,9 @@ func (dw *DurationViewtime) LogStatus(s chzap.StatusChange) {
 
 // Entries returns the length of views map (# of channels)
 func (dw *DurationViewtime) Entries() int {
-	(*dw).lock.Lock()
-	defer (*dw).lock.Unlock()
-	return len((*dw).duration)
+	dw.lock.Lock()
+	defer dw.lock.Unlock()
+	return len(dw.duration)
 }
 
 // Viewers return number of viewers for a channel
