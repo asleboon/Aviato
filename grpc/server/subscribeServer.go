@@ -17,7 +17,7 @@ import (
 )
 
 type SubscribeServer struct {
-	viewerslogger zlog.ZapLogger
+	advanced zlog.ZapLogger
 }
 
 var conn *net.UDPConn
@@ -150,7 +150,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	startZapServer()
 
-	server := &SubscribeServer{viewerslogger: zlog.NewViewersZapLogger()}
+	server := &SubscribeServer{viewerslogger: zlog.NewAdvancedZaplogger()}
 	go server.recordAll() // Record all zaps and store in logger
 
 	pb.RegisterSubscriptionServer(grpcServer, server)

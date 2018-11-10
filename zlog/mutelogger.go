@@ -148,7 +148,7 @@ func (dm *DurationMuted) LogZap(z chzap.ChZap) {
 		toChannelStats.viewers++
 		prev.channel = z.ToChan
 		if prev.mute == "1" || prev.volume == "0" {
-			fromChannelStats.numberOfMuted++
+			toChannelStats.numberOfMuted++
 			if prev.muteStart.IsZero() {
 				prev.muteStart = z.Time
 			}
