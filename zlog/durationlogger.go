@@ -9,7 +9,7 @@ import (
 
 // TODO: Move durationlogger to viewerslogger and rename to advancedlogger??
 // TODO: Implement or remove global stats
-// TODO: More clever naming in prevZapIP struxt
+// TODO: More clever naming in prevZapIP struct
 
 // Use pointers and locks when data is access concurrently
 // https://bit.ly/2Qyj5Zr

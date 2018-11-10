@@ -40,9 +40,7 @@ type val struct {
 // Global variables
 var prevVol *viewerStats
 
-// NewViewersZapLogger initializes a new map for storing views per channel.
-// Viewers adhere Zaplogger interface.
-func NewViewersZapLogger() ZapLogger {
+func NewMuteZapLogger() ZapLogger {
 	dm := DurationMuted{duration: make(map[string]*channelMute, 0)}
 	prevVol = &viewerStats{viewer: make(map[string]*val, 0)}
 	return &dm
