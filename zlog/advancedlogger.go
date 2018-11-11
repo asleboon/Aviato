@@ -1,7 +1,6 @@
 package zlog
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -200,18 +199,12 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "ChannelsMute")
 
-	res := make([]*AdvChannelMute, 0)
-
 	// Create slice with avg. mute duration per viewer and time of the day with highest number of muted viewers
+	res := make([]*AdvChannelMute, 0)
 	for channel, mute := range (*lg).mute {
-		fmt.Print(channel, mute) // Remove
-		totalViewers := lg.viewers[channel]
-		avgMute := int(mute.duration) / mute.totalViewers
-		advChannelMute := AdvChannelDuration{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
+		avgMute := int(mute.duration.Seconds()) / mute.totalViewers
+		advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
+		res = append(res, &advChannelMute)
 	}
-	// AdvChannelMute:
-	// Channel     string
-	// AvgMute     time.Duration
-	// MaxMuteTime time.Time
 	return res
 }
