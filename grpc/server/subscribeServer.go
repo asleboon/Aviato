@@ -92,7 +92,7 @@ func (s *SubscribeServer) recordAll() {
 	}
 }
 
-func (s *SubscribeServer) top10Viewers(stream *grpc.ServerStream) string {
+func (s *SubscribeServer) top10Viewers() string {
 	channels := s.logger.ChannelsViewers() // Map of all channels with number of viewers
 
 	// Sort channels by views, descending
@@ -116,14 +116,15 @@ func (s *SubscribeServer) top10Viewers(stream *grpc.ServerStream) string {
 	return top10Str
 }
 
-func (s *SubscribeServer) top10Muted(stream *grpc.ServerStream) string {
-
+func (s *SubscribeServer) top10Muted() string {
+	return ""
 }
 
 // Subscribe handles a client subscription request
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()
+		fmt.Printf("[%T] %+v\n", stream, stream)
 		if err == io.EOF { // Do we need this?
 			return nil
 		} else if err != nil {
@@ -133,12 +134,13 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
+			top10Str := ""
 			if in.StatisticsType == "viewership" {
-				top10Str = top10Viewers(stream)
+				top10Str = s.top10Viewers()
 			} else if in.StatisticsType == "duration" {
 				// TODO: Choose statistics, create method and send to client
 			} else if in.StatisticsType == "mute" {
-				top10Str = top10Muted(stream)
+				top10Str = s.top10Muted()
 			}
 
 			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
