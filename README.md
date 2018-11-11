@@ -18,7 +18,8 @@
 4. [Building a Zap Event Processing Server](#building-a-zap-event-processing-server)
 5. [Publish/Subscribe RPC Client and Server](#publishsubscribe-grpc-client-and-server)
 6. [Lab Approval](#lab-approval)
-6. [How to run](#how-to-run)
+7. [How to run Zapserver](#how-to-run-zapserver)
+8. [How to run gRPC](#how-to-run-grpc)
 
 ## Introduction
 
@@ -261,18 +262,51 @@ Also see the [Grading and Collaboration
 Policy](https://github.com/uis-dat320-fall18/course-info/blob/master/policy.md)
 document for additional information.
 
-## How to run
+## How to run Zapserver
+
 Run from zapserver folder (package main).
-### Flag
+#### Flag
 - `lab`: Which lab exercise to run
 - `mcast`: Specify multicast address, ip:port. Default: 224.0.1.130:10000
 - `memprofile`: Write memory profile to this file
 - `help`: Show help messages
-### Command
+#### Command
 ```
-go run *.go [-lab {tasknum}] [mcast {addr}] [-memprofile {filename}] [-h]
+go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-h]
 ```
-### Example
+#### Example
 ```
 go run *.go -lab c1
+```
+
+## How to run gRPC
+
+### Server
+Run from grpc/server folder
+#### Flag
+- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
+- `help`: Show usage help
+#### Command
+```
+go run subscribeServer.go [-endpoint {addr}] [-help]
+```
+#### Example
+```
+go run subscribeServer.go -endpoint localhost:1994
+```
+
+### Client
+Run from grpc/client folder
+#### Flag
+- `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
+- `help`: Show usage help
+- `rate`: Refresh rate at which the client will get a response from the server in seconds. Default: 1
+- `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration
+#### Command
+```
+go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}]
+```
+#### Example
+```
+go run subscribeClient.go -endpoint localhost:1994 -rate 2 -type mute
 ```

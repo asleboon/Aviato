@@ -24,25 +24,25 @@ func runLab() {
 	case "a", "c1", "c2", "d", "e":
 		ztore = zlog.NewSimpleZapLogger()
 	case "f":
-		// TODO activate with new ZapLogger data structure (task f)
-		// ztore = zlog.NewViewersZapLogger()
+		ztore = zlog.NewViewersZapLogger()
 	}
 	switch *labnum {
 	case "a":
 		go dumpAll()
 	case "c1":
 		go recordAll()
-		go showViewers(" NRK1")
+		go showViewers("NRK1")
 	case "c2":
 		go recordAll()
-		go showViewers(" TV2 Norge")
+		go showViewers("TV2 Norge")
 	case "d":
-		//TODO Comment task d
+		// See answer in serparate document.
 	case "e":
 		go recordAll()
 		go top10Viewers()
 	case "f":
-		//TODO write code for task f
+		go recordAll()
+		go top10Viewers()
 	}
 }
 
@@ -80,13 +80,13 @@ func dumpAll() {
 // recordAll processes and stores new viewers in Zaplogger
 func recordAll() {
 	for {
-		eventStr, err := readFromUDP() // Something wrong with readFromUDP
+		eventStr, err := readFromUDP()
 
-		if err != nil { // ReadFromUDP error check
+		if err != nil {
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
-			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange
-			if err != nil {                              // NewSTBEvent error check
+			chZap, _, err := chzap.NewSTBEvent(eventStr) // We don't care about statuschange here
+			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
@@ -126,6 +126,22 @@ func top10Viewers() {
 
 // calculatTop10 computes top 10 views list
 func calculateTop10() []*zlog.ChannelViewers {
+	channels := ztore.ChannelsViewers()
+
+	// Sort the channelviews, descending
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].Viewers > channels[j].Viewers
+	})
+
+	if len(channels) > 10 { // Only want top 10
+		channels = channels[:10]
+	}
+
+	return channels
+}
+
+// calculatTop10 computes top 10 views list
+func calculateTop10Muted() []*zlog.ChannelViewers {
 	channels := ztore.ChannelsViewers()
 
 	// Sort the channelviews, descending
