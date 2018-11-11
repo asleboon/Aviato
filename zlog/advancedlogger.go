@@ -165,15 +165,15 @@ func (lg *Logger) Channels() []string {
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
-func (lg *Logger) ChannelsViewers() []*ChannelViewers {
+func (lg *Logger) ChannelsViewers() []*AdvChannelViewers {
 	lg.lock.Lock()
 	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
-	res := make([]*ChannelViewers, 0)
+	res := make([]*AdvChannelViewers, 0)
 	for channel, viewers := range (*lg).viewers {
-		channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
-		res = append(res, &channelViewer)
+		advChannelViewer := AdvChannelViewers{Channel: channel, Viewers: viewers}
+		res = append(res, &advChannelViewer)
 	}
 	return res
 }
