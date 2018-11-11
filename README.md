@@ -300,11 +300,13 @@ Run from grpc/client folder
 #### Flag
 - `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
+- `rate`: Refresh rate at which the client will get a response from the server in seconds. Default: 1
+- `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration
 #### Command
 ```
-go run subscribeClient.go [-endpoint {addr}] [-help]
+go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}]
 ```
 #### Example
 ```
-go run subscribeClient.go -endpoint localhost:1994
+go run subscribeClient.go -endpoint localhost:1994 -rate 2 -type mute
 ```
