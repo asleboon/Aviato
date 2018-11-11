@@ -17,7 +17,7 @@ import (
 )
 
 type SubscribeServer struct {
-	logger zlog.ZapLogger
+	logger zlog.AdvZapLogger
 }
 
 var conn *net.UDPConn
@@ -51,8 +51,7 @@ func parseFlags() {
 	}
 }
 
-// TODO: The gRPC server and the zapserver part receiving zap events should be implemented as
-// separate goroutines, PREFERABLY IN SEPERATE FILES.
+// TODO: Split gRPC server and zapserver part into separate files
 func startZapServer() {
 	log.Println("Starting ZapServer...")
 	// Build UDP address
@@ -118,7 +117,6 @@ func (s *SubscribeServer) top10Viewers() string {
 
 func (s *SubscribeServer) top10Duration() string {
 	// TODO: Implement
-	channels := s.logger.ChannelsDuration() // Map of all channels with total duration
 	return ""
 }
 
