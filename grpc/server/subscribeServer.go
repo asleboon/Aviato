@@ -118,6 +118,7 @@ func (s *SubscribeServer) top10Viewers() string {
 
 func (s *SubscribeServer) top10Duration() string {
 	// TODO: Implement
+	channels := s.logger.ChannelsDuration() // Map of all channels with total duration
 	return ""
 }
 

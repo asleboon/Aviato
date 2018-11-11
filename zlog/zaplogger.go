@@ -8,7 +8,6 @@ import (
 
 type ZapLogger interface {
 	LogZap(z chzap.ChZap)
-	LogStatus(s chzap.StatusChange) // Added
 	Entries() int
 	Viewers(channelName string) int
 	Channels() []string

@@ -33,7 +33,7 @@ type muteStat struct {
 }
 
 // NewAdvancedZapLogger creates a new logger. Adhere Zaplogger interface
-func NewAdvancedZapLogger() ZapLogger {
+func NewAdvancedZapLogger() AdvZapLogger {
 	lg := Logger{
 		viewers:  make(map[string]int, 0),
 		duration: make(map[string]time.Duration, 0),
@@ -48,10 +48,10 @@ func NewAdvancedZapLogger() ZapLogger {
 func (lg *Logger) LogZap(z chzap.ChZap) {
 	lg.lock.Lock() // or (*lg)?
 	defer lg.lock.Unlock()
-
-	logZapViewers(z, lg)  // go?
-	logZapDuration(z, lg) // go?
-	logZapMute(z, lg)     // go?
+	// Can we run implement these as go routines later? (Remember locks!)
+	logZapViewers(z, lg)  // Update viewers data structure
+	logZapDuration(z, lg) // Update durationdata structure
+	logZapMute(z, lg)     // Update mute data structure
 }
 
 func logZapViewers(z chzap.ChZap, lg *Logger) {
@@ -115,11 +115,11 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 
 // LogStatus updates loggers when a new status event is received
 func (lg *Logger) LogStatus(s chzap.StatusChange) {
-	lg.lock.Lock() // or (*lg)?
+	lg.lock.Lock()
 	defer lg.lock.Unlock()
-
-	logStatusMute(s, lg)
-	logStatusDuration(s, lg)
+	// Can we run implement these as go routines later? (Remember locks!)
+	logStatusDuration(s, lg) // Update duration data structure
+	logStatusMute(s, lg)     // Update mute data structure
 }
 
 func logStatusDuration(s chzap.StatusChange, lg *Logger) {
@@ -176,4 +176,16 @@ func (lg *Logger) ChannelsViewers() []*ChannelViewers {
 		res = append(res, &channelViewer)
 	}
 	return res
+}
+
+// ChannelsDuration creates a ChannelDuration slice (total duration per channel)
+func (lg *Logger) ChannelsDuration() []*ChannelDuration {
+	// TODO: Implement
+	return nil
+}
+
+// ChannelsMute creates a ChannelMute slice (avg. muted duration per viewer per channel)
+func (lg *Logger) ChannelsMute() []*ChannelMute {
+	// TODO: Implement
+	return nil
 }
