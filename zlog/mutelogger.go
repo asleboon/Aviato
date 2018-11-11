@@ -9,9 +9,6 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 )
 
-// TODO: Move mutelogger to viewerslogger and rename to advancedlogger??
-// TODO: Implement handling in gRPC server and client
-
 type DurationMuted struct {
 	duration map[string]*channelMute // Key: channel name
 	lock     sync.Mutex

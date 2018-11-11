@@ -116,7 +116,13 @@ func (s *SubscribeServer) top10Viewers() string {
 	return top10Str
 }
 
-func (s *SubscribeServer) top10Muted() string {
+func (s *SubscribeServer) top10Duration() string {
+	// TODO: Implement
+	return ""
+}
+
+func (s *SubscribeServer) top10Mute() string {
+	// TODO: Implement
 	return ""
 }
 
@@ -124,7 +130,6 @@ func (s *SubscribeServer) top10Muted() string {
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()
-		fmt.Printf("[%T] %+v\n", stream, stream)
 		if err == io.EOF { // Do we need this?
 			return nil
 		} else if err != nil {
@@ -140,7 +145,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "duration" {
 				// TODO: Choose statistics, create method and send to client
 			} else if in.StatisticsType == "mute" {
-				top10Str = s.top10Muted()
+				top10Str = s.top10Mute()
 			}
 
 			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})

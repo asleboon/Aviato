@@ -23,7 +23,6 @@ func (zs *Zaps) LogZap(z chzap.ChZap) {
 }
 
 func (zs *Zaps) LogStatus(z chzap.StatusChange) {
-	// Not really needed
 }
 
 func (zs *Zaps) Entries() int {

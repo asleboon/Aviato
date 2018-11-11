@@ -24,14 +24,14 @@ var (
 		"Endpoint to which client connects",
 	)
 	refreshRate = flag.Uint64(
-		"refreshRate",
+		"rate",
 		1,
-		"Refresh rate at which the client will get a top 10 channel response from the server. Default: 1 second.",
+		"Refresh rate at which the client will get a response from the server in seconds. Default: 1",
 	)
 	statisticsType = flag.String(
-		"statisticsType",
+		"type",
 		"viewership",
-		"Statistics type for which this client want to subscribe for. Options: viewership (default) , muted or duration.",
+		"Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration",
 	)
 )
 
