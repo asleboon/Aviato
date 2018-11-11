@@ -304,7 +304,7 @@ Run from grpc/client folder
 - `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration
 #### Command
 ```
-go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type [viewership]|[mute]|[duration]]
+go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}]
 ```
 #### Example
 ```
