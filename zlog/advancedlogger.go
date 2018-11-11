@@ -96,7 +96,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			fromChannelStats.duration += z.Duration(prev.muteStart)
 		}
 	} else {
-		lg.mute[z.ToChan] = chanMute{}
+		lg.mute[z.FromChan] = chanMute{muteViewers: make(map[string]bool, 0)}
 	}
 
 	toChanStats, channelExists := lg.mute[z.ToChan]
@@ -114,7 +114,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			toChanStats.muteViewers[z.IP] = true
 		}
 	} else {
-		lg.mute[z.ToChan] = chanMute{}
+		lg.mute[z.ToChan] = chanMute{muteViewers: make(map[string]bool, 0)}
 	}
 }
 
