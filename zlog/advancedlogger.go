@@ -83,7 +83,7 @@ func logZapDuration(z chzap.ChZap, lg *Logger) {
 func logZapMute(z chzap.ChZap, lg *Logger) {
 	prev, ipExists := lg.prevMute[z.IP]
 	if !ipExists {
-		prevVol.viewer[z.IP] = &val{}
+		lg.prevMute[z.IP] = muteStat{}
 		prev = lg.prevMute[z.IP]
 	}
 
