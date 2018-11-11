@@ -48,7 +48,7 @@ func NewAdvancedZapLogger() AdvZapLogger {
 func (lg *Logger) LogZap(z chzap.ChZap) {
 	lg.lock.Lock() // or (*lg)?
 	defer lg.lock.Unlock()
-	// Can we run implement these as go routines later? (Remember locks!)
+	// Can we run these as go routines? (Remember locks!)
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure
 	logZapMute(z, lg)     // Update mute data structure
@@ -117,7 +117,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 func (lg *Logger) LogStatus(s chzap.StatusChange) {
 	lg.lock.Lock()
 	defer lg.lock.Unlock()
-	// Can we run implement these as go routines later? (Remember locks!)
+	// Can we run these as go routines? (Remember locks!)
 	logStatusDuration(s, lg) // Update duration data structure
 	logStatusMute(s, lg)     // Update mute data structure
 }
@@ -179,13 +179,13 @@ func (lg *Logger) ChannelsViewers() []*ChannelViewers {
 }
 
 // ChannelsDuration creates a ChannelDuration slice (total duration per channel)
-func (lg *Logger) ChannelsDuration() []*ChannelDuration {
+func (lg *Logger) ChannelsDuration() []*AdvChannelDuration {
 	// TODO: Implement
 	return nil
 }
 
 // ChannelsMute creates a ChannelMute slice (avg. muted duration per viewer per channel)
-func (lg *Logger) ChannelsMute() []*ChannelMute {
+func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 	// TODO: Implement
 	return nil
 }
