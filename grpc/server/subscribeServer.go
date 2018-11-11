@@ -118,7 +118,7 @@ func (s *SubscribeServer) top10Viewers() string {
 func (s *SubscribeServer) top10Duration() string {
 	channels := s.logger.ChannelsDuration() // Map of all channels with total duration
 
-	// Sort channels by views, descending
+	// Sort channels by total duration, descending
 	sort.Slice(channels, func(i, j int) bool {
 		return channels[i].Duration > channels[j].Duration
 	})
@@ -133,7 +133,7 @@ func (s *SubscribeServer) top10Duration() string {
 		if count != 0 {
 			top10Str += "\n"
 		}
-		top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Duration)
+		top10Str += fmt.Sprintf("%v. %v, total duration: %v", count+1, v.Channel, v.Duration)
 	}
 	top10Str += "\n\n"
 	return top10Str
@@ -142,9 +142,9 @@ func (s *SubscribeServer) top10Duration() string {
 func (s *SubscribeServer) top10Mute() string {
 	channels := s.logger.ChannelsMute() // Map of all channels with avg. muted duration per viewer
 
-	// Sort channels by views, descending
+	// Sort channels by avg mute per viewer, descending
 	sort.Slice(channels, func(i, j int) bool {
-		return channels[i].Mute > channels[j].Mute
+		return channels[i].AvgMute > channels[j].AvgMute
 	})
 
 	if len(channels) > 10 { // Only want top 10 channels
@@ -157,7 +157,8 @@ func (s *SubscribeServer) top10Mute() string {
 		if count != 0 {
 			top10Str += "\n"
 		}
-		top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Mute)
+		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %v\n", count+1, v.Channel, v.AvgMute)
+		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %v", v.MaxMuteTime)
 	}
 	top10Str += "\n\n"
 	return top10Str
