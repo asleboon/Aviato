@@ -1,6 +1,8 @@
 package zlog
 
 import (
+	"time"
+
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 )
 
@@ -22,10 +24,11 @@ type AdvChannelViewers struct {
 
 type AdvChannelDuration struct {
 	Channel  string
-	Duration int
+	Duration time.Duration
 }
 
 type AdvChannelMute struct {
-	Channel string
-	Mute    int
+	Channel     string
+	AvgMute     int
+	MaxMuteTime time.Time
 }
