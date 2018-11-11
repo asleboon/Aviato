@@ -19,11 +19,11 @@ type Logger struct {
 }
 
 type chanMute struct {
-	duration     time.Duration // Total mute duration
-	maxMuteTime  time.Time     // Date and time with highest number of muted views
-	maxMuteNum   int           // Time with highest number of muted views
-	numberOfMute int           // Current number of muted viewers
-	totalViewers int           // Toal number of viewers
+	duration     time.Duration   // Total mute duration
+	maxMuteTime  time.Time       // Date and time with highest number of muted views
+	maxMuteNum   int             // Time with highest number of muted views
+	numberOfMute int             // Current number of muted viewers
+	muteViewers  map[string]bool // Map of IP addresses that have viewed this channel muted
 }
 
 type muteStat struct {
@@ -108,6 +108,10 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			if prev.muteStart.IsZero() {
 				prev.muteStart = z.Time
 			}
+		}
+		_, ipMuteExists := lg.mute.muteViewers[z.IP]
+		if !ipMuteExists {
+			lg.mute.muteViewers[z.IP] = true
 		}
 	} else {
 		lg.mute[z.ToChan] = chanMute{}
@@ -202,7 +206,10 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 	// Create slice with avg. mute duration per viewer and time of the day with highest number of muted viewers
 	res := make([]*AdvChannelMute, 0)
 	for channel, mute := range (*lg).mute {
-		avgMute := int(mute.duration.Seconds()) / mute.totalViewers
+		avgMute := 0
+		if len(mute.muteViewers) > 0 {
+			avgMute = int(mute.duration.Seconds()) / len(mute.muteViewers)
+		}
 		advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
 		res = append(res, &advChannelMute)
 	}
