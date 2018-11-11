@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strconv"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"google.golang.org/grpc"
@@ -26,13 +25,13 @@ var (
 	)
 	refreshRate = flag.Uint64(
 		"refreshRate",
-		"1",
+		1,
 		"Refresh rate at which the client will get a top 10 channel response from the server. Default: 1 second.",
 	)
 	statisticsType = flag.String(
 		"statisticsType",
 		"viewership",
-		"Statistics type for which this client want to subscribe for. Options: viewership (default) , muted or duration."
+		"Statistics type for which this client want to subscribe for. Options: viewership (default) , muted or duration.",
 	)
 )
 
@@ -84,9 +83,9 @@ func main() {
 	}
 
 	err = stream.Send(&pb.SubscribeMessage{RefreshRate: *refreshRate, StatisticsType: *statisticsType}) // Send subscribe msg to gRPC server
-	stream.CloseSend() // Client will not send more messages on the stream
+	stream.CloseSend()                                                                                  // Client will not send more messages on the stream
 
-	waitchan := make(chan struct{})	// Wait channel so main does not return
+	waitchan := make(chan struct{}) // Wait channel so main does not return
 	go dumpTop10(stream, *statisticsType)
 	<-waitchan
 }
