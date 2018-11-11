@@ -116,13 +116,51 @@ func (s *SubscribeServer) top10Viewers() string {
 }
 
 func (s *SubscribeServer) top10Duration() string {
-	// TODO: Implement
-	return ""
+	channels := s.logger.ChannelsDuration() // Map of all channels with total duration
+
+	// Sort channels by views, descending
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].Duration > channels[j].Duration
+	})
+
+	if len(channels) > 10 { // Only want top 10 channels
+		channels = channels[:10]
+	}
+
+	// Create top 10 string
+	top10Str := ""
+	for count, v := range channels {
+		if count != 0 {
+			top10Str += "\n"
+		}
+		top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Duration)
+	}
+	top10Str += "\n\n"
+	return top10Str
 }
 
 func (s *SubscribeServer) top10Mute() string {
-	// TODO: Implement
-	return ""
+	channels := s.logger.ChannelsMute() // Map of all channels with avg. muted duration per viewer
+
+	// Sort channels by views, descending
+	sort.Slice(channels, func(i, j int) bool {
+		return channels[i].Mute > channels[j].Mute
+	})
+
+	if len(channels) > 10 { // Only want top 10 channels
+		channels = channels[:10]
+	}
+
+	// Create top 10 string
+	top10Str := ""
+	for count, v := range channels {
+		if count != 0 {
+			top10Str += "\n"
+		}
+		top10Str += fmt.Sprintf("%v. %v, viewers: %v", count+1, v.Channel, v.Mute)
+	}
+	top10Str += "\n\n"
+	return top10Str
 }
 
 // Subscribe handles a client subscription request
@@ -142,7 +180,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			if in.StatisticsType == "viewership" {
 				top10Str = s.top10Viewers()
 			} else if in.StatisticsType == "duration" {
-				// TODO: Choose statistics, create method and send to client
+				top10Str = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
 				top10Str = s.top10Mute()
 			}

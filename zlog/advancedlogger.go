@@ -1,6 +1,7 @@
 package zlog
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 
 // Logger type contains datastructure for logging viewers, duration and mute stats from a set-top box.
 type Logger struct {
-	viewers  map[string]int           // Key: channel name, value: number of viewers (viewerslogger)
+	viewers  map[string]int           // Key: channel name, value: current number of viewers (viewerslogger)
 	duration map[string]time.Duration // Key: channel name, value: total viewtime (durationlogger)
 	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap
 	mute     map[string]chanMute      // Key: channel name, value: mute stats (mutelogger)
@@ -19,10 +20,11 @@ type Logger struct {
 }
 
 type chanMute struct {
-	duration      time.Duration // Total mute duration
-	maxMutedTime  time.Time     // Date and time with highest number of muted views
-	maxMutedNum   int           // Time with highest number of muted views
-	numberOfMuted int           // Current number of muted viewers
+	duration     time.Duration // Total mute duration
+	maxMuteTime  time.Time     // Date and time with highest number of muted views
+	maxMuteNum   int           // Time with highest number of muted views
+	numberOfMute int           // Current number of muted viewers
+	totalViewers int           // Toal number of viewers
 }
 
 type muteStat struct {
@@ -91,7 +93,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 	if channelExists {
 		lg.viewers[z.ToChan]--
 		if prev.mute == "1" || prev.volume == "0" {
-			fromChannelStats.numberOfMuted--
+			fromChannelStats.numberOfMute--
 			fromChannelStats.duration += z.Duration(prev.muteStart)
 		}
 	} else {
@@ -103,7 +105,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 		lg.viewers[z.ToChan]++
 		prev.channel = z.ToChan
 		if prev.mute == "1" || prev.volume == "0" {
-			toChanStats.numberOfMuted++
+			toChanStats.numberOfMute++
 			if prev.muteStart.IsZero() {
 				prev.muteStart = z.Time
 			}
@@ -123,11 +125,11 @@ func (lg *Logger) LogStatus(s chzap.StatusChange) {
 }
 
 func logStatusDuration(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement
+	// TODO: Implement. Partly implemented in durationlogger.go
 }
 
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement
+	// TODO: Implement. Partly implemented in mutelogger.go
 }
 
 // Entries returns the length of the views map (# of channels)
@@ -144,7 +146,7 @@ func (lg *Logger) Viewers(channelName string) int {
 	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Viewers")
 
-	count, exists := lg.viewers[channelName]
+	count, exists := (*lg).viewers[channelName]
 	if exists {
 		return count
 	}
@@ -158,7 +160,7 @@ func (lg *Logger) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
-	for channel := range lg.viewers {
+	for channel := range (*lg).viewers {
 		channels = append(channels, channel)
 	}
 	return channels
@@ -180,12 +182,36 @@ func (lg *Logger) ChannelsViewers() []*AdvChannelViewers {
 
 // ChannelsDuration creates a ChannelDuration slice (total duration per channel)
 func (lg *Logger) ChannelsDuration() []*AdvChannelDuration {
-	// TODO: Implement
-	return nil
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
+	defer util.TimeElapsed(time.Now(), "ChannelsDuration")
+
+	res := make([]*AdvChannelDuration, 0)
+	for channel, duration := range (*lg).duration {
+		advChannelDuration := AdvChannelDuration{Channel: channel, Duration: duration}
+		res = append(res, &advChannelDuration)
+	}
+	return res
 }
 
 // ChannelsMute creates a ChannelMute slice (avg. muted duration per viewer per channel)
 func (lg *Logger) ChannelsMute() []*AdvChannelMute {
-	// TODO: Implement
-	return nil
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
+	defer util.TimeElapsed(time.Now(), "ChannelsMute")
+
+	res := make([]*AdvChannelMute, 0)
+
+	// Create slice with avg. mute duration per viewer and time of the day with highest number of muted viewers
+	for channel, mute := range (*lg).mute {
+		fmt.Print(channel, mute) // Remove
+		totalViewers := lg.viewers[channel]
+		avgMute := int(mute.duration) / mute.totalViewers
+		advChannelMute := AdvChannelDuration{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
+	}
+	// AdvChannelMute:
+	// Channel     string
+	// AvgMute     time.Duration
+	// MaxMuteTime time.Time
+	return res
 }
