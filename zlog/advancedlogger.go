@@ -109,9 +109,9 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 				prev.muteStart = z.Time
 			}
 		}
-		_, ipMuteExists := lg.mute.muteViewers[z.IP]
+		_, ipMuteExists := toChanStats.muteViewers[z.IP]
 		if !ipMuteExists {
-			lg.mute.muteViewers[z.IP] = true
+			toChanStats.muteViewers[z.IP] = true
 		}
 	} else {
 		lg.mute[z.ToChan] = chanMute{}
