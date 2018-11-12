@@ -1,6 +1,7 @@
 package zlog
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 )
 
 // Logger type contains datastructure for logging viewers, duration and mute stats from a set-top box.
+// Remark: HDMI_Status and Volume not considered in mute and durationlogger
 type Logger struct {
 	viewers  map[string]int           // Key: channel name, value: current number of viewers (viewerslogger)
 	duration map[string]time.Duration // Key: channel name, value: total viewtime (durationlogger)
@@ -122,17 +124,51 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 func (lg *Logger) LogStatus(s chzap.StatusChange) {
 	lg.lock.Lock()
 	defer lg.lock.Unlock()
-	// Can we run these as go routines? (Remember locks!)
-	logStatusDuration(s, lg) // Update duration data structure
-	logStatusMute(s, lg)     // Update mute data structure
-}
-
-func logStatusDuration(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement. Partly implemented in durationlogger.go
+	logStatusMute(s, lg) // Update mute data structure
 }
 
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement. Partly implemented in mutelogger.go
+	// TODO: Implement. See mutelogger.go
+	prev, ipExists := lg.prevMute[s.IP]
+	if !ipExists {
+		lg.prevMute[s.IP] = muteStat{}
+		prev = lg.prevMute[s.IP]
+	}
+	channelStats, channelExists := lg.mute[prev.channel]
+
+	if s.Status == "Mute_Status: 1" {
+		prev.mute = "1"
+		// If previous channel is known - Update channel stats
+		if prev.channel != "" {
+			// Set mute start time of not already set on this channel
+			if prev.muteStart.IsZero() {
+				prev.muteStart = s.Time
+			}
+			if channelExists {
+				channelStats.numberOfMute++
+				if channelStats.numberOfMute > channelStats.maxMuteNum {
+					channelStats.maxMuteTime = s.Time
+					channelStats.maxMuteNum = channelStats.numberOfMute
+				}
+			} else { // Should never happen
+				fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
+			}
+		}
+	} else if s.Status == "Mute_Status: 0" {
+		prev.mute = "0"
+		// If previous channel is known - Update channel stats
+		if prev.channel != "" {
+			if channelExists {
+				channelStats.numberOfMute--
+				if !prev.muteStart.IsZero() { // If this is not true, muteStart never set
+					channelStats.duration += prev.muteStart.Sub(s.Time)
+				}
+			} else { // Should never happen
+				fmt.Printf("Failure: Channel assigned to IP address, but does not exist in DurationMuted.")
+			}
+			prev.muteStart = time.Time{} // Reset mute start time
+		}
+	}
 }
 
 // Entries returns the length of the views map (# of channels)
