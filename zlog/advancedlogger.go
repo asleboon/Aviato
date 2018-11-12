@@ -136,7 +136,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	channelStats, channelExists := lg.mute[prev.channel]
 
 	if s.Status == "Mute_Status: 1" {
-		fmt.Printf("New Mute_Status: 1\n%v", channelStats) // Only for debug, remove after
+		fmt.Printf("New Mute_Status: 1, %v\n", channelStats) // Only for debug, remove after
 		prev.mute = "1"
 		// If previous channel is known - Update channel stats
 		if prev.channel != "" {
@@ -155,7 +155,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			}
 		}
 	} else if s.Status == "Mute_Status: 0" {
-		fmt.Printf("New Mute_Status: 1\n%v", channelStats) // Only for debug, remove after
+		fmt.Printf("New Mute_Status: 0, %v\n", channelStats) // Only for debug, remove after
 		prev.mute = "0"
 		// If previous channel is known - Update channel stats
 		if prev.channel != "" {
