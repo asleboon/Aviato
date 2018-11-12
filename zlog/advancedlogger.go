@@ -128,7 +128,6 @@ func (lg *Logger) LogStatus(s chzap.StatusChange) {
 }
 
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement. See mutelogger.go
 	prev, ipExists := lg.prevMute[s.IP]
 	if !ipExists {
 		lg.prevMute[s.IP] = muteStat{}
@@ -137,6 +136,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	channelStats, channelExists := lg.mute[prev.channel]
 
 	if s.Status == "Mute_Status: 1" {
+		fmt.Printf("New Mute_Status: 1") // Only for debug, remove after
 		prev.mute = "1"
 		// If previous channel is known - Update channel stats
 		if prev.channel != "" {
@@ -155,6 +155,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			}
 		}
 	} else if s.Status == "Mute_Status: 0" {
+		fmt.Printf("New Mute_Status: 0") // Only for debug, remove after
 		prev.mute = "0"
 		// If previous channel is known - Update channel stats
 		if prev.channel != "" {
