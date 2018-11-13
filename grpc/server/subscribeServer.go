@@ -132,7 +132,7 @@ func (s *SubscribeServer) top10Duration() string {
 	for count, v := range channels {
 		if count != 0 {
 			top10Str += "\n"
-		}S
+		}
 		top10Str += fmt.Sprintf("%v. %v, total duration: %v", count+1, v.Channel, v.Duration)
 	}
 	top10Str += "\n\n"
@@ -166,10 +166,11 @@ func (s *SubscribeServer) top10Mute() string {
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	sumViewers := 0
 	count := 0
-	sma := s.logger.ChannelsSMA()
+	sma := s.logger.ChannelsSMA(smaChannel)
 
-	for k, v := range sma {
-		if timeNow.Sub(k) < (time.Duration(smaLength) * time.Second) {
+	timeNow := time.Now()
+	for k, v := range *sma {
+		if .Sub(k) < (time.Duration(smaLength) * time.Second) {
 			sumViewers += v
 			count++
 		}
