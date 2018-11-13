@@ -42,6 +42,7 @@ func NewAdvancedZapLogger() AdvZapLogger {
 		duration: make(map[string]time.Duration, 0),
 		prevZap:  make(map[string]chzap.ChZap, 0),
 		mute:     make(map[string]*chanMute, 0),
+		sma:      make(map[time.Time]int, 0),
 		prevMute: make(map[string]*muteStat, 0),
 	}
 	return &lg
