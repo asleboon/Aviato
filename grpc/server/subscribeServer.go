@@ -163,6 +163,12 @@ func (s *SubscribeServer) top10Mute() string {
 	return top10Str
 }
 
+func (s *SubscribeServer) SMA(SMAChannel string, SMALength uint64) string {
+	resString = ""
+
+	return resString
+}
+
 // Subscribe handles a client subscription request
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
@@ -184,7 +190,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
 			} else if in.StatisticsType == "SMA" {
-				resString = s.SMA()
+				resString = s.SMA(in.SMAChannel, in.SMALength) // Have to compile proto file again
 			}
 
 			err := stream.Send(&pb.NotificationMessage{Top10: resString})
