@@ -163,7 +163,7 @@ func (s *SubscribeServer) top10Mute() string {
 	return top10Str
 }
 
-func (s *SubscribeServer) sma(SMAChannel string, SMALength uint64) string {
+func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	// views := s.logger.Viewers(SMAChannel)
 	// SMAMap := make(map[time.Time]int)
 	// SMAMap[time.Now()] = views
@@ -202,7 +202,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
 			} else if in.StatisticsType == "SMA" {
-				resString = s.sma(in.smaChannel, in.smaLength) // Have to compile proto file again
+				resString = s.sma(in.SmaChannel, in.SmaLength) // Have to compile proto file again
 
 			}
 
