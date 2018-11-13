@@ -164,7 +164,7 @@ func (s *SubscribeServer) top10Mute() string {
 }
 
 func (s *SubscribeServer) SMA(SMAChannel string, SMALength uint64) string {
-	resString = ""
+	resString := ""
 	// get viewcount from a channel for the last x seconds
 
 	return resString
