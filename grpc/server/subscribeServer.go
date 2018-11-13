@@ -164,20 +164,21 @@ func (s *SubscribeServer) top10Mute() string {
 }
 
 func (s *SubscribeServer) SMA(SMAChannel string, SMALength uint64) string {
-	SMAMap := make(map[time.Time]int)
 	views := s.logger.Viewers(SMAChannel)
+	SMAMap := make(map[time.Time]int)
 	SMAMap[time.Now()] = views
 
 	timeNow := time.Now()
 	sumViewers := 0
 	count := 0
+	resString := "mjau mjau mjau"
 	for k, v := range SMAMap {
 		if timeNow.Sub(k) < (time.Duration(SMALength) * time.Second) {
 			sumViewers += v
 			count++
 		}
 	}
-	return fmt.Sprintf("Simple Moving Average for %q: %q", SMAChannel, sumViewers/count)
+	return resString
 }
 
 // Subscribe handles a client subscription request
