@@ -167,7 +167,7 @@ func (s *SubscribeServer) sma(SMAChannel string, SMALength uint64) string {
 	views := s.logger.Viewers(SMAChannel)
 	SMAMap := make(map[time.Time]int)
 	SMAMap[time.Now()] = views
-
+	fmt.Println("this also runs but nothing is returned")
 	timeNow := time.Now()
 	sumViewers := 0
 	count := 0
@@ -202,6 +202,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
 			} else if in.StatisticsType == "SMA" {
+				fmt.Println("this runs")
 				resString = s.sma(in.SMAChannel, in.SMALength) // Have to compile proto file again
 
 			}
