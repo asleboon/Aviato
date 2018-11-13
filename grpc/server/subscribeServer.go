@@ -170,7 +170,7 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 
 	sumViewers := 0
 	count := 0
-	for k, v := range SMAMap {
+	for k, v := range s.logger.sma {
 		if timeNow.Sub(k) < (time.Duration(smaLength) * time.Second) {
 			sumViewers += v
 			count++
