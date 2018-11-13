@@ -163,6 +163,24 @@ func (s *SubscribeServer) top10Mute() string {
 	return top10Str
 }
 
+func (s *SubscribeServer) SMA(SMAChannel string, SMALength uint64) string {
+	resString := ""
+	SMAMap := make(map[time.Time]int)
+	views := s.logger.Viewers(SMAChannel)
+	SMAMap[time.Now()] = views
+
+	timeNow := time.Now()
+	sumViewers := 0
+	count := 0
+	for k, v := range SMAMap {
+		if timeNow.Sub(k) < (time.Duration(SMALength) * time.Second) {
+			sumViewers += v
+			count++
+		}
+	}
+	return fmt.Sprintf("Simple Moving Average for %q: %q", SMAChannel, sumViewers/count)
+}
+
 // Subscribe handles a client subscription request
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
@@ -176,16 +194,18 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			top10Str := ""
+			resString := ""
 			if in.StatisticsType == "viewership" {
-				top10Str = s.top10Viewers()
+				resString = s.top10Viewers()
 			} else if in.StatisticsType == "duration" {
-				top10Str = s.top10Duration()
+				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
-				top10Str = s.top10Mute()
+				resString = s.top10Mute()
+			} else if in.StatisticsType == "SMA" {
+				resString = s.SMA(in.SMAChannel, in.SMALength) // Have to compile proto file again
 			}
 
-			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
+			err := stream.Send(&pb.NotificationMessage{Top10: resString})
 			if err != nil {
 				return err
 			}

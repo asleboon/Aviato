@@ -33,6 +33,16 @@ var (
 		"viewership",
 		"Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration",
 	)
+	SMAChannel = flag.String(
+		"SMA channel",
+		"viewership",
+		"Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration",
+	)
+	SMALength = flag.String(
+		"SMA length",
+		"viewership",
+		"Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration",
+	)
 )
 
 func Usage() {
