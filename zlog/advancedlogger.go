@@ -138,6 +138,9 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 
 	pZap, _ := lg.prevZap[s.IP]
 	//if pZapExists {	// No updates if no zap events on previous zap registred on this IP address
+	if pZap.ToChan] != "" {
+
+
 	channelStats, channelExists := lg.mute[pZap.ToChan]
 	if s.Status == "Mute_Status: 1" {
 		if !channelExists {
@@ -190,6 +193,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	// }
 
 	//}
+}
 }
 
 // Entries returns the length of the views map (# of channels)
