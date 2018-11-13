@@ -135,7 +135,6 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 		prev, ipExists := lg.prevMute[s.IP]
 		if s.Status == "Mute_Status: 1" || s.Status == "Mute_Status: 0" {
 			// Get previous mute values for this IP, or create new struct if not present
-
 			if !ipExists {
 				lg.prevMute[s.IP] = &muteStat{}
 				prev = lg.prevMute[s.IP]
