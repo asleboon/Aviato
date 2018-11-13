@@ -155,16 +155,6 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				}
 				lg.mute[pZap.ToChan].muteViewers[s.IP] = true
 				fmt.Printf("MuteStatus 1, channelStats: %v, channel:%v\n", channelStats.numberOfMute, pZap.ToChan)
-
-				// } else { // If no mute event has happened on this channel before, create struct
-				// 	lg.mute[pZap.ToChan] = chanMute{
-				// 		numberOfMute: 1,
-				// 		maxMuteNum:   1,
-				// 		maxMuteTime:  s.Time,
-				// 		muteViewers:  make(map[string]bool, 0),
-				// 	}
-				// 	// Add IP address to map of IP addresses that have viewed this channel muted
-				// 	lg.mute[pZap.ToChan].muteViewers[s.IP] = true
 			}
 
 			// Update prev mute values
