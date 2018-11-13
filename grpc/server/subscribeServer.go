@@ -164,21 +164,21 @@ func (s *SubscribeServer) top10Mute() string {
 }
 
 func (s *SubscribeServer) sma(SMAChannel string, SMALength uint64) string {
-	views := s.logger.Viewers(SMAChannel)
-	SMAMap := make(map[time.Time]int)
-	SMAMap[time.Now()] = views
-	log.Printf("does it run?")
-	timeNow := time.Now()
-	sumViewers := 0
-	count := 0
+	// views := s.logger.Viewers(SMAChannel)
+	// SMAMap := make(map[time.Time]int)
+	// SMAMap[time.Now()] = views
+
+	// timeNow := time.Now()
+	// sumViewers := 0
+	// count := 0
 	resString := "mjau mjau mjau"
-	for k, v := range SMAMap {
-		if timeNow.Sub(k) < (time.Duration(SMALength) * time.Second) {
-			sumViewers += v
-			count++
-		}
-	}
 	return resString
+	// for k, v := range SMAMap {
+	// 	if timeNow.Sub(k) < (time.Duration(SMALength) * time.Second) {
+	// 		sumViewers += v
+	// 		count++
+	// 	}
+	// }
 }
 
 // Subscribe handles a client subscription request
