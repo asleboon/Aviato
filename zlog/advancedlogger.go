@@ -83,42 +83,40 @@ func logZapDuration(z chzap.ChZap, lg *Logger) {
 }
 
 func logZapMute(z chzap.ChZap, lg *Logger) {
-	/*
-		prev, ipExists := lg.prevMute[z.IP]
-		//fmt.Printf("ipExists:%v\n", ipExists)
-		//fmt.Printf("Prev:%v\n", prev)
-		if ipExists == true { // If no prev mute values exist for this IP, do nothing
-			// From channel handling
-			fromChannelStats, channelExists := lg.mute[z.FromChan]
-			if !channelExists {
-				lg.mute[z.FromChan] = chanMute{muteViewers: make(map[string]bool, 0)}
-				fromChannelStats = lg.mute[z.FromChan]
-			}
-			if prev.mute == "1" {
-				fromChannelStats.numberOfMute--
-				fromChannelStats.duration += z.Duration(prev.muteStart)
-			}
-			// To channel handling
-			toChannelStats, channelExists := lg.mute[z.ToChan]
-			if !channelExists {
-				lg.mute[z.ToChan] = chanMute{muteViewers: make(map[string]bool, 0)}
-				fromChannelStats = lg.mute[z.ToChan]
-			}
-			if prev.mute == "1" {
-				// Increment number of mutes on channel and set maxMuteNum and maxMuteTime if true
-				toChannelStats.numberOfMute++
-				if toChannelStats.numberOfMute > toChannelStats.maxMuteNum {
-					toChannelStats.maxMuteTime = z.Time
-					toChannelStats.maxMuteNum = toChannelStats.numberOfMute
-				}
-				// Update prev mute
-				prev.mute = "1"
-				prev.muteStart = z.Time
-				// Add IP address to map of IP addresses that have viewed this channel muted
-				toChannelStats.muteViewers[z.IP] = true
-			}
+	prev, ipExists := lg.prevMute[z.IP]
+	//fmt.Printf("ipExists:%v\n", ipExists)
+	//fmt.Printf("Prev:%v\n", prev)
+	if ipExists == true { // If no prev mute values exist for this IP, do nothing
+		// From channel handling
+		fromChannelStats, channelExists := lg.mute[z.FromChan]
+		if !channelExists {
+			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
+			fromChannelStats = lg.mute[z.FromChan]
 		}
-	*/
+		if prev.mute == "1" {
+			fromChannelStats.numberOfMute--
+			fromChannelStats.duration += z.Duration(prev.muteStart)
+		}
+		// To channel handling
+		toChannelStats, channelExists := lg.mute[z.ToChan]
+		if !channelExists {
+			lg.mute[z.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
+			fromChannelStats = lg.mute[z.ToChan]
+		}
+		if prev.mute == "1" {
+			// Increment number of mutes on channel and set maxMuteNum and maxMuteTime if true
+			toChannelStats.numberOfMute++
+			if toChannelStats.numberOfMute > toChannelStats.maxMuteNum {
+				toChannelStats.maxMuteTime = z.Time
+				toChannelStats.maxMuteNum = toChannelStats.numberOfMute
+			}
+			// Update prev mute
+			prev.mute = "1"
+			prev.muteStart = z.Time
+			// Add IP address to map of IP addresses that have viewed this channel muted
+			toChannelStats.muteViewers[z.IP] = true
+		}
+	}
 }
 
 // LogStatus updates loggers when a new status event is received
