@@ -33,13 +33,13 @@ var (
 		"viewership",
 		"Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration",
 	)
-	SMAChannel = flag.String(
-		"SMAChannel",
+	smaChannel = flag.String(
+		"smaChan",
 		"NRK1",
 		"Simple moving average will be calculated for this Channel",
 	)
-	SMALength = flag.Uint64(
-		"SMALength",
+	smaLength = flag.Uint64(
+		"smaLen",
 		10,
 		"Interval for the simple moving average",
 	)
