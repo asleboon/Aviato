@@ -15,9 +15,8 @@ type AdvZapLogger interface {
 	ChannelsViewers() []*AdvChannelViewers
 	ChannelsDuration() []*AdvChannelDuration
 	ChannelsMute() []*AdvChannelMute
+	ChannelsSMA(channelName string) *map[time.Time]int
 }
-
-var sma map[time.Time]int
 
 type AdvChannelViewers struct {
 	Channel string

@@ -16,8 +16,8 @@ type Logger struct {
 	duration map[string]time.Duration // Key: channel name, value: total viewtime (durationlogger)
 	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used for durationlogger)
 	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
-	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used for mutelogger)
-	sma      map[time.Time]int        // Key: Time added, value: current number of viwers (simple moving average)
+	sma      map[time.Time]int
+	prevMute map[string]*muteStat // Key: IP address, value: previous mute (used for mutelogger)
 	lock     sync.Mutex
 }
 
@@ -208,6 +208,12 @@ func (lg *Logger) Channels() []string {
 		channels = append(channels, channel)
 	}
 	return channels
+}
+
+func (lg *Logger) ChannelsSMA(channelName string) *map[time.Time]int {
+	count, _ := lg.viewers[channelName]
+	lg.sma[time.Now()] = count
+	return &lg.sma
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
