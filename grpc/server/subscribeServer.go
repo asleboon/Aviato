@@ -202,7 +202,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
 			} else if in.StatisticsType == "SMA" {
-				resString = s.sma(in.SMAChannel, in.SMALength) // Have to compile proto file again
+				resString = s.sma(in.smaChannel, in.smaLength) // Have to compile proto file again
 
 			}
 
