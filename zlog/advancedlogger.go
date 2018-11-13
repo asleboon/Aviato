@@ -133,22 +133,21 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
 		channelStats, channelExists := lg.mute[pZap.ToChan]
 		prev, ipExists := lg.prevMute[s.IP]
+
 		if s.Status == "Mute_Status: 1" || s.Status == "Mute_Status: 0" {
 			// Get previous mute values for this IP, or create new struct if not present
 			if !ipExists {
 				lg.prevMute[s.IP] = &muteStat{}
 				prev = lg.prevMute[s.IP]
 			}
-		}
-
-		if s.Status == "Mute_Status: 1" {
 			if !channelExists {
 				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
 				channelStats = lg.mute[pZap.ToChan]
 			}
+		}
 
+		if s.Status == "Mute_Status: 1" {
 			if channelExists {
-
 				lg.mute[pZap.ToChan].numberOfMute++
 				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum {
 					lg.mute[pZap.ToChan].maxMuteTime = s.Time
@@ -174,7 +173,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
 				channelStats.numberOfMute--
-				if !prev.muteStart.IsZero() { // If this is not true, muteStart never set
+				if !prev.muteStart.IsZero() {
 					channelStats.duration += prev.muteStart.Sub(s.Time)
 				}
 				fmt.Printf("MuteStatus 0, channelStats: %v, channel:%v\n", channelStats.numberOfMute, pZap.ToChan)
@@ -184,14 +183,6 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			prev.mute = "0"
 			prev.muteStart = time.Time{} // Reset mute start time
 		}
-		// Debug print
-		// if pZap.ToChan != "" {
-		// 	fmt.Printf("mute.duration: %v, mute.numberOfMute: %v, mute.muteViewers: %v\n", channelStats.duration, channelStats.numberOfMute, channelStats.muteViewers)
-		// 	fmt.Printf("prevMute.mute: %v, prevMute.muteStart: %v\n", prev.mute, prev.muteStart)
-		// 	fmt.Printf("Channel: %v, IP: %v\n", pZap.ToChan, s.IP)
-		// }
-
-		//}
 	}
 }
 

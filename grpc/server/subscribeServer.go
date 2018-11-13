@@ -153,7 +153,6 @@ func (s *SubscribeServer) top10Mute() string {
 	// Create top 10 string
 	top10Str := ""
 	for count, v := range channels {
-		fmt.Printf("%v, ", v)
 		if count != 0 {
 			top10Str += "\n"
 		}
