@@ -84,8 +84,6 @@ func logZapDuration(z chzap.ChZap, lg *Logger) {
 
 func logZapMute(z chzap.ChZap, lg *Logger) {
 	prev, ipExists := lg.prevMute[z.IP]
-	//fmt.Printf("ipExists:%v\n", ipExists)
-	//fmt.Printf("Prev:%v\n", prev)
 	if ipExists == true { // If no prev mute values exist for this IP, do nothing
 		// From channel handling
 		fromChannelStats, channelExists := lg.mute[z.FromChan]
@@ -107,7 +105,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			// Increment number of mutes on channel and set maxMuteNum and maxMuteTime if true
 			toChannelStats.numberOfMute++
 			if toChannelStats.numberOfMute > toChannelStats.maxMuteNum {
-				toChannelStats.maxMuteTime = z.Time
+				toChannelStats.maxMuteTime = time.Now()
 				toChannelStats.maxMuteNum = toChannelStats.numberOfMute
 			}
 			// Update prev mute
@@ -148,11 +146,10 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			if channelExists {
 				lg.mute[pZap.ToChan].numberOfMute++
 				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum {
-					lg.mute[pZap.ToChan].maxMuteTime = s.Time
+					lg.mute[pZap.ToChan].maxMuteTime = time.Now()
 					lg.mute[pZap.ToChan].maxMuteNum = channelStats.numberOfMute
 				}
 				lg.mute[pZap.ToChan].muteViewers[s.IP] = true
-				fmt.Printf("MuteStatus 1, channelStats: %v, channel:%v\n", channelStats.numberOfMute, pZap.ToChan)
 			}
 
 			// Update prev mute values
@@ -164,7 +161,6 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				if !prev.muteStart.IsZero() {
 					channelStats.duration += s.Time.Sub(prev.muteStart)
 				}
-				fmt.Printf("MuteStatus 0, channelStats: %v, channel:%v\n", channelStats.numberOfMute, pZap.ToChan)
 			}
 
 			// Update prev mute values
@@ -245,14 +241,14 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 	// Create slice with avg. mute duration per viewer and time of the day with highest number of muted viewers
 	res := make([]*AdvChannelMute, 0)
 	for channel, mute := range lg.mute {
-		fmt.Printf("Channel: %v, Duration: %v, maxMuteTime: %v, maxMuteNum: %v, numberOfMute: %v\n", channel, mute.duration, mute.maxMuteNum, mute.maxMuteTime, mute.numberOfMute)
 		avgMute := 0
 		if len(mute.muteViewers) > 0 {
 			avgMute = int(mute.duration.Seconds()) / len(mute.muteViewers)
 		}
-		advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
-		fmt.Printf("AdvChanneMute:", advChannelMute)
-		res = append(res, &advChannelMute)
+		if avgMute > 0 { // Don't want to include channels without a valid average mute in result
+			advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
+			res = append(res, &advChannelMute)
+		}
 	}
 	return res
 }

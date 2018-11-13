@@ -61,8 +61,10 @@ func dumpTop10(stream pb.Subscription_SubscribeClient, sType string) {
 			fmt.Printf("Error: %v", err)
 			return
 		}
-		log.Printf("Top 10: " + sType)
-		fmt.Printf("%v", in.Top10)
+		if in.Top10 != "" {
+			log.Printf("Top 10: " + sType)
+			fmt.Printf("%v", in.Top10)
+		}
 	}
 }
 
