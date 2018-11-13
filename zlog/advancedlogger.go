@@ -250,6 +250,7 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 		if len(mute.muteViewers) > 0 {
 			avgMute = int(mute.duration.Seconds()) / len(mute.muteViewers)
 		}
+		fmt.Printf("AvgMute: %v\n", avgMute)
 		advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
 		res = append(res, &advChannelMute)
 	}
