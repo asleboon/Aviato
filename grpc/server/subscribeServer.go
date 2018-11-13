@@ -177,6 +177,9 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 			count++
 		}
 	}
+	if count == 0 {
+		return fmt.Sprintf("\nSimpel moving average for %q: %q", smaChannel, 0)
+	}
 	return fmt.Sprintf("\nSimpel moving average for %q: %q", smaChannel, sumViewers/count)
 }
 
