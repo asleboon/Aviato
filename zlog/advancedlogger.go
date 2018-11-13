@@ -162,7 +162,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			if channelExists {
 				channelStats.numberOfMute--
 				if !prev.muteStart.IsZero() {
-					channelStats.duration += prev.muteStart.Sub(s.Time)
+					channelStats.duration += s.Time.Sub(prev.muteStart)
 				}
 				fmt.Printf("MuteStatus 0, channelStats: %v, channel:%v\n", channelStats.numberOfMute, pZap.ToChan)
 			}
@@ -248,7 +248,7 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 		fmt.Printf("Channel: %v, Duration: %v, maxMuteTime: %v, maxMuteNum: %v, numberOfMute: %v\n", channel, mute.duration, mute.maxMuteNum, mute.maxMuteTime, mute.numberOfMute)
 		avgMute := 0
 		if len(mute.muteViewers) > 0 {
-			avgMute = int(mute.duration.Seconds()) / len(mute.muteViewers)
+			avgMute = float64(mute.duration.Seconds()) / len(mute.muteViewers)
 		}
 		advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
 		res = append(res, &advChannelMute)
