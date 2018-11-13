@@ -29,6 +29,6 @@ type AdvChannelDuration struct {
 
 type AdvChannelMute struct {
 	Channel     string
-	AvgMute     int
+	AvgMute     time.Duration
 	MaxMuteTime time.Time
 }

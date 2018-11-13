@@ -247,7 +247,7 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 		}
 		if avgMute > 0 { // Don't want to include channels without a valid average mute in result
 			fmt.Printf("%v", time.Duration(avgMute)*time.Second)
-			advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
+			advChannelMute := AdvChannelMute{Channel: channel, AvgMute: time.Duration(avgMute), MaxMuteTime: mute.maxMuteTime}
 			res = append(res, &advChannelMute)
 		}
 	}
