@@ -166,7 +166,6 @@ func (s *SubscribeServer) top10Mute() string {
 func (s *SubscribeServer) SMA(SMAChannel string, SMALength uint64) string {
 	resString := ""
 	// get viewcount from a channel for the last x seconds
-
 	return resString
 }
 
@@ -190,6 +189,8 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
+			} else if in.StatisticsType == "SMA" {
+				resString = s.SMA(in.SMAChannel, in.SMALength) // Have to compile proto file again
 			}
 
 			err := stream.Send(&pb.NotificationMessage{Top10: resString})
