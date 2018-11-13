@@ -17,6 +17,7 @@ type Logger struct {
 	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used for durationlogger)
 	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
 	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used for mutelogger)
+	sma      map[time.Time]int        // Key: Time added, value: current number of viwers (simple moving average)
 	lock     sync.Mutex
 }
 

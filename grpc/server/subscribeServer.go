@@ -165,10 +165,9 @@ func (s *SubscribeServer) top10Mute() string {
 
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	views := s.logger.Viewers(smaChannel)
-	SMAMap := make(map[time.Time]int)
-	SMAMap[time.Now()] = views
-
 	timeNow := time.Now()
+	s.logger.sma[timeNow] = views
+
 	sumViewers := 0
 	count := 0
 	for k, v := range SMAMap {
@@ -178,9 +177,9 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 		}
 	}
 	if count == 0 {
-		return fmt.Sprintf("\nSimpel moving average for %s: %d", smaChannel, 0)
+		return fmt.Sprintf("Simple moving average for %s: %d\n", smaChannel, 0)
 	}
-	return fmt.Sprintf("\nSimpel moving average for %s: %d", smaChannel, sumViewers/count)
+	return fmt.Sprintf("Simple moving average for %s: %d\n", smaChannel, sumViewers/count)
 }
 
 // Subscribe handles a client subscription request
@@ -205,6 +204,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				resString = s.top10Mute()
 			} else if in.StatisticsType == "SMA" {
 				resString = s.sma(in.SmaChannel, in.SmaLength) // Have to compile proto file again
+				fmt.Printf(in.SmaChannel)
 
 			}
 
