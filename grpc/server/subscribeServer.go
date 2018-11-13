@@ -141,7 +141,7 @@ func (s *SubscribeServer) top10Duration() string {
 
 func (s *SubscribeServer) top10Mute() string {
 	channels := s.logger.ChannelsMute() // Map of all channels with avg. muted duration per viewer
-
+	fmt.Printf("top10MuteChannels: %v\n")
 	// Sort channels by avg mute per viewer, descending
 	sort.Slice(channels, func(i, j int) bool {
 		return channels[i].AvgMute > channels[j].AvgMute
@@ -153,7 +153,9 @@ func (s *SubscribeServer) top10Mute() string {
 
 	// Create top 10 string
 	top10Str := ""
+	fmt.Printf("top10MuteChannels:\n")
 	for count, v := range channels {
+		fmt.Printf("%v, ", v)
 		if count != 0 {
 			top10Str += "\n"
 		}
