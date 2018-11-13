@@ -53,10 +53,11 @@ func (lg *Logger) LogZap(z chzap.ChZap) {
 	// Can we run these as go routines? (Remember locks!)
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure
-	//logZapMute(z, lg)     // Update mute data structure
+	//logZapMute(z, lg)     // Update mute data structure. TODO: Uncomment and test
 }
 
 func logZapViewers(z chzap.ChZap, lg *Logger) {
+	// ToChan handling
 	count, exists := lg.viewers[z.ToChan]
 	if exists {
 		lg.viewers[z.ToChan] = count + 1
@@ -64,6 +65,7 @@ func logZapViewers(z chzap.ChZap, lg *Logger) {
 		lg.viewers[z.ToChan] = 1
 	}
 
+	// FromChan handling
 	count, exists = lg.viewers[z.FromChan]
 	if exists {
 		lg.viewers[z.FromChan] = count - 1
@@ -74,7 +76,6 @@ func logZapViewers(z chzap.ChZap, lg *Logger) {
 
 func logZapDuration(z chzap.ChZap, lg *Logger) {
 	pZap, exists := lg.prevZap[z.IP]
-
 	if exists {
 		newDur := z.Duration(pZap.Time)    // Duration between previous and this zap on IP
 		lg.duration[pZap.ToChan] += newDur // Add duration for channel
@@ -85,9 +86,10 @@ func logZapDuration(z chzap.ChZap, lg *Logger) {
 func logZapMute(z chzap.ChZap, lg *Logger) {
 	prev, ipExists := lg.prevMute[z.IP]
 	if ipExists == true { // If no prev mute values exist for this IP, do nothing
+
 		// From channel handling
 		fromChannelStats, channelExists := lg.mute[z.FromChan]
-		if !channelExists {
+		if !channelExists { // Initialize chanMute strcut for this channel
 			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
 			fromChannelStats = lg.mute[z.FromChan]
 		}
@@ -95,6 +97,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			fromChannelStats.numberOfMute--
 			fromChannelStats.duration += z.Duration(prev.muteStart)
 		}
+
 		// To channel handling
 		toChannelStats, channelExists := lg.mute[z.ToChan]
 		if !channelExists {
@@ -111,6 +114,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			// Update prev mute
 			prev.mute = "1"
 			prev.muteStart = z.Time
+
 			// Add IP address to map of IP addresses that have viewed this channel muted
 			toChannelStats.muteViewers[z.IP] = true
 		}
@@ -131,12 +135,11 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 		prev, ipExists := lg.prevMute[s.IP]
 
 		if s.Status == "Mute_Status: 1" || s.Status == "Mute_Status: 0" {
-			// Get previous mute values for this IP, or create new struct if not present
-			if !ipExists {
+			if !ipExists { // Create new muteStat struct for IP if not present
 				lg.prevMute[s.IP] = &muteStat{}
 				prev = lg.prevMute[s.IP]
 			}
-			if !channelExists {
+			if !channelExists { // Create new chanMute struct for IP if not present
 				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
 				channelStats = lg.mute[pZap.ToChan]
 			}
@@ -151,10 +154,10 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				}
 				lg.mute[pZap.ToChan].muteViewers[s.IP] = true
 			}
-
 			// Update prev mute values
 			prev.mute = "1"
 			prev.muteStart = s.Time
+
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
 				channelStats.numberOfMute--
@@ -162,10 +165,8 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 					channelStats.duration += s.Time.Sub(prev.muteStart)
 				}
 			}
-
-			// Update prev mute values
+			// Update prev mute value
 			prev.mute = "0"
-			prev.muteStart = time.Time{} // Reset mute start time
 		}
 	}
 }
@@ -244,6 +245,7 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 		avgMute := 0.0
 		if len(mute.muteViewers) > 0 {
 			avgMute = mute.duration.Seconds() / float64(len(mute.muteViewers))
+			// TODO: Check that avgMute is desired format
 		}
 		if avgMute > 0 { // Don't want to include channels without a valid average mute in result
 			fmt.Printf("%v", time.Duration(avgMute)*time.Second)
