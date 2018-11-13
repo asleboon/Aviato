@@ -245,6 +245,7 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 	// Create slice with avg. mute duration per viewer and time of the day with highest number of muted viewers
 	res := make([]*AdvChannelMute, 0)
 	for channel, mute := range lg.mute {
+		fmt.Printf("Duration: %v, maxMuteTime: %v, maxMuteNum: %v, numberOfMute: %v", mute.duration, mute.maxMuteNum, mute.maxMuteTime, mute.numberOfMute)
 		avgMute := 0
 		if len(mute.muteViewers) > 0 {
 			avgMute = int(mute.duration.Seconds()) / len(mute.muteViewers)

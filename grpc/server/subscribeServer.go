@@ -153,7 +153,6 @@ func (s *SubscribeServer) top10Mute() string {
 	// Create top 10 string
 	top10Str := ""
 	for count, v := range channels {
-		fmt.Printf("%v. %v, average muted duration per viewer: %v\n", count+1, v.Channel, v.AvgMute)
 		if count != 0 {
 			top10Str += "\n"
 		}
@@ -177,16 +176,18 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			top10Str := ""
+			resString := ""
 			if in.StatisticsType == "viewership" {
-				top10Str = s.top10Viewers()
+				resString = s.top10Viewers()
 			} else if in.StatisticsType == "duration" {
-				top10Str = s.top10Duration()
+				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
-				top10Str = s.top10Mute()
+				resString = s.top10Mute()
+			} else if in.StatisticsType == "SMA" {
+				resString = s.SMA()
 			}
 
-			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
+			err := stream.Send(&pb.NotificationMessage{Top10: resString})
 			if err != nil {
 				return err
 			}
