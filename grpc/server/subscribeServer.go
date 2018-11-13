@@ -164,7 +164,6 @@ func (s *SubscribeServer) top10Mute() string {
 }
 
 func (s *SubscribeServer) SMA(SMAChannel string, SMALength uint64) string {
-	resString := ""
 	SMAMap := make(map[time.Time]int)
 	views := s.logger.Viewers(SMAChannel)
 	SMAMap[time.Now()] = views
