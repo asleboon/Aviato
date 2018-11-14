@@ -100,7 +100,9 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 		}
 		if prev.mute == "1" {
 			fromChannelStats.numberOfMute--
-			fromChannelStats.duration += z.Time.Sub(prev.muteStart)
+			if !prev.muteStart.IsZero() {
+				fromChannelStats.duration += z.Time.Sub(prev.muteStart)
+			}
 		}
 
 		// To channel handling
