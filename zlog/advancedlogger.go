@@ -141,8 +141,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				prev = lg.prevMute[s.IP]
 			}
 			if !channelExists { // Create new chanMute struct for IP if not present
-				minInt := -int(^uint(0)>>1) - 1
-				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
+				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
 				channelStats = lg.mute[pZap.ToChan]
 			}
 		}
@@ -150,7 +149,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 		if s.Status == "Mute_Status: 1" {
 			if channelExists {
 				lg.mute[pZap.ToChan].numberOfMute++
-				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum { // This need to bee like this? Why?
+				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum {
 					lg.mute[pZap.ToChan].maxMuteTime = time.Now()
 					lg.mute[pZap.ToChan].maxMuteNum = channelStats.numberOfMute
 				}
@@ -158,15 +157,15 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			}
 			// Update prev mute values
 			prev.mute = "1"
-			prev.muteStart = time.Now()
+			prev.muteStart = s.Time
 
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
 				channelStats.numberOfMute--
 				if !prev.muteStart.IsZero() {
 					fmt.Printf("\nNew + duration. Channel: %v.\n", pZap.ToChan)
-					fmt.Printf("%v\n%v", lg.mute[pZap.ToChan], channelStats)
-					channelStats.duration += s.Time.Sub(prev.muteStart)
+					fmt.Printf("lg.mute[pZap.ToChan]: %v\nchannelStats: %v\n", *lg.mute[pZap.ToChan], *channelStats)
+					lg.mute[pZap.ToChan].duration += s.Time.Sub(prev.muteStart)
 				}
 			}
 			// Update prev mute value
