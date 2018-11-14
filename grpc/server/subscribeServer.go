@@ -166,10 +166,10 @@ func (s *SubscribeServer) top10Mute() string {
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	sumViewers := 0
 	count := 0
-	sma := s.logger.ChannelsSMA(smaChannel)
+	sma := s.logger.ChannelsSMA(smaChannel) // returns a map with smaStats
 
 	timeNow := time.Now()
-	for k, v := range *sma {
+	for k, v := range sma {
 		if timeNow.Sub(k) < (time.Duration(smaLength) * time.Second) {
 			sumViewers += v
 			count++
