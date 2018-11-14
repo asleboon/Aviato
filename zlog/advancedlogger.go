@@ -15,8 +15,9 @@ type Logger struct {
 	viewers  map[string]int           // Key: channel name, value: current number of viewers (viewerslogger)
 	duration map[string]time.Duration // Key: channel name, value: total viewtime (durationlogger)
 	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used for durationlogger)
-	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
 	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used for mutelogger)
+	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
+	sma      map[string][]*smaStats   // Key: channel name, value: views
 	lock     sync.Mutex
 }
 
@@ -40,8 +41,9 @@ func NewAdvancedZapLogger() AdvZapLogger {
 		viewers:  make(map[string]int, 0),
 		duration: make(map[string]time.Duration, 0),
 		prevZap:  make(map[string]chzap.ChZap, 0),
-		mute:     make(map[string]*chanMute, 0),
 		prevMute: make(map[string]*muteStat, 0),
+		mute:     make(map[string]*chanMute, 0),
+		sma:      make(map[string][]*smaStats, 0),
 	}
 	return &lg
 }
@@ -203,6 +205,14 @@ func (lg *Logger) Channels() []string {
 		channels = append(channels, channel)
 	}
 	return channels
+}
+
+func (lg *Logger) ChannelsSMA(channelName string) *map[string][]*smaStats {
+	count := lg.viewers[channelName]
+	fmt.Printf("count: %q", count)
+	output := &smaStats{Views: count, TimeAdded: time.Now()}
+	lg.sma[channelName] = append(lg.sma[channelName], output)
+	return &lg.sma
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)

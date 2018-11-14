@@ -164,11 +164,27 @@ func (s *SubscribeServer) top10Mute() string {
 		t := v.MaxMuteTime
 		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %d-%02d-%02d %02d:%02d:%02d\n",t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	}
-	if top10Str == "" {
-		return ""
-	} else {
-		return top10Str += "\n\n"
+	top10Str += "\n\n"
+	return top10Str
+}
+
+func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
+	sumViewers := 0
+	count := 0
+	sma := s.logger.ChannelsSMA(smaChannel) // returns a map with smaStats
+
+	for _, v := range *sma {
+		for _, smaStat := range v {
+			if time.Now().Sub(smaStat.TimeAdded) < (time.Duration(smaLength) * time.Second) {
+				sumViewers += smaStat.Views
+				count++
+			}
+		}
 	}
+	if count == 0 {
+		return fmt.Sprintf("Simple moving average for %s: %d\n", smaChannel, 0)
+	}
+	return fmt.Sprintf("Simple moving average for %s: %d %d\n", smaChannel, sumViewers/count, count)
 }
 
 // Subscribe handles a client subscription request
@@ -191,6 +207,9 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
+
+			} else if in.StatisticsType == "SMA" {
+				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
 
 			err := stream.Send(&pb.NotificationMessage{Top10: resString})
