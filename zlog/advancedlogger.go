@@ -150,16 +150,16 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 
 		if s.Status == "Mute_Status: 1" {
 			if channelExists {
-				lg.mute[pZap.ToChan].numberOfMute++
-				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum {
-					lg.mute[pZap.ToChan].maxMuteTime = time.Now()
-					lg.mute[pZap.ToChan].maxMuteNum = channelStats.numberOfMute
+				channelStats.numberOfMute++
+				if channelStats.numberOfMute > channelStats.maxMuteNum {
+					channelStats.maxMuteTime = s.Time
+					channelStats.maxMuteNum = channelStats.numberOfMute
 				}
-				lg.mute[pZap.ToChan].muteViewers[s.IP] = true
+				channelStats.muteViewers[s.IP] = true
 			}
 			// Update prev mute values
 			prev.mute = "1"
-			prev.muteStart = s.Time
+			prev.muteStart = s.Time // Can't change this to time.Now()!
 
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
