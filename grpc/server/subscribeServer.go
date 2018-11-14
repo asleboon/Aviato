@@ -17,7 +17,7 @@ import (
 )
 
 type SubscribeServer struct {
-	logger *zlog.AdvZapLogger // TODO: Remove * ?
+	logger zlog.AdvZapLogger // TODO: Remove * ?
 }
 
 var conn *net.UDPConn
