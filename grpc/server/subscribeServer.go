@@ -168,10 +168,9 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	count := 0
 	sma := s.logger.ChannelsSMA(smaChannel) // returns a map with smaStats
 
-	timeNow := time.Now()
 	for _, v := range *sma {
 		for _, smaStat := range v {
-			if timeNow.Sub(smaStat.TimeAdded) < (time.Duration(smaLength) * time.Second) {
+			if time.Now().Sub(smaStat.TimeAdded) < (time.Duration(smaLength) * time.Second) {
 				sumViewers += smaStat.Views
 				count++
 			}
@@ -204,10 +203,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
 			} else if in.StatisticsType == "SMA" {
-				fmt.Printf("in.SmaChannel")
-				fmt.Printf(in.SmaChannel)
-				resString = s.sma(in.SmaChannel, in.SmaLength) // Have to compile proto file again
-
+				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
 
 			err := stream.Send(&pb.NotificationMessage{Top10: resString})
