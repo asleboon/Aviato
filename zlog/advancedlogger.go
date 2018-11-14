@@ -159,7 +159,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			}
 			// Update prev mute values
 			prev.mute = "1"
-			prev.muteStart = time.Now()
+			prev.muteStart = s.Time
 
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
