@@ -166,6 +166,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				// muteStart.IsZero -> Don't know for how long this viewer has been muted.
 				// Do not update total duration for this channel
 				if !prev.muteStart.IsZero() {
+					fmt.Printf("test")
 					channelStats.duration += s.Time.Sub(prev.muteStart)
 				}
 			}
