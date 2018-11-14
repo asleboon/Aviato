@@ -163,14 +163,9 @@ func (s *SubscribeServer) top10Mute() string {
 		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %d\n", count+1, v.Channel, v.AvgMute)
 		t := v.MaxMuteTime
 		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %d-%02d-%02d %02d:%02d:%02d\n",t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
-		//top10Str += fmt.Sprintf("Time with highest number of muted viewers: %v", v.MaxMuteTime)
-		
 	}
-	if top10Str == "" {
-		return ""
-	} else {
-		return top10Str += "\n\n"
-	}
+	top10Str += "\n\n"
+	return top10Str
 }
 
 // Subscribe handles a client subscription request
