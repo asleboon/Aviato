@@ -25,8 +25,8 @@ type AdvZapLogger interface {
 // }
 
 type smaStats struct {
-	views     int
-	timeAdded time.Time
+	Views     int
+	TimeAdded time.Time
 }
 
 type AdvChannelViewers struct {
