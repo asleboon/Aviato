@@ -153,11 +153,16 @@ func (s *SubscribeServer) top10Mute() string {
 	// Create top 10 string
 	top10Str := ""
 	for count, v := range channels {
+		if v.AvgMute > 0 {
+			fmt.Printf("Channel: %v, AvgMute:%v, MaxMuteTime: %v\n", v.Channel, v.AvgMute, v.MaxMuteTime)
+		}
 		if count != 0 {
 			top10Str += "\n"
 		}
-		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %v\n", count+1, v.Channel, v.AvgMute)
-		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %v", v.MaxMuteTime)
+		
+		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %d\n", count+1, v.Channel, v.AvgMute)
+		t := v.MaxMuteTime
+		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %d-%02d-%02d %02d:%02d:%02d\n",t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	}
 	top10Str += "\n\n"
 	return top10Str
@@ -202,6 +207,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
+
 			} else if in.StatisticsType == "SMA" {
 				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}

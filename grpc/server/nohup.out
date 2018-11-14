@@ -1,0 +1,2 @@
+# github.com/uis-dat320-fall18/Aviato/zlog
+../../zlog/advancedlogger.go:4:2: imported and not used: "fmt"
