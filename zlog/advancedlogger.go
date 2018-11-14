@@ -130,13 +130,13 @@ func (lg *Logger) LogStatus(s chzap.StatusChange) {
 }
 
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
-	fmt.Printf("%v: ", s)
 	pZap, pZapExists := lg.prevZap[s.IP]
 	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
 		channelStats, channelExists := lg.mute[pZap.ToChan]
 		prev, ipExists := lg.prevMute[s.IP]
 
 		if s.Status == "Mute_Status: 1" || s.Status == "Mute_Status: 0" {
+			fmt.Printf("%v: \n", s)
 			if !ipExists { // Create new muteStat struct for IP if not present
 				lg.prevMute[s.IP] = &muteStat{}
 				prev = lg.prevMute[s.IP]
