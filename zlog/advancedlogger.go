@@ -89,10 +89,10 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 	prev, ipExists := lg.prevMute[z.IP]
 
 	if ipExists == true { // If no prev mute values exist for this IP, do nothing
-		fmt.Printf("New zap event")
-		fmt.Printf("%v", prev)
+		fmt.Printf("New zap event. Prev: %v\n", prev)
 		// From channel handling
 		fromChannelStats, channelExists := lg.mute[z.FromChan]
+		fmt.Printf("From channelStats: %v\n", fromChannelStats)
 		if !channelExists { // Initialize chanMute struct for this channel
 			minInt := -int(^uint(0)>>1) - 1
 			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
