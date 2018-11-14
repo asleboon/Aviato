@@ -133,45 +133,43 @@ func (lg *Logger) LogStatus(s chzap.StatusChange) {
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	pZap, pZapExists := lg.prevZap[s.IP]
 	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
-		channelStats, channelExists := lg.mute[pZap.ToChan]
-		prev, ipExists := lg.prevMute[s.IP]
+		_, channelExists := lg.mute[pZap.ToChan]
+		_, ipExists := lg.prevMute[s.IP]
 
 		if s.Status == "Mute_Status: 1" || s.Status == "Mute_Status: 0" {
 			if !ipExists { // Create new muteStat struct for IP if not present
 				lg.prevMute[s.IP] = &muteStat{}
-				prev = lg.prevMute[s.IP]
 			}
 			if !channelExists { // Create new chanMute struct for IP if not present
 				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
-				channelStats = lg.mute[pZap.ToChan]
 			}
 		}
 
 		if s.Status == "Mute_Status: 1" {
 			if channelExists {
-				channelStats.numberOfMute++
-				if channelStats.numberOfMute > channelStats.maxMuteNum {
-					channelStats.maxMuteTime = time.Now()
-					channelStats.maxMuteNum = channelStats.numberOfMute
+				lg.mute[pZap.ToChan].numberOfMute++
+				if lg.mute[pZap.ToChan].numberOfMute > lg.mute[pZap.ToChan].maxMuteNum {
+					lg.mute[pZap.ToChan].maxMuteTime = time.Now()
+					lg.mute[pZap.ToChan].maxMuteNum = lg.mute[pZap.ToChan].numberOfMute
 				}
-				channelStats.muteViewers[s.IP] = true
+				lg.mute[pZap.ToChan].muteViewers[s.IP] = true
 			}
 			// Update prev mute values
-			prev.mute = "1"
-			prev.muteStart = time.Now()
+			lg.prevMute[s.IP].mute = "1"
+			lg.prevMute[s.IP].muteStart = time.Now()
 
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
-				channelStats.numberOfMute--
+				lg.mute[pZap.ToChan].numberOfMute--
 
 				// muteStart.IsZero -> Don't know for how long this viewer has been muted.
 				// Do not update total duration for this channel
-				if !prev.muteStart.IsZero() {
-					channelStats.duration += s.Time.Sub(prev.muteStart)
+				if !lg.prevMute[s.IP].muteStart.IsZero() {
+					lg.mute[pZap.ToChan].duration += s.Time.Sub(lg.prevMute[s.IP].muteStart)
 				}
 			}
 			// Update prev mute value
-			prev.mute = "0"
+			lg.prevMute[s.IP].mute = "0"
 		}
 	}
 }
