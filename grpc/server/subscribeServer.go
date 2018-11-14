@@ -207,7 +207,6 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
-				fmt.Printf("test")
 			} else if in.StatisticsType == "SMA" {
 				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
