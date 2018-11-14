@@ -130,6 +130,7 @@ func (lg *Logger) LogStatus(s chzap.StatusChange) {
 }
 
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
+	fmt.Printf("%v: ", s)
 	pZap, pZapExists := lg.prevZap[s.IP]
 	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
 		channelStats, channelExists := lg.mute[pZap.ToChan]
