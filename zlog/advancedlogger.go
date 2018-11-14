@@ -141,7 +141,8 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				prev = lg.prevMute[s.IP]
 			}
 			if !channelExists { // Create new chanMute struct for IP if not present
-				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
+				minInt := -int(^uint(0)>>1) - 1
+				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 				channelStats = lg.mute[pZap.ToChan]
 			}
 		}
