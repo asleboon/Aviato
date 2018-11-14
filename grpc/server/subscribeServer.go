@@ -153,9 +153,6 @@ func (s *SubscribeServer) top10Mute() string {
 	// Create top 10 string
 	top10Str := ""
 	for count, v := range channels {
-		if v.AvgMute > 0 {
-			fmt.Printf("Channel: %v, AvgMute:%v, MaxMuteTime: %v\n", v.Channel, v.AvgMute, v.MaxMuteTime)
-		}
 		if count != 0 {
 			top10Str += "\n"
 		}
