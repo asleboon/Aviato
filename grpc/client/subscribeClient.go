@@ -92,8 +92,8 @@ func main() {
 		log.Fatalf("Client failed to subscribe: %v", err)
 	}
 
-	err = stream.Send(&pb.SubscribeMessage{RefreshRate: *refreshRate, StatisticsType: *statisticsType}) // Send subscribe msg to gRPC server
-	stream.CloseSend()                                                                                  // Client will not send more messages on the stream
+	err = stream.Send(&pb.SubscribeMessage{RefreshRate: *refreshRate, StatisticsType: *statisticsType, SmaChannel: *smaChannel, SmaLength: *smaLength}) // Send subscribe msg to gRPC server
+	stream.CloseSend()                                                                                                                                  // Client will not send more messages on the stream
 
 	waitchan := make(chan struct{}) // Wait channel so main does not return
 	go dumpTop10(stream, *statisticsType)
