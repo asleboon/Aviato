@@ -162,11 +162,11 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
-				channelStats.numberOfMute--
+				lg.mute[pZap.ToChan].numberOfMute--
 				if !prev.muteStart.IsZero() {
-					fmt.Printf("\nNew + duration. Channel: %v. %v\n", pZap.ToChan, channelStats)
-					channelStats.duration += s.Time.Sub(prev.muteStart)
-					fmt.Printf("New + duration. Channel: %v. %v\n", pZap.ToChan, channelStats)
+					fmt.Printf("\nNew + duration. Channel: %v. %v\n", pZap.ToChan, lg.mute[pZap.ToChan])
+					lg.mute[pZap.ToChan].duration += s.Time.Sub(prev.muteStart)
+					fmt.Printf("New + duration. Channel: %v. %v\n", pZap.ToChan, lg.mute[pZap.ToChan])
 				}
 			}
 			// Update prev mute value
