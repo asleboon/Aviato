@@ -129,6 +129,7 @@ func (lg *Logger) LogStatus(s chzap.StatusChange) {
 	logStatusMute(s, lg) // Update mute data structure
 }
 
+// logStatusMute is working, but not with correct time
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	pZap, pZapExists := lg.prevZap[s.IP]
 	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
