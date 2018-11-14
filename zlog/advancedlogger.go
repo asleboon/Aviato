@@ -54,7 +54,7 @@ func (lg *Logger) LogZap(z chzap.ChZap) {
 	defer lg.lock.Unlock()
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure
-	//logZapMute(z, lg)     // Update mute data structure
+	logZapMute(z, lg)     // Update mute data structure
 }
 
 func logZapViewers(z chzap.ChZap, lg *Logger) {
@@ -90,13 +90,14 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 
 		// From channel handling
 		fromChannelStats, channelExists := lg.mute[z.FromChan]
-		if !channelExists { // Initialize chanMute strcut for this channel
-			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0)}
+		if !channelExists { // Initialize chanMute struct for this channel
+			minInt := -int(^uint(0)>>1) - 1
+			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 			fromChannelStats = lg.mute[z.FromChan]
 		}
 		if prev.mute == "1" {
 			fromChannelStats.numberOfMute--
-			fromChannelStats.duration += z.Duration(prev.muteStart)
+			fromChannelStats.duration += z.Time.Sub(prev.muteStart)
 		}
 
 		// To channel handling
@@ -153,7 +154,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			if channelExists {
 				channelStats.numberOfMute++
 				if channelStats.numberOfMute > channelStats.maxMuteNum {
-					channelStats.maxMuteTime = s.Time
+					channelStats.maxMuteTime = time.Now() // TODO: Does this work?
 					channelStats.maxMuteNum = channelStats.numberOfMute
 				}
 				channelStats.muteViewers[s.IP] = true
