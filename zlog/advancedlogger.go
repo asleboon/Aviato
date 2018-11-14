@@ -150,7 +150,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 		if s.Status == "Mute_Status: 1" {
 			if channelExists {
 				lg.mute[pZap.ToChan].numberOfMute++
-				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum {
+				if lg.mute[pZap.ToChan].numberOfMute > channelStats.maxMuteNum { // This need to bee like this? Why?
 					lg.mute[pZap.ToChan].maxMuteTime = time.Now()
 					lg.mute[pZap.ToChan].maxMuteNum = channelStats.numberOfMute
 				}
@@ -164,9 +164,9 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			if channelExists {
 				channelStats.numberOfMute--
 				if !prev.muteStart.IsZero() {
-					fmt.Printf("\nNew + duration. Channel: %v. %v\n", pZap.ToChan, channelStats)
+					fmt.Printf("\nNew + duration. Channel: %v.\n", pZap.ToChan)
+					fmt.Printf("%v\n%v", lg.mute[pZap.ToChan], channelStats)
 					channelStats.duration += s.Time.Sub(prev.muteStart)
-					fmt.Printf("New + duration. Channel: %v. %v\n", pZap.ToChan, channelStats)
 				}
 			}
 			// Update prev mute value
