@@ -169,8 +169,6 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	sumViewers := float64(0)
 	count := float64(0)
 	sma := s.logger.ChannelsSMA(smaChannel) // returns a map with smaStats
-	var timer time.Time
-	var timer2 time.Duration
 
 	for _, v := range *sma {
 		for _, smaStat := range v {
