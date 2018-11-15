@@ -7,6 +7,8 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
+	"runtime/pprof"
 	"sort"
 	"time"
 
@@ -34,6 +36,11 @@ var (
 		"endpoint",
 		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
 		"Endpoint on which server runs. Preferable",
+	)
+	memprofile = flag.String(
+		"memprofile",
+		"",
+		"write memory profile to this file",
 	)
 )
 
@@ -220,6 +227,9 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 
 func main() {
 	parseFlags()
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Kill, os.Interrupt)
+
 	grpcServer := grpc.NewServer()
 	startZapServer()
 
@@ -234,8 +244,19 @@ func main() {
 	}
 
 	fmt.Printf("Preparing to serve incoming requests...\n")
-	err = grpcServer.Serve(listener)
-	if err != nil {
-		fmt.Printf("Error with gRPC serve. Quitting...")
+	go grpcServer.Serve(listener)
+
+	// Here we wait for CTRL-C or some other kill signal
+	s := <-signalChan
+	fmt.Println("Server stopping on", s, "signal")
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
+		fmt.Println("Saved memory profile")
+		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *memprofile)
 	}
 }
