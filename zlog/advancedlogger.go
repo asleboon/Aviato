@@ -113,7 +113,7 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 		if !channelExists {
 			minInt := -int(^uint(0)>>1) - 1
 			lg.mute[z.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
-			fromChannelStats = lg.mute[z.ToChan]
+			toChannelStats = lg.mute[z.ToChan]
 		}
 		fmt.Printf("Test1\n")
 		if prev.mute == "1" {
