@@ -102,7 +102,7 @@ func (s *SubscribeServer) top10Mute() string {
 			top10Str += "\n"
 		}
 
-		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %d\n", count+1, v.Channel, v.AvgMute)
+		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %v\n", count+1, v.Channel, v.AvgMute)
 		t := v.MaxMuteTime
 		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %d-%02d-%02d %02d:%02d:%02d\n", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	}
