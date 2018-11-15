@@ -166,7 +166,7 @@ func (s *SubscribeServer) top10Mute() string {
 	return top10Str
 }
 
-// sma - Calculates the simple moving for a channel within a timeframe given by the client
+// sma calculates the simple moving for a channel within a timeframe given by the client
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	sumViewers := float64(0)
 	count := float64(0)
