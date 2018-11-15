@@ -42,6 +42,11 @@ var (
 		"",
 		"write memory profile to this file",
 	)
+	cpuprofile = flag.String(
+		"cpuprofile",
+		"",
+		"write cpu profile to this file",
+	)
 )
 
 func Usage() {
@@ -249,6 +254,16 @@ func main() {
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
 	fmt.Println("Server stopping on", s, "signal")
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
 		if err != nil {
