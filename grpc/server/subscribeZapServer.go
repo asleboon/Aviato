@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"runtime/pprof"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
@@ -15,11 +16,6 @@ import (
 
 var conn *net.UDPConn
 var err error
-
-// Go away green line
-type SubscribeServer struct {
-	logger zlog.AdvZapLogger
-}
 
 var (
 	help = flag.Bool(
@@ -75,6 +71,9 @@ func readFromUDP() (string, error) {
 
 func main() {
 	parseFlags()
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Kill, os.Interrupt)
+
 	grpcServer := grpc.NewServer()
 	startZapServer()
 
