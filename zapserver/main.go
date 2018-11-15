@@ -49,7 +49,7 @@ func main() {
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
 	chartViews, chartTime := ztore.StupidChart("NRK1")
-	for _, each := chartViews {
+	for _, each := range chartViews {
 		fmt.Println(each)
 	}
 	charting.DrawChart(chartViews, chartTime)
