@@ -47,7 +47,6 @@ func parseFlags() {
 	}
 }
 
-// TODO: Split gRPC server and zapserver part into separate files
 func startZapServer() {
 	log.Println("Starting ZapServer...")
 	// Build UDP address
