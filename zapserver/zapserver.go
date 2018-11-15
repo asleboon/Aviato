@@ -32,6 +32,7 @@ func runLab() {
 	case "c1":
 		go recordAll()
 		go showViewers("NRK1")
+		go logChart("NRK1")
 	case "c2":
 		go recordAll()
 		go showViewers("TV2 Norge")
@@ -153,4 +154,9 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 		channels = channels[:10]
 	}
 	return channels
+}
+
+func logChart(chName string) {
+	views := float64(ztore.Viewers(chName))
+	ztore.ChartStats(views)
 }

@@ -49,8 +49,8 @@ func main() {
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
 	chartViews, chartTime := ztore.StupidChart("NRK1")
-	for _, each := range chartViews {
-		fmt.Println(each)
+	for i, each := range chartViews {
+		fmt.Printf("%1.f views at index %d", each, i)
 	}
 	charting.DrawChart(chartViews, chartTime)
 	fmt.Println("Server stopping on", s, "signal")

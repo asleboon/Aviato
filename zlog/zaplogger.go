@@ -13,7 +13,8 @@ type ZapLogger interface {
 	Viewers(channelName string) int
 	Channels() []string
 	ChannelsViewers() []*ChannelViewers
-	StupidChart(channelName string) ([]float64, []time.Time)
+	StupidChart() ([]float64, []time.Time)
+	ChartStats(views float64)
 }
 
 type ChannelViewers struct {

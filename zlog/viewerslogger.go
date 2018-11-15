@@ -95,9 +95,11 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 	return res
 }
 
-func (vs *Viewers) StupidChart(channelName string) ([]float64, []time.Time) {
-	views := float64(vs.views[channelName])
+func (vs *Viewers) ChartStats(views float64) {
 	chartViews = append(chartViews, views)
 	chartTime = append(chartTime, time.Now())
+}
+
+func (vs *Viewers) StupidChart() ([]float64, []time.Time) {
 	return chartViews, chartTime
 }
