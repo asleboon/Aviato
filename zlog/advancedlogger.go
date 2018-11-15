@@ -93,11 +93,13 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 		// From channel handling
 		fromChannelStats, channelExists := lg.mute[z.FromChan]
 		fmt.Printf("From channelStats: %v\n", fromChannelStats)
+		// Error is happening below here somewhere
 		if !channelExists { // Initialize chanMute struct for this channel
 			minInt := -int(^uint(0)>>1) - 1
 			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 			fromChannelStats = lg.mute[z.FromChan]
 		}
+		fmt.Printf("Test")
 		if prev.mute == "1" {
 			fromChannelStats.numberOfMute--
 			if !prev.muteStart.IsZero() {
