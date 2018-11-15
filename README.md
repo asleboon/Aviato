@@ -304,10 +304,13 @@ Run from grpc/client folder
 - `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
 - `rate`: Refresh rate at which the client will get a response from the server in seconds. Default: 1
-- `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration
+- `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute, duration or sma
+- `smaChannel`: Channel for which you want to calculate simple moving average
+- `smaLength`: Interval for the simple moving average
 #### Command
 ```
-go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}]
+go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}] 
+   [-smaChannel {channel}] [smaLength {interval}]
 ```
 #### Example
 ```
