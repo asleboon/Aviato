@@ -288,11 +288,11 @@ Run from grpc/server folder
 - `help`: Show usage help
 #### Command
 ```
-go run subscribeZapServer.go [-endpoint {addr}] [-help]
+go run subscribeServer.go [-endpoint {addr}] [-help]
 ```
 #### Example
 ```
-go run subscribeZapServer.go -endpoint localhost:1994
+go run subscribeServer.go -endpoint localhost:1994
 ```
 
 ### Client
