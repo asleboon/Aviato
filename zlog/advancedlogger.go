@@ -89,10 +89,8 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 	prev, ipExists := lg.prevMute[z.IP]
 
 	if ipExists == true { // If no prev mute values exist for this IP, do nothing
-		fmt.Printf("New zap event. Prev: %v\n", prev)
 		// From channel handling
 		fromChannelStats, channelExists := lg.mute[z.FromChan]
-		fmt.Printf("From channelStats: %v\n", fromChannelStats)
 
 		if !channelExists { // Initialize chanMute struct for this channel
 			minInt := -int(^uint(0)>>1) - 1
@@ -115,25 +113,20 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			lg.mute[z.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 			toChannelStats = lg.mute[z.ToChan]
 		}
-		fmt.Printf("Test1\n")
 		if prev.mute == "1" {
-			fmt.Printf("Test2\n")
 			// Increment number of mutes on channel and set maxMuteNum and maxMuteTime if true
 			toChannelStats.numberOfMute++
 			if toChannelStats.numberOfMute > toChannelStats.maxMuteNum {
 				toChannelStats.maxMuteTime = time.Now()
 				toChannelStats.maxMuteNum = toChannelStats.numberOfMute
 			}
-			fmt.Printf("Test3\n")
 			// Update prev mute
 			prev.mute = "1"
 			prev.muteStart = z.Time
 
 			// Add IP address to map of IP addresses that have viewed this channel muted
 			toChannelStats.muteViewers[z.IP] = true
-			fmt.Printf("Test4\n")
 		}
-		fmt.Printf("Test5\n")
 	}
 }
 
@@ -180,8 +173,6 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			if channelExists {
 				channelStats.numberOfMute--
 				if !prev.muteStart.IsZero() {
-					fmt.Printf("\nNew + duration. Channel: %v.\n", pZap.ToChan)
-					fmt.Printf("lg.mute[pZap.ToChan]: %v\nchannelStats: %v\n", *lg.mute[pZap.ToChan], *channelStats)
 					lg.mute[pZap.ToChan].duration += s.Time.Sub(prev.muteStart)
 				}
 			}
@@ -225,6 +216,7 @@ func (lg *Logger) Channels() []string {
 	return channels
 }
 
+// TODO: Add comment
 func (lg *Logger) ChannelsSMA(channelName string) *map[string][]*smaStats {
 	count := lg.viewers[channelName]
 	fmt.Printf("count: %q", count)
@@ -276,7 +268,6 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 			// TODO: Check that avgMute is desired format
 		}
 		if avgMute > 0 { // Don't want to include channels without a valid average mute in result
-			fmt.Printf("%v", time.Duration(avgMute)*time.Second)
 			advChannelMute := AdvChannelMute{Channel: channel, AvgMute: time.Duration(avgMute), MaxMuteTime: mute.maxMuteTime}
 			res = append(res, &advChannelMute)
 		}
