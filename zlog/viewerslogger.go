@@ -1,7 +1,6 @@
 package zlog
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -101,9 +100,6 @@ func (vs *Viewers) Chart(views float64, viewTime time.Time) {
 	// need time and views at this time
 	chartViews = append(chartViews, views)
 	chartTime = append(chartTime, viewTime)
-	for _, each := range chartViews {
-		fmt.Println(each)
-	}
 }
 
 func (vs *Viewers) GetChart() ([]float64, []time.Time) {
