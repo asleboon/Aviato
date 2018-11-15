@@ -15,6 +15,7 @@ import (
 var conn *net.UDPConn
 var err error
 
+// Go away green line
 type SubscribeServer struct {
 	logger zlog.AdvZapLogger
 }
