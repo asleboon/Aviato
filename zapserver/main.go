@@ -48,10 +48,7 @@ func main() {
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
 	chartViews, chartTime := ztore.Chart("NRK1")
-	for each, ok := range chartViews {
-		if !ok {
-			fmt.Println("Something went wrong")
-		}
+	for _, val := range chartViews {
 		fmt.Println(each)
 	}
 	charting.DrawChart(chartViews, chartTime)
