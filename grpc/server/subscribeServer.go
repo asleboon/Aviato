@@ -174,19 +174,19 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 
 	for _, v := range *sma {
 		for _, smaStat := range v {
-			timer = smaStat.TimeAdded
-			timer2 = time.Now().Sub(timer)
 
 			if time.Now().Sub(smaStat.TimeAdded) < (time.Duration(smaLength) * time.Second) {
 				sumViewers += float64(smaStat.Views)
 				count++
+			} else {
+
 			}
 		}
 	}
 	if count == 0 {
 		return fmt.Sprintf("Simple moving average for %s: %d\n", smaChannel, 0)
 	}
-	return fmt.Sprintf("Simple moving average for %s: %.2f %1.f %v %v\n", smaChannel, sumViewers/count, count, timer, timer2)
+	return fmt.Sprintf("Simple moving average for %s the last %d seconds is %.2f:\n", smaChannel, smaLength, sumViewers/count)
 }
 
 // Subscribe handles a client subscription request
