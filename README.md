@@ -269,10 +269,11 @@ Run from zapserver folder (package main).
 - `lab`: Which lab exercise to run
 - `mcast`: Specify multicast address, ip:port. Default: 224.0.1.130:10000
 - `memprofile`: Write memory profile to this file
+- `cpuprofile`: Write cpu profile to this file
 - `help`: Show help messages
 #### Command
 ```
-go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-h]
+go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
 ```
 #### Example
 ```
@@ -286,9 +287,11 @@ Run from grpc/server folder
 #### Flag
 - `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
+- `memprofile`: Write memory profile to this file
+- `cpuprofile`: Write cpu profile to this file
 #### Command
 ```
-go run subscribeServer.go [-endpoint {addr}] [-help]
+go run subscribeServer.go [-endpoint {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
 ```
 #### Example
 ```
