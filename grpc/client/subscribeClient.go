@@ -32,7 +32,7 @@ var (
 	statisticsType = flag.String(
 		"type",
 		"viewership",
-		"Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration",
+		"Statistics type which this client want to subscribe to. Options: viewership(default), mute, duration or sma",
 	)
 	smaChannel = flag.String(
 		"smaChan",
