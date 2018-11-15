@@ -4,12 +4,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/uis-dat320-fall18/Aviato/charting"
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// Viwers holds a lock and a map with key: Channel, Value: viewers
+// Viewers holds a lock and a map with key: Channel, Value: viewers
 type Viewers struct {
 	views map[string]int // Key: Channelname, value: Viewers
 	lock  sync.Mutex
@@ -97,12 +96,10 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 }
 
 // ChartViews generates a chart for a given channel
-func (vs *Viewers) ChartViews(channelName string) {
+func (vs *Viewers) Chart(channelName string) ([]float64, []time.Time) {
 	// need time and views at this time
 	views := float64((*vs).views[channelName])
 	chartViews = append(chartViews, views)
-	viewTime := time.Now()
-	chartTime = append(chartTime, viewTime)
-	// Need two slices
-	charting.DrawChart(chartViews, chartTime)
+	chartTime = append(chartTime, time.Now())
+	return chartViews, chartTime
 }

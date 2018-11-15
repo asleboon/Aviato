@@ -216,8 +216,8 @@ func (lg *Logger) Channels() []string {
 
 // ChannelsSMA stores the number of viewers on a channel at a given time
 func (lg *Logger) ChannelsSMA(channelName string) *map[string][]*smaStats {
-	count := lg.viewers[channelName]
-	output := &smaStats{Views: count, TimeAdded: time.Now()}
+	views := lg.viewers[channelName]
+	output := &smaStats{Views: views, TimeAdded: time.Now()}
 	lg.sma[channelName] = append(lg.sma[channelName], output)
 	return &lg.sma
 }

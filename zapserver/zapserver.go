@@ -97,14 +97,6 @@ func recordAll() {
 	}
 }
 
-// // ChartViews generates a chart for a given channel
-// func chartViews(channelName string) {
-// 	// need time and views at this time
-// 	views := ztore.Viewers(channelName)
-// 	viewTime := time.Now()
-// 	charting.DrawChart(views, viewTime)
-// }
-
 // showViewers compute number of viewers on channel and prints every second
 func showViewers(chName string) {
 	tickChan := time.NewTicker(time.Second)
@@ -114,7 +106,6 @@ func showViewers(chName string) {
 		views := ztore.Viewers(chName)
 		fmt.Printf("No. of viewers on %s is now %d\n", chName, views)
 	}
-
 }
 
 // top10Viewers prints top 10 channel views list every second
