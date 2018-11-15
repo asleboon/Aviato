@@ -15,6 +15,10 @@ import (
 var conn *net.UDPConn
 var err error
 
+type SubscribeServer struct {
+	logger zlog.AdvZapLogger
+}
+
 var (
 	help = flag.Bool(
 		"help",

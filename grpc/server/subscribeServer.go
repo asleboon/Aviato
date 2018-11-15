@@ -8,12 +8,7 @@ import (
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
-	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
-
-type SubscribeServer struct {
-	logger zlog.AdvZapLogger
-}
 
 // recordAll processes and stores new viewers in Zaplogger
 func (s *SubscribeServer) recordAll() {
@@ -154,7 +149,6 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "SMA" {
 				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
-
 			err := stream.Send(&pb.NotificationMessage{Top10: resString})
 			if err != nil {
 				return err
