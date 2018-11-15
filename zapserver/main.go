@@ -49,7 +49,7 @@ func main() {
 	s := <-signalChan
 	chartViews, chartTime := ztore.Chart("NRK1")
 	for _, val := range chartViews {
-		fmt.Println(each)
+		fmt.Println(val)
 	}
 	charting.DrawChart(chartViews, chartTime)
 	fmt.Println("Server stopping on", s, "signal")
