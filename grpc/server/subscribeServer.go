@@ -8,13 +8,7 @@ import (
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
-	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
-
-// SubscribeServer includes a logger for zap- and statusevents
-type SubscribeServer struct {
-	logger zlog.AdvZapLogger
-}
 
 // recordAll processes and stores new viewers in Zaplogger
 func (s *SubscribeServer) recordAll() {

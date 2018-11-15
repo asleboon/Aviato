@@ -14,6 +14,11 @@ import (
 	"google.golang.org/grpc"
 )
 
+// SubscribeServer includes a logger for zap- and statusevents
+type SubscribeServer struct {
+	logger zlog.AdvZapLogger
+}
+
 var conn *net.UDPConn
 var err error
 
