@@ -99,15 +99,15 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 			fromChannelStats = lg.mute[z.FromChan]
 		}
-		// Error is happening below here somewhere
+
 		if prev.mute == "1" {
 			fromChannelStats.numberOfMute--
 			if !prev.muteStart.IsZero() {
 				fromChannelStats.duration += z.Time.Sub(prev.muteStart)
 			}
 		}
-		fmt.Printf("\nTest\n")
 
+		// Error is happening below here somewhere
 		// To channel handling
 		toChannelStats, channelExists := lg.mute[z.ToChan]
 		if !channelExists {
@@ -115,20 +115,25 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			lg.mute[z.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 			fromChannelStats = lg.mute[z.ToChan]
 		}
+		fmt.Printf("Test1\n")
 		if prev.mute == "1" {
+			fmt.Printf("Test2\n")
 			// Increment number of mutes on channel and set maxMuteNum and maxMuteTime if true
 			toChannelStats.numberOfMute++
 			if toChannelStats.numberOfMute > toChannelStats.maxMuteNum {
 				toChannelStats.maxMuteTime = time.Now()
 				toChannelStats.maxMuteNum = toChannelStats.numberOfMute
 			}
+			fmt.Printf("Test3\n")
 			// Update prev mute
 			prev.mute = "1"
 			prev.muteStart = z.Time
 
 			// Add IP address to map of IP addresses that have viewed this channel muted
 			toChannelStats.muteViewers[z.IP] = true
+			fmt.Printf("Test4\n")
 		}
+		fmt.Printf("Test5\n")
 	}
 }
 
