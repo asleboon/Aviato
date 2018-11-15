@@ -1,7 +1,6 @@
 package zlog
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -54,7 +53,7 @@ func (lg *Logger) LogZap(z chzap.ChZap) {
 	defer lg.lock.Unlock()
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure
-	//logZapMute(z, lg)     // Update mute data structure
+	logZapMute(z, lg)     // Update mute data structure
 }
 
 func logZapViewers(z chzap.ChZap, lg *Logger) {
@@ -105,7 +104,6 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			}
 		}
 
-		// Error is happening below here somewhere
 		// To channel handling
 		toChannelStats, channelExists := lg.mute[z.ToChan]
 		if !channelExists {
