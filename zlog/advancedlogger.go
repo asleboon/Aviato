@@ -1,6 +1,7 @@
 package zlog
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -262,7 +263,7 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 		avgMute := 0.0
 		if len(mute.muteViewers) > 0 {
 			avgMute = mute.duration.Seconds() / float64(len(mute.muteViewers))
-			// TODO: Check that avgMute is desired format
+			fmt.Printf("%v", time.Duration(avgMute))
 		}
 		if avgMute > 0 { // Don't want to include channels without a valid average mute in result
 			advChannelMute := AdvChannelMute{Channel: channel, AvgMute: time.Duration(avgMute), MaxMuteTime: mute.maxMuteTime}
