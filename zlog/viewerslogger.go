@@ -14,8 +14,8 @@ type Viewers struct {
 	lock  sync.Mutex
 }
 
-var chartViews []float64
 var chartTime []time.Time
+var chartViews []float64
 
 // NewViewersZapLogger initializes a new map for storing views per channel.
 // Viewers adhere Zaplogger interface.
@@ -95,13 +95,9 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 	return res
 }
 
-// ChartViews generates a chart for a given channel
-func (vs *Viewers) Chart(views float64, viewTime time.Time) {
-	// need time and views at this time
+func (vs *Viewers) StupidChart(channelName string) ([]float64, []time.Time) {
+	views := float64(vs.views[channelName])
 	chartViews = append(chartViews, views)
-	chartTime = append(chartTime, viewTime)
-}
-
-func (vs *Viewers) GetChart() ([]float64, []time.Time) {
+	chartTime = append(chartTime, time.Now())
 	return chartViews, chartTime
 }

@@ -167,6 +167,7 @@ func (s *SubscribeServer) top10Mute() string {
 }
 
 // sma - Calculates the simple moving for a channel within a timeframe given by the client
+// use len of slice not count <<--- THIS
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	sumViewers := float64(0)
 	count := float64(0)

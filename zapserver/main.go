@@ -10,6 +10,7 @@ import (
 	"runtime/pprof"
 
 	"github.com/uis-dat320-fall18/Aviato/charting"
+
 	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
 
@@ -47,13 +48,10 @@ func main() {
 
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
-	chartViews, chartTime := ztore.GetChart()
-	for i, val := range chartViews {
-		fmt.Printf("value: %f, at index %d\n", val, i)
-	}
+	chartViews, chartTime := ztore.StupidChart("NRK1")
 	charting.DrawChart(chartViews, chartTime)
 	fmt.Println("Server stopping on", s, "signal")
-	fmt.Println("Saving chart")
+	fmt.Println("Creating Chart")
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
 		if err != nil {
