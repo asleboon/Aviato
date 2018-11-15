@@ -46,6 +46,8 @@ func main() {
 
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
+	ChartViews("NRK1")
+	fmt.Println("Saving chart")
 	fmt.Println("Server stopping on", s, "signal")
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)

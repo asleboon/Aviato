@@ -4,15 +4,19 @@ import (
 	"sync"
 	"time"
 
+	"github.com/uis-dat320-fall18/Aviato/charting"
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// Exported or unexported?
+// Viwers holds a lock and a map with key: Channel, Value: viewers
 type Viewers struct {
 	views map[string]int // Key: Channelname, value: Viewers
 	lock  sync.Mutex
 }
+
+var chartViews []float64
+var chartTime []time.Time
 
 // NewViewersZapLogger initializes a new map for storing views per channel.
 // Viewers adhere Zaplogger interface.
@@ -90,4 +94,15 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 		res = append(res, &channelViewer)
 	}
 	return res
+}
+
+// ChartViews generates a chart for a given channel
+func (vs *Viewers) ChartViews(channelName string) {
+	// need time and views at this time
+	views := float64((*vs).views[channelName])
+	chartViews = append(chartViews, views)
+	viewTime := time.Now()
+	chartTime = append(chartTime, viewTime)
+	// Need two slices
+	charting.DrawChart(chartViews, chartTime)
 }
