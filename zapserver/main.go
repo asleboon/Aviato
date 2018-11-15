@@ -47,7 +47,7 @@ func main() {
 
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
-	chartViews, chartTime := ztore.Chart("NRK1")
+	chartViews, chartTime := ztore.GetChart()
 	for i, val := range chartViews {
 		fmt.Printf("value: %f, at index %d\n", val, i)
 	}

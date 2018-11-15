@@ -13,7 +13,8 @@ type ZapLogger interface {
 	Viewers(channelName string) int
 	Channels() []string
 	ChannelsViewers() []*ChannelViewers
-	Chart(channelName string) ([]float64, []time.Time)
+	Chart(views float64, viewTime time.Time)
+	GetChart() (views []float64, viewTime []time.Time)
 }
 
 type ChannelViewers struct {

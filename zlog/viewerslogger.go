@@ -96,10 +96,12 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 }
 
 // ChartViews generates a chart for a given channel
-func (vs *Viewers) Chart(channelName string) ([]float64, []time.Time) {
+func (vs *Viewers) Chart(views float64, viewTime time.Time) {
 	// need time and views at this time
-	views := float64((*vs).views[channelName])
 	chartViews = append(chartViews, views)
-	chartTime = append(chartTime, time.Now())
+	chartTime = append(chartTime, viewTime)
+}
+
+func (vs *Viewers) GetChart() ([]float64, []time.Time) {
 	return chartViews, chartTime
 }
