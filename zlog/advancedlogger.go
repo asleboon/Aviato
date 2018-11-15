@@ -9,12 +9,14 @@ import (
 )
 
 // Logger type contains datastructure for logging viewers, duration and mute stats from a set-top box.
+// Remark: HDMI_Status and Volume not considered in mute and durationlogger
 type Logger struct {
 	viewers  map[string]int           // Key: channel name, value: current number of viewers (viewerslogger)
 	duration map[string]time.Duration // Key: channel name, value: total viewtime (durationlogger)
-	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap
-	mute     map[string]chanMute      // Key: channel name, value: mute stats (mutelogger)
-	prevMute map[string]muteStat      // Key: IP address, value: previous mute
+	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used for durationlogger)
+	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used for mutelogger)
+	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
+	sma      map[string][]*smaStats   // Key: channel name, value: views
 	lock     sync.Mutex
 }
 
@@ -27,8 +29,7 @@ type chanMute struct {
 }
 
 type muteStat struct {
-	channel   string    // Previous channel watched
-	volume    string    // Previous volume value
+	//channel   string    // Previous channel watched. Do not need this
 	mute      string    // Previous mute value
 	muteStart time.Time // Time when mute was started
 }
@@ -39,8 +40,9 @@ func NewAdvancedZapLogger() AdvZapLogger {
 		viewers:  make(map[string]int, 0),
 		duration: make(map[string]time.Duration, 0),
 		prevZap:  make(map[string]chzap.ChZap, 0),
-		mute:     make(map[string]chanMute, 0),
-		prevMute: make(map[string]muteStat, 0),
+		prevMute: make(map[string]*muteStat, 0),
+		mute:     make(map[string]*chanMute, 0),
+		sma:      make(map[string][]*smaStats, 0),
 	}
 	return &lg
 }
@@ -49,20 +51,21 @@ func NewAdvancedZapLogger() AdvZapLogger {
 func (lg *Logger) LogZap(z chzap.ChZap) {
 	lg.lock.Lock() // or (*lg)?
 	defer lg.lock.Unlock()
-	// Can we run these as go routines? (Remember locks!)
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure
 	logZapMute(z, lg)     // Update mute data structure
 }
 
 func logZapViewers(z chzap.ChZap, lg *Logger) {
-	count, exists := (*lg).viewers[z.ToChan]
+	// ToChan handling
+	count, exists := lg.viewers[z.ToChan]
 	if exists {
 		lg.viewers[z.ToChan] = count + 1
 	} else {
 		lg.viewers[z.ToChan] = 1
 	}
 
+	// FromChan handling
 	count, exists = lg.viewers[z.FromChan]
 	if exists {
 		lg.viewers[z.FromChan] = count - 1
@@ -73,7 +76,6 @@ func logZapViewers(z chzap.ChZap, lg *Logger) {
 
 func logZapDuration(z chzap.ChZap, lg *Logger) {
 	pZap, exists := lg.prevZap[z.IP]
-
 	if exists {
 		newDur := z.Duration(pZap.Time)    // Duration between previous and this zap on IP
 		lg.duration[pZap.ToChan] += newDur // Add duration for channel
@@ -82,39 +84,47 @@ func logZapDuration(z chzap.ChZap, lg *Logger) {
 }
 
 func logZapMute(z chzap.ChZap, lg *Logger) {
+
 	prev, ipExists := lg.prevMute[z.IP]
-	if !ipExists {
-		lg.prevMute[z.IP] = muteStat{}
-		prev = lg.prevMute[z.IP]
-	}
 
-	fromChannelStats, channelExists := lg.mute[z.FromChan]
-	if channelExists {
-		lg.viewers[z.ToChan]--
-		if prev.mute == "1" || prev.volume == "0" {
-			fromChannelStats.numberOfMute--
-			fromChannelStats.duration += z.Duration(prev.muteStart)
+	if ipExists == true { // If no prev mute values exist for this IP, do nothing
+		// From channel handling
+		fromChannelStats, channelExists := lg.mute[z.FromChan]
+
+		if !channelExists { // Initialize chanMute struct for this channel
+			minInt := -int(^uint(0)>>1) - 1
+			lg.mute[z.FromChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
+			fromChannelStats = lg.mute[z.FromChan]
 		}
-	} else {
-		lg.mute[z.FromChan] = chanMute{muteViewers: make(map[string]bool, 0)}
-	}
 
-	toChanStats, channelExists := lg.mute[z.ToChan]
-	if channelExists {
-		lg.viewers[z.ToChan]++
-		prev.channel = z.ToChan
-		if prev.mute == "1" || prev.volume == "0" {
-			toChanStats.numberOfMute++
-			if prev.muteStart.IsZero() {
-				prev.muteStart = z.Time
+		if prev.mute == "1" {
+			fromChannelStats.numberOfMute--
+			if !prev.muteStart.IsZero() {
+				fromChannelStats.duration += z.Time.Sub(prev.muteStart)
 			}
 		}
-		_, ipMuteExists := toChanStats.muteViewers[z.IP]
-		if !ipMuteExists {
-			toChanStats.muteViewers[z.IP] = true
+
+		// To channel handling
+		toChannelStats, channelExists := lg.mute[z.ToChan]
+		if !channelExists {
+			minInt := -int(^uint(0)>>1) - 1
+			lg.mute[z.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
+			toChannelStats = lg.mute[z.ToChan]
 		}
-	} else {
-		lg.mute[z.ToChan] = chanMute{muteViewers: make(map[string]bool, 0)}
+		if prev.mute == "1" {
+			// Increment number of mutes on channel and set maxMuteNum and maxMuteTime if true
+			toChannelStats.numberOfMute++
+			if toChannelStats.numberOfMute > toChannelStats.maxMuteNum {
+				toChannelStats.maxMuteTime = time.Now()
+				toChannelStats.maxMuteNum = toChannelStats.numberOfMute
+			}
+			// Update prev mute
+			prev.mute = "1"
+			prev.muteStart = z.Time
+
+			// Add IP address to map of IP addresses that have viewed this channel muted
+			toChannelStats.muteViewers[z.IP] = true
+		}
 	}
 }
 
@@ -122,17 +132,52 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 func (lg *Logger) LogStatus(s chzap.StatusChange) {
 	lg.lock.Lock()
 	defer lg.lock.Unlock()
-	// Can we run these as go routines? (Remember locks!)
-	logStatusDuration(s, lg) // Update duration data structure
-	logStatusMute(s, lg)     // Update mute data structure
+	logStatusMute(s, lg) // Update mute data structure
 }
 
-func logStatusDuration(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement. Partly implemented in durationlogger.go
-}
-
+// logStatusMute is working, but not with correct time
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
-	// TODO: Implement. Partly implemented in mutelogger.go
+	pZap, pZapExists := lg.prevZap[s.IP]
+	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
+		channelStats, channelExists := lg.mute[pZap.ToChan]
+		prev, ipExists := lg.prevMute[s.IP]
+
+		if s.Status == "Mute_Status: 1" || s.Status == "Mute_Status: 0" {
+			if !ipExists { // Create new muteStat struct for IP if not present
+				lg.prevMute[s.IP] = &muteStat{}
+				prev = lg.prevMute[s.IP]
+			}
+			if !channelExists { // Create new chanMute struct for IP if not present
+				minInt := -int(^uint(0)>>1) - 1
+				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
+				channelStats = lg.mute[pZap.ToChan]
+			}
+		}
+
+		if s.Status == "Mute_Status: 1" {
+			if channelExists {
+				channelStats.numberOfMute++
+				if channelStats.numberOfMute > channelStats.maxMuteNum {
+					channelStats.maxMuteTime = time.Now() // TODO: Does this work?
+					channelStats.maxMuteNum = channelStats.numberOfMute
+				}
+				channelStats.muteViewers[s.IP] = true
+			}
+			// Update prev mute values
+			prev.mute = "1"
+			prev.muteStart = s.Time // Can't change this to time.Now()!!
+
+		} else if s.Status == "Mute_Status: 0" {
+			if channelExists {
+				channelStats.numberOfMute--
+				if !prev.muteStart.IsZero() {
+					lg.mute[pZap.ToChan].duration += s.Time.Sub(prev.muteStart)
+				}
+			}
+			// Update prev mute value
+			prev.mute = "0"
+		}
+	}
 }
 
 // Entries returns the length of the views map (# of channels)
@@ -169,6 +214,14 @@ func (lg *Logger) Channels() []string {
 	return channels
 }
 
+// TODO: Add comment
+func (lg *Logger) ChannelsSMA(channelName string) *map[string][]*smaStats {
+	count := lg.viewers[channelName]
+	output := &smaStats{Views: count, TimeAdded: time.Now()}
+	lg.sma[channelName] = append(lg.sma[channelName], output)
+	return &lg.sma
+}
+
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (lg *Logger) ChannelsViewers() []*AdvChannelViewers {
 	lg.lock.Lock()
@@ -176,7 +229,7 @@ func (lg *Logger) ChannelsViewers() []*AdvChannelViewers {
 	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	res := make([]*AdvChannelViewers, 0)
-	for channel, viewers := range (*lg).viewers {
+	for channel, viewers := range lg.viewers {
 		advChannelViewer := AdvChannelViewers{Channel: channel, Viewers: viewers}
 		res = append(res, &advChannelViewer)
 	}
@@ -190,7 +243,7 @@ func (lg *Logger) ChannelsDuration() []*AdvChannelDuration {
 	defer util.TimeElapsed(time.Now(), "ChannelsDuration")
 
 	res := make([]*AdvChannelDuration, 0)
-	for channel, duration := range (*lg).duration {
+	for channel, duration := range lg.duration {
 		advChannelDuration := AdvChannelDuration{Channel: channel, Duration: duration}
 		res = append(res, &advChannelDuration)
 	}
@@ -205,13 +258,16 @@ func (lg *Logger) ChannelsMute() []*AdvChannelMute {
 
 	// Create slice with avg. mute duration per viewer and time of the day with highest number of muted viewers
 	res := make([]*AdvChannelMute, 0)
-	for channel, mute := range (*lg).mute {
-		avgMute := 0
+	for channel, mute := range lg.mute {
+		avgMute := 0.0
 		if len(mute.muteViewers) > 0 {
-			avgMute = int(mute.duration.Seconds()) / len(mute.muteViewers)
+			avgMute = mute.duration.Seconds() / float64(len(mute.muteViewers))
+			// TODO: Check that avgMute is desired format
 		}
-		advChannelMute := AdvChannelMute{Channel: channel, AvgMute: avgMute, MaxMuteTime: mute.maxMuteTime}
-		res = append(res, &advChannelMute)
+		if avgMute > 0 { // Don't want to include channels without a valid average mute in result
+			advChannelMute := AdvChannelMute{Channel: channel, AvgMute: time.Duration(avgMute), MaxMuteTime: mute.maxMuteTime}
+			res = append(res, &advChannelMute)
+		}
 	}
 	return res
 }

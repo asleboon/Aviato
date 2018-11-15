@@ -17,7 +17,7 @@ import (
 )
 
 type SubscribeServer struct {
-	logger zlog.AdvZapLogger
+	logger zlog.AdvZapLogger // TODO: Remove * ?
 }
 
 var conn *net.UDPConn
@@ -157,11 +157,35 @@ func (s *SubscribeServer) top10Mute() string {
 		if count != 0 {
 			top10Str += "\n"
 		}
-		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %v\n", count+1, v.Channel, v.AvgMute)
-		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %v", v.MaxMuteTime)
+    
+		top10Str += fmt.Sprintf("%v. %v, average muted duration per viewer: %d\n", count+1, v.Channel, v.AvgMute)
+		t := v.MaxMuteTime
+		top10Str += fmt.Sprintf("Time with highest number of muted viewers: %d-%02d-%02d %02d:%02d:%02d\n", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
 	}
 	top10Str += "\n\n"
 	return top10Str
+}
+
+func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
+	sumViewers := float64(0)
+	count := float64(0)
+	sma := s.logger.ChannelsSMA(smaChannel) // returns a map with smaStats
+
+	for _, v := range *sma {
+		for _, smaStat := range v {
+
+			if time.Now().Sub(smaStat.TimeAdded) < (time.Duration(smaLength) * time.Second) {
+				sumViewers += float64(smaStat.Views)
+				count++
+			} else {
+
+			}
+		}
+	}
+	if count == 0 {
+		return fmt.Sprintf("Simple moving average for %s: %d\n", smaChannel, 0)
+	}
+	return fmt.Sprintf("Simple moving average for %s the last %d seconds is %.2f:\n", smaChannel, smaLength, sumViewers/count)
 }
 
 // Subscribe handles a client subscription request
@@ -177,16 +201,18 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 		tickChan := time.NewTicker(time.Second * time.Duration(in.RefreshRate))
 		defer tickChan.Stop()
 		for range tickChan.C { // Runs code inside loop ~ at specified refresh rate
-			top10Str := ""
+			resString := ""
 			if in.StatisticsType == "viewership" {
-				top10Str = s.top10Viewers()
+				resString = s.top10Viewers()
 			} else if in.StatisticsType == "duration" {
-				top10Str = s.top10Duration()
+				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
-				top10Str = s.top10Mute()
+				resString = s.top10Mute()
+			} else if in.StatisticsType == "SMA" {
+				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
 
-			err := stream.Send(&pb.NotificationMessage{Top10: top10Str})
+			err := stream.Send(&pb.NotificationMessage{Top10: resString})
 			if err != nil {
 				return err
 			}
