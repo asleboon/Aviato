@@ -263,6 +263,8 @@ func main() {
 			log.Fatal("could not start CPU profile: ", err)
 		}
 		defer pprof.StopCPUProfile()
+		fmt.Println("Saved cpu profile")
+		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *cpuprofile)
 	}
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
