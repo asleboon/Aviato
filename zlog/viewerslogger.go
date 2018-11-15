@@ -8,7 +8,6 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// Exported or unexported?
 type Viewers struct {
 	views map[string]int // Key: Channelname, value: Viewers
 	lock  sync.Mutex

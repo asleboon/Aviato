@@ -29,7 +29,6 @@ type chanMute struct {
 }
 
 type muteStat struct {
-	//channel   string    // Previous channel watched. Do not need this
 	mute      string    // Previous mute value
 	muteStart time.Time // Time when mute was started
 }
