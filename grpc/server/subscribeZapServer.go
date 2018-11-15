@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime/pprof"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
@@ -30,6 +31,11 @@ var (
 		"endpoint",
 		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
 		"Endpoint on which server runs. Preferable",
+	)
+	memprofile = flag.String(
+		"memprofile",
+		"",
+		"write memory profile to this file",
 	)
 )
 
@@ -83,8 +89,19 @@ func main() {
 	}
 
 	fmt.Printf("Preparing to serve incoming requests...\n")
-	err = grpcServer.Serve(listener)
-	if err != nil {
-		fmt.Printf("Error with gRPC serve. Quitting...")
+	go grpcServer.Serve(listener)
+
+	// Here we wait for CTRL-C or some other kill signal
+	s := <-signalChan
+	fmt.Println("Server stopping on", s, "signal")
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
+		fmt.Println("Saved memory profile")
+		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *memprofile)
 	}
 }

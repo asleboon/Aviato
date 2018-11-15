@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
 
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"google.golang.org/grpc"
@@ -80,6 +81,8 @@ func dumpTop10(stream pb.Subscription_SubscribeClient, sType string) {
 
 func main() {
 	parseFlags()
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Kill, os.Interrupt)
 
 	conn, err := grpc.Dial(*endpoint, grpc.WithInsecure()) // WithInsecure: Disable transport security connection
 	if err != nil {
@@ -97,7 +100,9 @@ func main() {
 	err = stream.Send(&pb.SubscribeMessage{RefreshRate: *refreshRate, StatisticsType: *statisticsType, SmaChannel: *smaChannel, SmaLength: *smaLength}) // Send subscribe msg to gRPC server
 	stream.CloseSend()                                                                                                                                  // Client will not send more messages on the stream
 
-	waitchan := make(chan struct{}) // Wait channel so main does not return
 	go dumpTop10(stream, *statisticsType)
-	<-waitchan
+
+	// Here we wait for CTRL-C or some other kill signal
+	s := <-signalChan
+	fmt.Println("Client stopping on", s, "signal")
 }
