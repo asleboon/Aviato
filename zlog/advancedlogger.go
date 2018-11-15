@@ -219,7 +219,6 @@ func (lg *Logger) Channels() []string {
 // TODO: Add comment
 func (lg *Logger) ChannelsSMA(channelName string) *map[string][]*smaStats {
 	count := lg.viewers[channelName]
-	fmt.Printf("count: %q", count)
 	output := &smaStats{Views: count, TimeAdded: time.Now()}
 	lg.sma[channelName] = append(lg.sma[channelName], output)
 	return &lg.sma
