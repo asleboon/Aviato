@@ -17,6 +17,7 @@ var (
 	labnum     = flag.String("lab", "c1", "which lab exercise to run")
 	showHelp   = flag.Bool("h", false, "show this help message and exit")
 	memprofile = flag.String("memprofile", "", "write memory profile to this file")
+	cpuprofile = flag.String("memprofile", "", "write memory profile to this file")
 )
 
 var ztore zlog.ZapLogger
@@ -56,5 +57,15 @@ func main() {
 		f.Close()
 		fmt.Println("Saved memory profile")
 		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *memprofile)
+	}
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+		fmt.Println("Saved cpu profile")
+		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *cpuprofile)
 	}
 }
