@@ -194,7 +194,7 @@ func (lg *Logger) Viewers(channelName string) int {
 	defer lg.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Viewers")
 
-	count, exists := lg.viewers[channelName]
+	count, exists := (*lg).viewers[channelName]
 	if exists {
 		return count
 	}
@@ -208,7 +208,7 @@ func (lg *Logger) Channels() []string {
 	defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
-	for channel := range lg.viewers {
+	for channel := range (*lg).viewers {
 		channels = append(channels, channel)
 	}
 	return channels
