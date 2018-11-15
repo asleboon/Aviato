@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// SubscribeServer Go away green line ...
+// SubscribeServer includes a logger for zap- and statusevents
 type SubscribeServer struct {
 	logger zlog.AdvZapLogger
 }
