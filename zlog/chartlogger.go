@@ -28,29 +28,27 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	defer cl.lock.Unlock()
 
 	// Log views
-	vtSlice, exists := cl.v[z.ToChan]
+	_, exists := cl.v[z.ToChan]
 	if !exists {
 		cl.v[z.ToChan] = []*ViewTime{&ViewTime{Times: z.Time, Views: 1}}
-		vtSlice = cl.v[z.ToChan]
 	} else {
-		prevVt := *vtSlice[len(vtSlice)-1]
-		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
+		prevVt := cl.v[z.ToChan][len(cl.v[z.ToChan])-1]
+		cl.v[z.ToChan] = append(cl.v[z.ToChan], &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
 		fmt.Printf("PrevVt: %v", prevVt)
 	}
-	for _, value := range vtSlice {
+	for _, value := range cl.v[z.ToChan] {
 		fmt.Printf("ToChannel: %v, Times: %v, Views: %v\n", z.ToChan, value.Times, value.Views)
 	}
 
-	vtSlice, exists = cl.v[z.FromChan]
+	_, exists = cl.v[z.FromChan]
 	if !exists {
 		cl.v[z.FromChan] = []*ViewTime{&ViewTime{Times: z.Time, Views: -1}}
-		vtSlice = cl.v[z.FromChan]
 	} else {
-		prevVt := *vtSlice[len(vtSlice)-1]
-		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
+		prevVt := cl.v[z.FromChan][len(cl.v[z.FromChan])-1]
+		cl.v[z.FromChan] = append(cl.v[z.FromChan], &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
 		fmt.Printf("PrevVt: %v", prevVt)
 	}
-	for _, value := range vtSlice {
+	for _, value := range cl.v[z.FromChan] {
 		fmt.Printf("FromChannel: %v, Times: %v, Views: %v\n", z.FromChan, value.Times, value.Views)
 	}
 
