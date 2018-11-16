@@ -28,9 +28,10 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	defer cl.lock.Unlock()
 
 	// Log views
-	vtSlice, _ := cl.v[z.ToChan]
-	if len(vtSlice) <= 0 {
-		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: 1})
+	vtSlice, exists := cl.v[z.ToChan]
+	if !exists {
+		cl.v[z.ToChan] = []*ViewTime{&ViewTime{Times: z.Time, Views: 1}}
+		vtSlice = cl.v[z.ToChan]
 	} else {
 		prevVt := vtSlice[len(vtSlice)-1]
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
@@ -39,17 +40,42 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 		fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.ToChan, value.Times, value.Views)
 	}
 
-	vtSlice = cl.v[z.FromChan]
-	if len(vtSlice) <= 0 {
-		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: -1})
+	vtSlice, exists = cl.v[z.FromChan]
+	if !exists {
+		cl.v[z.FromChan] = []*ViewTime{&ViewTime{Times: z.Time, Views: 1}}
+		vtSlice = cl.v[z.FromChan]
 	} else {
 		prevVt := vtSlice[len(vtSlice)-1]
-		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
+		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
 	}
 	for _, value := range vtSlice {
 		fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.FromChan, value.Times, value.Views)
 	}
+
 	fmt.Println()
+
+	/*
+		vtSlice = cl.v[z.FromChan]
+		if len(vtSlice) <= 0 {
+			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: -1})
+		} else {
+			prevVt := vtSlice[len(vtSlice)-1]
+			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
+		}
+		for _, value := range vtSlice {
+			fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.FromChan, value.Times, value.Views)
+		}
+
+		if len(vtSlice) <= 0 {
+			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: 1})
+		} else {
+			prevVt := vtSlice[len(vtSlice)-1]
+			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
+		}
+		for _, value := range vtSlice {
+			fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.ToChan, value.Times, value.Views)
+		}
+	*/
 }
 
 func (cl *Chartlogger) GetChartVal(channelName string) []*ViewTime {
