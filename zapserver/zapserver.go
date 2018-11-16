@@ -19,7 +19,7 @@ import (
 
 var conn *net.UDPConn
 var err error
-var ztoreGraph *zlog.Chartlogger
+var ztoreGraph zlog.Chartlogger
 
 func runLab() {
 	switch *labnum {
@@ -49,7 +49,7 @@ func runLab() {
 		go top10Viewers()
 	case "g":
 		go recordAll()
-		go drawChart("NRK1")
+		//go drawChart("NRK1")
 		//go drawChart("TV2")
 	}
 }
