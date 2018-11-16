@@ -48,11 +48,11 @@ func main() {
 
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
-	chartViews, chartTime := ztore.StupidChart()
-	if len(chartViews) == 0 {
+	views, times := ztore.StupidChart()
+	if len(views) == 0 {
 		fmt.Println("this is empty")
 	}
-	for i, each := range chartViews {
+	for i, each := range views {
 		fmt.Printf("%1.f views at index %d", each, i)
 	}
 	charting.DrawChart(chartViews, chartTime)
