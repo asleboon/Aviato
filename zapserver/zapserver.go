@@ -171,8 +171,8 @@ func drawChart(channelName string) {
 	for range tickChan.C { // Runs code inside loop every 24hrs
 		data := ztoreGraph.GetChartVal(channelName)
 		for count, value := range data {
-			times = append(times, value.times)
-			views = append(views, value.views)
+			times = append(times, value.Times)
+			views = append(views, value.Views)
 		}
 	}
 	fmt.Printf("\nViews: %v", views)

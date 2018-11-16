@@ -12,8 +12,8 @@ type Chartlogger struct {
 	lock  sync.Mutex
 }
 type ViewTime struct {
-	times time.Time
-	views float64
+	Times time.Time
+	Views float64
 }
 
 func NewChartLogger() *Chartlogger {
