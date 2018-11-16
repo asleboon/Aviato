@@ -49,23 +49,3 @@ func GetChartVal(channelName string, cl *Chartlogger) []*viewTime {
 	defer cl.lock.Unlock()
 	return cl.views[channelName]
 }
-
-// Entries returns the length of views map (# of channnels)
-func (cl *Chartlogger) Entries() int {
-	return 0
-}
-
-// Viewers return number of viewers for a channel
-func (cl *Chartlogger) Viewers(channelName string) int {
-	return 0
-}
-
-// Channels creates a list of channels in the viewers.
-func (cl *Chartlogger) Channels() []string {
-	return nil
-}
-
-// ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
-func (cl *Chartlogger) ChannelsViewers() []*ChannelViewers {
-	return nil
-}
