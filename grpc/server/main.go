@@ -85,7 +85,7 @@ func main() {
 	udpServer, err := NewUDPServer("224.0.1.130:10000") // have to specify this specifically unless we use another flag
 	subscribeServer := &SubscribeServer{logger: zlog.NewAdvancedZapLogger()}
 
-	go subscribeServer.recordAll(udpServer) // Record all zaps and store in logger
+	go subscribeServer.recordAll(udpServer) // Record all zaps and store in logger, need udpServer for this
 
 	pb.RegisterSubscriptionServer(grpcServer, subscribeServer)
 

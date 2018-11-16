@@ -291,11 +291,11 @@ Run from grpc/server folder
 - `cpuprofile`: Write cpu profile to this file
 #### Command
 ```
-go run subscribeServer.go [-endpoint {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
+go run *.go [-endpoint {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
 ```
-#### Example
+#### Examples
 ```
-go run subscribeServer.go -endpoint localhost:1994
+go run *.go -endpoint localhost:1994
 ```
 
 ### Client
@@ -312,7 +312,9 @@ Run from grpc/client folder
 go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}] 
    [-smaChannel {channel}] [smaLength {interval}]
 ```
-#### Example
+#### Examples
 ```
 go run subscribeClient.go -endpoint localhost:1994 -rate 2 -type mute
+
+go run subscribeClient.go -endpoint localhost:1994 -rate 2 -type sma -smaChan NRK1 -smaLen 10
 ```
