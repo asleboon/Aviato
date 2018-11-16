@@ -1,7 +1,6 @@
 package zlog
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -43,31 +42,6 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 		prevVt := cl.v[z.FromChan][len(cl.v[z.FromChan])-1]
 		cl.v[z.FromChan] = append(cl.v[z.FromChan], &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
 	}
-
-	fmt.Println()
-
-	/*
-		vtSlice = cl.v[z.FromChan]
-		if len(vtSlice) <= 0 {
-			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: -1})
-		} else {
-			prevVt := vtSlice[len(vtSlice)-1]
-			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
-		}
-		for _, value := range vtSlice {
-			fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.FromChan, value.Times, value.Views)
-		}
-
-		if len(vtSlice) <= 0 {
-			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: 1})
-		} else {
-			prevVt := vtSlice[len(vtSlice)-1]
-			vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
-		}
-		for _, value := range vtSlice {
-			fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.ToChan, value.Times, value.Views)
-		}
-	*/
 }
 
 func (cl *Chartlogger) GetChartVal(channelName string) []*ViewTime {
