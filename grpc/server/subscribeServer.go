@@ -264,15 +264,4 @@ func main() {
 		fmt.Println("Saved memory profile")
 		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *memprofile)
 	}
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-		fmt.Println("Saved cpu profile")
-		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *cpuprofile)
-	}
-
 }

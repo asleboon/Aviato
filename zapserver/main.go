@@ -41,9 +41,9 @@ func main() {
 	parseFlags()
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Kill, os.Interrupt)
-
-	startServer()
-	runLab()
+	server, _ := NewUDPServer(*maddr)
+	server.startServer()
+	server.runLab()
 
 	// Here we wait for CTRL-C or some other kill signal
 	s := <-signalChan
@@ -57,15 +57,5 @@ func main() {
 		f.Close()
 		fmt.Println("Saved memory profile")
 		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *memprofile)
-	}
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-		fmt.Println("Saved cpu profile")
-		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *cpuprofile)
 	}
 }

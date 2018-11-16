@@ -16,10 +16,11 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
 
-var conn *net.UDPConn
-var err error
+type UDPServer struct {
+	conn *net.UDPConn
+}
 
-func runLab() {
+func (s *UDPServer) runLab() {
 	switch *labnum {
 	case "a", "c1", "c2", "d", "e":
 		ztore = zlog.NewSimpleZapLogger()
@@ -28,47 +29,56 @@ func runLab() {
 	}
 	switch *labnum {
 	case "a":
-		go dumpAll()
+		go s.dumpAll()
 	case "c1":
-		go recordAll()
+		go s.recordAll()
 		go showViewers("NRK1")
 	case "c2":
-		go recordAll()
+		go s.recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
 		// See answer in serparate document.
 	case "e":
-		go recordAll()
+		go s.recordAll()
 		go top10Viewers()
 	case "f":
-		go recordAll()
+		go s.recordAll()
 		go top10Viewers()
 	}
 }
 
-func startServer() {
+func NewUDPServer(addr string) (*UDPServer, error) {
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
+	if err != nil {
+		return nil, err
+	}
+	connUDP, err := net.ListenUDP("udp", udpAddr)
+	return &UDPServer{conn: connUDP}, err
+}
+
+func (server *UDPServer) startServer() {
 	log.Println("Starting ZapServer...")
 	// Build UDP address
-	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
+	addr, err := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
 
 	// Create connection
-	conn, err = net.ListenMulticastUDP("udp", nil, addr)
+	server.conn, err = net.ListenMulticastUDP("udp", nil, addr)
 	if err != nil {
 		fmt.Println("NewUDPServer: Error creating UDP connection")
 	}
 }
 
-func readFromUDP() (string, error) {
-	buf := make([]byte, 256)           // UDP packages usually ~50-70 bytes
-	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
+func (server *UDPServer) readFromUDP() (string, error) {
+	buf := make([]byte, 256)                  // UDP packages usually ~50-70 bytes
+	n, _, err := server.conn.ReadFromUDP(buf) // n = Number of bytes read
 	str := string(buf[:n])
 	return str, err
 }
 
 // dumpAll reads new STB events and prints to console
-func dumpAll() {
+func (server *UDPServer) dumpAll() {
 	for {
-		eventStr, err := readFromUDP()
+		eventStr, err := server.readFromUDP()
 		if err != nil { // ReadFromUDP error check
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
@@ -78,9 +88,9 @@ func dumpAll() {
 }
 
 // recordAll processes and stores new viewers in Zaplogger
-func recordAll() {
+func (server *UDPServer) recordAll() {
 	for {
-		eventStr, err := readFromUDP()
+		eventStr, err := server.readFromUDP()
 
 		if err != nil {
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
