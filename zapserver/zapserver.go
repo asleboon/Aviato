@@ -7,7 +7,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"sort"
 	"time"
@@ -56,17 +55,17 @@ func NewUDPServer(addr string) (*UDPServer, error) {
 	return &UDPServer{conn: connUDP}, err
 }
 
-func (server *UDPServer) startServer() {
-	log.Println("Starting ZapServer...")
-	// Build UDP address
-	addr, err := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
+// func (server *UDPServer) startServer() {
+// 	log.Println("Starting ZapServer...")
+// 	// Build UDP address
+// 	addr, err := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
 
-	// Create connection
-	server.conn, err = net.ListenMulticastUDP("udp", nil, addr)
-	if err != nil {
-		fmt.Println("NewUDPServer: Error creating UDP connection")
-	}
-}
+// 	// Create connection
+// 	server.conn, err = net.ListenMulticastUDP("udp", nil, addr)
+// 	if err != nil {
+// 		fmt.Println("NewUDPServer: Error creating UDP connection")
+// 	}
+// }
 
 func (server *UDPServer) readFromUDP() (string, error) {
 	buf := make([]byte, 256)                  // UDP packages usually ~50-70 bytes

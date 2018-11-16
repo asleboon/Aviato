@@ -23,8 +23,11 @@ type SubscribeServer struct {
 	logger zlog.AdvZapLogger
 }
 
+type UDPConn struct {
+	conn *net.UDPConn
+}
+
 var conn *net.UDPConn
-var err error
 
 var (
 	help = flag.Bool(
@@ -62,6 +65,10 @@ func parseFlags() {
 		flag.Usage()
 		os.Exit(0)
 	}
+}
+
+func newUDPServer *net.UDPConn {
+	conn
 }
 
 func startZapServer() {
