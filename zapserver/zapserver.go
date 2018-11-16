@@ -48,7 +48,7 @@ func runLab() {
 		go recordAll()
 		go top10Viewers()
 	case "g":
-		go recordAll()
+		//go recordAll()
 		//go drawChart("NRK1")
 		//go drawChart("TV2")
 	}
