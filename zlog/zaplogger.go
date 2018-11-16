@@ -2,7 +2,6 @@ package zlog
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 )
@@ -13,7 +12,6 @@ type ZapLogger interface {
 	Viewers(channelName string) int
 	Channels() []string
 	ChannelsViewers() []*ChannelViewers
-	StupidChart() ([]float64, []time.Time)
 }
 
 type ChannelViewers struct {

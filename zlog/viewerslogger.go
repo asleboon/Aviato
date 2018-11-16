@@ -11,14 +11,13 @@ import (
 // Viewers holds a lock and a map with key: Channel, Value: viewers
 type Viewers struct {
 	views map[string]int // Key: Channelname, value: Viewers
-	chart map[time.Time]float64
 	lock  sync.Mutex
 }
 
 // NewViewersZapLogger initializes a new map for storing views per channel.
 // Viewers adhere Zaplogger interface.
 func NewViewersZapLogger() ZapLogger {
-	vs := Viewers{views: make(map[string]int, 0), chart: make(map[time.Time]float64)}
+	vs := Viewers{views: make(map[string]int, 0)}
 	return &vs
 }
 
@@ -42,8 +41,6 @@ func (vs *Viewers) LogZap(z chzap.ChZap) {
 		(*vs).views[z.FromChan] = -1
 	}
 }
-func (vs *Viewers) LogStatus(z chzap.StatusChange) {
-}
 
 // Entries returns the length of views map (# of channnels)
 func (vs *Viewers) Entries() int {
@@ -63,7 +60,6 @@ func (vs *Viewers) Viewers(channelName string) int {
 	if exists {
 		return count
 	}
-	(*vs).chart[time.Now()] = float64(count)
 	return 0 // Not found in views map = 0 zaps
 }
 
@@ -92,13 +88,4 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 		res = append(res, &channelViewer)
 	}
 	return res
-}
-
-func (vs *Viewers) StupidChart() ([]float64, []time.Time) {
-	views, times := []float64{}, []time.Time{}
-	for k, v := range (*vs).chart {
-		times = append(times, k)
-		views = append(views, v)
-	}
-	return views, times
 }

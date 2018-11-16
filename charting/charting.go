@@ -9,7 +9,7 @@ import (
 	"github.com/wcharczuk/go-chart"
 )
 
-func DrawChart(channelViews []float64, viewTime []time.Time) {
+func DrawChart(channelName string, channelViews []float64, viewTime []time.Time) {
 
 	graph := chart.Chart{
 		XAxis: chart.XAxis{
@@ -24,7 +24,7 @@ func DrawChart(channelViews []float64, viewTime []time.Time) {
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
-				Name: "Nrk Viewers",
+				Name: channelName,
 				Style: chart.Style{
 					Show:        true,
 					StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
@@ -36,12 +36,15 @@ func DrawChart(channelViews []float64, viewTime []time.Time) {
 		},
 	}
 
+	buffer := bytes.NewBuffer([]byte{})
+	err := graph.Render(chart.PNG, buffer)
+
 	// add legend
 	graph.Elements = []chart.Renderable{
 		chart.Legend(&graph),
 	}
 
-	buffer := bytes.NewBuffer([]byte{})
+	buffer = bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
 	// Write to file.

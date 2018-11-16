@@ -12,12 +12,14 @@ import (
 	"sort"
 	"time"
 
+	"github.com/uis-dat320-fall18/Aviato/charting"
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
 
 var conn *net.UDPConn
 var err error
+var ztoreGraph *Chartlogger
 
 func runLab() {
 	switch *labnum {
@@ -25,6 +27,8 @@ func runLab() {
 		ztore = zlog.NewSimpleZapLogger()
 	case "f":
 		ztore = zlog.NewViewersZapLogger()
+	default:
+		ztoreGraph = zlog.NewChartLogger()
 	}
 	switch *labnum {
 	case "a":
@@ -36,13 +40,17 @@ func runLab() {
 		go recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
-		// See answer in serparate document.
+		// See answer in separate document.
 	case "e":
 		go recordAll()
 		go top10Viewers()
 	case "f":
 		go recordAll()
 		go top10Viewers()
+	case "g":
+		go recordAll()
+		go drawChart("NRK1")
+		go drawChart("TV2")
 	}
 }
 
@@ -91,6 +99,7 @@ func recordAll() {
 			} else {
 				if chZap != nil {
 					ztore.LogZap(*chZap) // Make a copy of pointer value
+					ztoreGraph.LogZap(*chZap)
 				}
 			}
 		}
@@ -153,4 +162,20 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 		channels = channels[:10]
 	}
 	return channels
+}
+
+func drawChart(channelName string) {
+	views, times := []float64{}, []time.Time{}
+	tickChan := time.NewTicker(time.Second * 60) // TODO: Change to time.Hour * 24
+	defer tickChan.Stop()
+	for range tickChan.C { // Runs code inside loop every 24hrs
+		data := ztoreGraph.GetChartVal(channelName)
+		for count, value := range data {
+			times = append(times, value.times)
+			views = append(views, value.views)
+		}
+	}
+	fmt.Printf("\nViews: %v", views)
+	fmt.Printf("\nTimes: %v", times)
+	charting.DrawChart(channelName, views, times)
 }
