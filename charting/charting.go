@@ -3,6 +3,7 @@ package charting
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"time"
 
@@ -44,7 +45,8 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 	graph.Render(chart.PNG, buffer)
 
 	// Write to file.
-	fo, err := os.Create("image.png")
+	imgName := fmt.Sprintf(channelName + ".png")
+	fo, err := os.Create(imgName)
 	if err != nil {
 		panic(err)
 	}
