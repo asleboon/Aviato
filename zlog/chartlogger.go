@@ -43,7 +43,10 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 		prevVt := vtSlice[len(vtSlice)-1]
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
 	}
-	fmt.Printf("VtSlice: %v\n", vtSlice)
+	for _, value := range vtSlice {
+		fmt.Printf("%v, %v", value.Times, value.Views)
+	}
+	fmt.Println()
 }
 
 func (cl *Chartlogger) GetChartVal(channelName string) []*ViewTime {
