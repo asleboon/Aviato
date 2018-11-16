@@ -27,7 +27,7 @@ func runLab() {
 		ztore = zlog.NewSimpleZapLogger()
 	case "f":
 		ztore = zlog.NewViewersZapLogger()
-	default:
+	case "g":
 		ztoreGraph = zlog.NewChartLogger()
 	}
 	switch *labnum {
