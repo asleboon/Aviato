@@ -100,7 +100,7 @@ func recordAll() {
 			} else {
 				if chZap != nil {
 					ztore.LogZap(*chZap) // Make a copy of pointer value
-					//ztoreGraph.LogZap(*chZap)
+					ztoreGraph.LogZap(*chZap)
 				}
 			}
 		}
@@ -166,7 +166,7 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 }
 
 func drawChart(channelName string) {
-	fmt.Printf("Drawing chart for %v\n", channelName)
+	fmt.Printf("Drawing chart for '%v'\n", channelName)
 	views, times := []float64{}, []time.Time{}
 	tickChan := time.NewTicker(time.Second * 5) // TODO: Change to time.Hour * 24
 	defer tickChan.Stop()
