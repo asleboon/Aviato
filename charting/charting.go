@@ -35,19 +35,16 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 		},
 	}
 
-	buffer := bytes.NewBuffer([]byte{})
-	err := graph.Render(chart.PNG, buffer)
-
 	// add legend
 	graph.Elements = []chart.Renderable{
 		chart.Legend(&graph),
 	}
 
-	buffer = bytes.NewBuffer([]byte{})
+	buffer := bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
 	// Write to file.
-	fo, err := os.Create("img.png")
+	fo, err := os.Create("image.png")
 	if err != nil {
 		panic(err)
 	}
