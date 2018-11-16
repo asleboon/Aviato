@@ -168,16 +168,18 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 func drawChart(channelName string) {
 	fmt.Printf("Drawing chart for %v\n", channelName)
 	views, times := []float64{}, []time.Time{}
-	tickChan := time.NewTicker(time.Second * 60) // TODO: Change to time.Hour * 24
+	tickChan := time.NewTicker(time.Second * 5) // TODO: Change to time.Hour * 24
 	defer tickChan.Stop()
 	for range tickChan.C { // Runs code inside loop every 24hrs
 		data := ztoreGraph.GetChartVal(channelName)
+		fmt.Printf("Data:%v", data)
 		for _, value := range data {
 			times = append(times, value.Times)
 			views = append(views, value.Views)
 		}
+		fmt.Printf("\nViews: %v", views)
+		fmt.Printf("\nTimes: %v", times)
+		charting.DrawChart(channelName, views, times)
 	}
-	fmt.Printf("\nViews: %v", views)
-	fmt.Printf("\nTimes: %v", times)
-	charting.DrawChart(channelName, views, times)
+
 }
