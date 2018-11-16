@@ -35,6 +35,7 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	} else {
 		prevVt := vtSlice[len(vtSlice)-1]
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
+		fmt.Printf("PrevVt: %v", prevVt)
 	}
 	for _, value := range vtSlice {
 		fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.ToChan, value.Times, value.Views)
@@ -47,6 +48,7 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	} else {
 		prevVt := vtSlice[len(vtSlice)-1]
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
+		fmt.Printf("PrevVt: %v", prevVt)
 	}
 	for _, value := range vtSlice {
 		fmt.Printf("Channel: %v, Times: %v, Views: %v\n", z.FromChan, value.Times, value.Views)
