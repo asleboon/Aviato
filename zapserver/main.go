@@ -45,7 +45,7 @@ func main() {
 	runLab()
 
 	// Here we wait for CTRL-C or some other kill signal
-	s := <-signalChan
+	<-signalChan
 
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
