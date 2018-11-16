@@ -165,7 +165,7 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 }
 
 func drawChart(channelName string) {
-	fmt.Printf("Drawing chart for %v", channelName)
+	fmt.Printf("Drawing chart for %v\n", channelName)
 	views, times := []float64{}, []time.Time{}
 	tickChan := time.NewTicker(time.Second * 60) // TODO: Change to time.Hour * 24
 	defer tickChan.Stop()
