@@ -1,6 +1,7 @@
 package zlog
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -25,6 +26,7 @@ func NewChartLogger() *Chartlogger {
 func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	cl.lock.Lock()
 	defer cl.lock.Unlock()
+	fmt.Printf("Chart logzap")
 
 	// Log views
 	vtSlice := cl.v[z.ToChan]
