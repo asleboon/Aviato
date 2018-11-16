@@ -99,7 +99,7 @@ func recordAll() {
 			} else {
 				if chZap != nil {
 					ztore.LogZap(*chZap) // Make a copy of pointer value
-					ztoreGraph.LogZap(*chZap)
+					//ztoreGraph.LogZap(*chZap)
 				}
 			}
 		}
