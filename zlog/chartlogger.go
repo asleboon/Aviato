@@ -8,8 +8,8 @@ import (
 )
 
 type Chartlogger struct {
-	views map[string][]*ViewTime // Key: Channelname, value: viewtime
-	lock  sync.Mutex
+	v    map[string][]*ViewTime // Key: Channelname, value: viewtime
+	lock sync.Mutex
 }
 type ViewTime struct {
 	Times time.Time
@@ -17,7 +17,7 @@ type ViewTime struct {
 }
 
 func NewChartLogger() *Chartlogger {
-	cl := Chartlogger{views: make(map[string][]*ViewTime, 0)}
+	cl := Chartlogger{v: make(map[string][]*ViewTime, 0)}
 	return &cl
 }
 
@@ -27,25 +27,25 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	defer cl.lock.Unlock()
 
 	// Log views
-	vtSlice := cl.views[z.ToChan]
+	vtSlice := cl.v[z.ToChan]
 	if len(vtSlice) <= 0 {
-		vtSlice = append(vtSlice, &ViewTime{times: z.Time, views: 1})
+		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: 1})
 	} else {
 		prevVt := vtSlice[len(vtSlice)-1]
-		vtSlice = append(vtSlice, &ViewTime{times: z.Time, views: prevVt.views + 1})
+		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
 	}
 
-	vtSlice = cl.views[z.FromChan]
+	vtSlice = cl.v[z.FromChan]
 	if len(vtSlice) <= 0 {
-		vtSlice = append(vtSlice, &ViewTime{times: z.Time, views: -1})
+		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: -1})
 	} else {
 		prevVt := vtSlice[len(vtSlice)-1]
-		vtSlice = append(vtSlice, &ViewTime{times: z.Time, views: prevVt.views - 1})
+		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
 	}
 }
 
 func (cl *Chartlogger) GetChartVal(channelName string) []*ViewTime {
 	cl.lock.Lock()
 	defer cl.lock.Unlock()
-	return cl.views[channelName]
+	return cl.v[channelName]
 }
