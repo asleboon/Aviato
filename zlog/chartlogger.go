@@ -17,7 +17,7 @@ type ViewTime struct {
 	Views float64
 }
 
-func NewChartLogger() Chartlogger {
+func NewChartLogger() *Chartlogger {
 	cl := Chartlogger{v: make(map[string][]*ViewTime, 0)}
 	return &cl
 }
