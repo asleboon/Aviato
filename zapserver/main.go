@@ -55,7 +55,7 @@ func main() {
 	for i, each := range views {
 		fmt.Printf("%1.f views at index %d", each, i)
 	}
-	charting.DrawChart(chartViews, chartTime)
+	charting.DrawChart(views, times)
 	fmt.Println("Server stopping on", s, "signal")
 	fmt.Println("Creating Chart")
 	if *memprofile != "" {
