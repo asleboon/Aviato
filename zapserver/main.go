@@ -42,7 +42,6 @@ func main() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Kill, os.Interrupt)
 	server, _ := NewUDPServer(*maddr)
-	// server.startServer()
 	server.runLab()
 
 	// Here we wait for CTRL-C or some other kill signal

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -23,89 +22,17 @@ type SubscribeServer struct {
 	logger zlog.AdvZapLogger
 }
 
-type UDPConn struct {
-	conn *net.UDPConn
-}
-
-var conn *net.UDPConn
-
-var (
-	help = flag.Bool(
-		"help",
-		false,
-		"Show usage help",
-	)
-	endpoint = flag.String(
-		"endpoint",
-		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
-		"Endpoint on which server runs. Preferable",
-	)
-	memprofile = flag.String(
-		"memprofile",
-		"",
-		"write memory profile to this file",
-	)
-	cpuprofile = flag.String(
-		"cpuprofile",
-		"",
-		"write cpu profile to this file",
-	)
-)
-
-func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS]\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	flag.PrintDefaults()
-}
-
-func parseFlags() {
-	flag.Usage = Usage
-	flag.Parse()
-	if *help {
-		flag.Usage()
-		os.Exit(0)
-	}
-}
-
-func newUDPServer *net.UDPConn {
-	conn
-}
-
-func startZapServer() {
-	log.Println("Starting ZapServer...")
-	// Build UDP address
-	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
-
-	// Create connection
-	conn, err = net.ListenMulticastUDP("udp", nil, addr)
-	if err != nil {
-		fmt.Println("NewUDPServer: Error creating UDP connection")
-	}
-}
-
-func readFromUDP() (string, error) {
-	buf := make([]byte, 256)           // UDP packages usually ~50-70 bytes
-	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
-	str := string(buf[:n])
-	return str, err
-}
-
 // recordAll processes and stores new viewers in Zaplogger
 func (s *SubscribeServer) recordAll() {
 	for {
-		eventStr, err := readFromUDP()
-
-		if err != nil { // ReadFromUDP error check
-			fmt.Printf("ReadFromUDP: error: %v\n", err)
-		} else {
-			chZap, stChange, err := chzap.NewSTBEvent(eventStr)
-			if err != nil {
-				fmt.Printf("Error: %v\n", err)
-			} else if chZap != nil {
-				s.logger.LogZap(*chZap) // Pass a copy of pointer value
-			} else if stChange != nil {
-				s.logger.LogStatus(*stChange) // Pass a copy of pointer value
-			}
+		eventStr, err := ReadFromUDP()
+		chZap, stChange, err := chzap.NewSTBEvent(eventStr)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		} else if chZap != nil {
+			s.logger.LogZap(*chZap) // Pass a copy of pointer value
+		} else if stChange != nil {
+			s.logger.LogStatus(*stChange) // Pass a copy of pointer value
 		}
 	}
 }
@@ -243,8 +170,6 @@ func main() {
 	signal.Notify(signalChan, os.Kill, os.Interrupt)
 
 	grpcServer := grpc.NewServer()
-	startZapServer()
-
 	server := &SubscribeServer{logger: zlog.NewAdvancedZapLogger()}
 	go server.recordAll() // Record all zaps and store in logger
 
