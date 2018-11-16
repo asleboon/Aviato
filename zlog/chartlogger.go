@@ -44,7 +44,7 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	}
 }
 
-func GetChartVal(channelName string, cl *Chartlogger) []*viewTime {
+func (cl *Chartlogger) GetChartVal(channelName string) []*viewTime {
 	cl.lock.Lock()
 	defer cl.lock.Unlock()
 	return cl.views[channelName]
