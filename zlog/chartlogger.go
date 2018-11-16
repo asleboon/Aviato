@@ -34,10 +34,6 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	} else {
 		prevVt := cl.v[z.ToChan][len(cl.v[z.ToChan])-1]
 		cl.v[z.ToChan] = append(cl.v[z.ToChan], &ViewTime{Times: z.Time, Views: prevVt.Views + 1})
-		fmt.Printf("PrevVt: %v", prevVt)
-	}
-	for _, value := range cl.v[z.ToChan] {
-		fmt.Printf("ToChannel: %v, Times: %v, Views: %v\n", z.ToChan, value.Times, value.Views)
 	}
 
 	_, exists = cl.v[z.FromChan]
@@ -46,10 +42,6 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	} else {
 		prevVt := cl.v[z.FromChan][len(cl.v[z.FromChan])-1]
 		cl.v[z.FromChan] = append(cl.v[z.FromChan], &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
-		fmt.Printf("PrevVt: %v", prevVt)
-	}
-	for _, value := range cl.v[z.FromChan] {
-		fmt.Printf("FromChannel: %v, Times: %v, Views: %v\n", z.FromChan, value.Times, value.Views)
 	}
 
 	fmt.Println()
