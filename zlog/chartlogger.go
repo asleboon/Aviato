@@ -26,11 +26,9 @@ func NewChartLogger() *Chartlogger {
 func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	cl.lock.Lock()
 	defer cl.lock.Unlock()
-	fmt.Printf("Chart logzap")
 
 	// Log views
-	vtSlice, exists := cl.v[z.ToChan]
-	fmt.Printf("Exists:%v", exists)
+	vtSlice, _ := cl.v[z.ToChan]
 	if len(vtSlice) <= 0 {
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: 1})
 	} else {
@@ -45,6 +43,7 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 		prevVt := vtSlice[len(vtSlice)-1]
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: prevVt.Views - 1})
 	}
+	fmt.Printf("VtSlice: %v\n", vtSlice)
 }
 
 func (cl *Chartlogger) GetChartVal(channelName string) []*ViewTime {
