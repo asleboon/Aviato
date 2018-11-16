@@ -28,6 +28,7 @@ func runLab() {
 	case "f":
 		ztore = zlog.NewViewersZapLogger()
 	case "g":
+		ztore = zlog.NewViewersZapLogger()
 		ztoreGraph = zlog.NewChartLogger()
 	}
 	switch *labnum {
@@ -48,8 +49,8 @@ func runLab() {
 		go recordAll()
 		go top10Viewers()
 	case "g":
-		//go recordAll()
-		//go drawChart("NRK1")
+		go recordAll()
+		go drawChart("NRK1")
 		//go drawChart("TV2")
 	}
 }
