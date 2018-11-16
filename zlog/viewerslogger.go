@@ -65,6 +65,8 @@ func (vs *Viewers) Viewers(channelName string) int {
 	if exists {
 		return count
 	}
+	chartViews = append(chartViews, float64(count))
+	chartTime = append(chartTime, time.Now())
 	return 0 // Not found in views map = 0 zaps
 }
 
@@ -93,11 +95,6 @@ func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
 		res = append(res, &channelViewer)
 	}
 	return res
-}
-
-func (vs *Viewers) ChartStats(views float64) {
-	chartViews = append(chartViews, views)
-	chartTime = append(chartTime, time.Now())
 }
 
 func (vs *Viewers) StupidChart() ([]float64, []time.Time) {
