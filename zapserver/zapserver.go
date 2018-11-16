@@ -50,7 +50,7 @@ func runLab() {
 	case "g":
 		go recordAll()
 		go drawChart("NRK1")
-		go drawChart("TV2")
+		//go drawChart("TV2")
 	}
 }
 

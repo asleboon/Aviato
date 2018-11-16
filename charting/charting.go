@@ -10,7 +10,6 @@ import (
 )
 
 func DrawChart(channelName string, channelViews []float64, viewTime []time.Time) {
-
 	graph := chart.Chart{
 		XAxis: chart.XAxis{
 			Name:      "Time",

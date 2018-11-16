@@ -29,7 +29,8 @@ func (cl *Chartlogger) LogZap(z chzap.ChZap) {
 	fmt.Printf("Chart logzap")
 
 	// Log views
-	vtSlice := cl.v[z.ToChan]
+	vtSlice, exists := cl.v[z.ToChan]
+	fmt.Printf("Exists:%v", exists)
 	if len(vtSlice) <= 0 {
 		vtSlice = append(vtSlice, &ViewTime{Times: z.Time, Views: 1})
 	} else {
