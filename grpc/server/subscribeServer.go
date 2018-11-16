@@ -3,18 +3,12 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
-	"net"
-	"os"
-	"os/signal"
-	"runtime/pprof"
 	"sort"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
-	"google.golang.org/grpc"
 )
 
 // SubscribeServer includes a logger for zap- and statusevents
@@ -23,9 +17,9 @@ type SubscribeServer struct {
 }
 
 // recordAll processes and stores new viewers in Zaplogger
-func (s *SubscribeServer) recordAll() {
+func (s *SubscribeServer) recordAll(udpServer *UDPServer) {
 	for {
-		eventStr, err := ReadFromUDP()
+		eventStr, err := ReadFromUDP(udpServer)
 		chZap, stChange, err := chzap.NewSTBEvent(eventStr)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
@@ -161,39 +155,5 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				return err
 			}
 		}
-	}
-}
-
-func main() {
-	parseFlags()
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Kill, os.Interrupt)
-
-	grpcServer := grpc.NewServer()
-	server := &SubscribeServer{logger: zlog.NewAdvancedZapLogger()}
-	go server.recordAll() // Record all zaps and store in logger
-
-	pb.RegisterSubscriptionServer(grpcServer, server)
-
-	listener, err := net.Listen("tcp", *endpoint)
-	if err != nil {
-		log.Fatalf("net.listen error: %v\n", err)
-	}
-
-	fmt.Printf("Preparing to serve incoming requests...\n")
-	go grpcServer.Serve(listener)
-
-	// Here we wait for CTRL-C or some other kill signal
-	s := <-signalChan
-	fmt.Println("Server stopping on", s, "signal")
-	if *memprofile != "" {
-		f, err := os.Create(*memprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.WriteHeapProfile(f)
-		f.Close()
-		fmt.Println("Saved memory profile")
-		fmt.Println("Analyze with: go tool pprof $GOPATH/bin/zapserver", *memprofile)
 	}
 }

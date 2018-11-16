@@ -69,7 +69,7 @@ func NewUDPServer(addr string) (*UDPServer, error) {
 	return &UDPServer{conn: connUDP}, nil
 }
 
-func (server *UDPServer) readFromUDP() (string, error) {
+func ReadFromUDP(server *UDPServer) (string, error) {
 	buf := make([]byte, 256)                  // UDP packages usually ~50-70 bytes
 	n, _, err := server.conn.ReadFromUDP(buf) // n = Number of bytes read
 	str := string(buf[:n])
@@ -85,7 +85,7 @@ func main() {
 	udpServer, err := NewUDPServer("224.0.1.130:10000") // have to specify this specifically unless we use another flag
 	subscribeServer := &SubscribeServer{logger: zlog.NewAdvancedZapLogger()}
 
-	go subscribeServer.recordAll() // Record all zaps and store in logger
+	go subscribeServer.recordAll(udpServer) // Record all zaps and store in logger
 
 	pb.RegisterSubscriptionServer(grpcServer, subscribeServer)
 
