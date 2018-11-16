@@ -19,7 +19,7 @@ import (
 
 var conn *net.UDPConn
 var err error
-var ztoreGraph zlog.Chartlogger
+var ztoreGraph *zlog.Chartlogger
 
 func runLab() {
 	switch *labnum {
