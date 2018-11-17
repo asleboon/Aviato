@@ -1,92 +1,32 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
-	"log"
-	"net"
-	"os"
 	"sort"
 	"time"
 
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	pb "github.com/uis-dat320-fall18/Aviato/proto"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
-	"google.golang.org/grpc"
 )
 
-// SubscribeServer Go away green line ...
+// SubscribeServer includes a logger for zap- and statusevents
 type SubscribeServer struct {
 	logger zlog.AdvZapLogger
 }
 
-var conn *net.UDPConn
-var err error
-
-var (
-	help = flag.Bool(
-		"help",
-		false,
-		"Show usage help",
-	)
-	endpoint = flag.String(
-		"endpoint",
-		"localhost:1994", // Changed port from std to 1994 to avoid problems during testing.
-		"Endpoint on which server runs. Preferable",
-	)
-)
-
-func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS]\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\nOptions:\n")
-	flag.PrintDefaults()
-}
-
-func parseFlags() {
-	flag.Usage = Usage
-	flag.Parse()
-	if *help {
-		flag.Usage()
-		os.Exit(0)
-	}
-}
-
-func startZapServer() {
-	log.Println("Starting ZapServer...")
-	// Build UDP address
-	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
-
-	// Create connection
-	conn, err = net.ListenMulticastUDP("udp", nil, addr)
-	if err != nil {
-		fmt.Println("NewUDPServer: Error creating UDP connection")
-	}
-}
-
-func readFromUDP() (string, error) {
-	buf := make([]byte, 256)           // UDP packages usually ~50-70 bytes
-	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
-	str := string(buf[:n])
-	return str, err
-}
-
 // recordAll processes and stores new viewers in Zaplogger
-func (s *SubscribeServer) recordAll() {
+func (s *SubscribeServer) recordAll(udpServer *UDPServer) {
 	for {
-		eventStr, err := readFromUDP()
-
-		if err != nil { // ReadFromUDP error check
-			fmt.Printf("ReadFromUDP: error: %v\n", err)
-		} else {
-			chZap, stChange, err := chzap.NewSTBEvent(eventStr)
-			if err != nil {
-				fmt.Printf("Error: %v\n", err)
-			} else if chZap != nil {
-				s.logger.LogZap(*chZap) // Pass a copy of pointer value
-			} else if stChange != nil {
-				s.logger.LogStatus(*stChange) // Pass a copy of pointer value
-			}
+		eventStr, err := ReadFromUDP(udpServer)
+		chZap, stChange, err := chzap.NewSTBEvent(eventStr)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		} else if chZap != nil {
+			s.logger.LogZap(*chZap) // Pass a copy of pointer value
+		} else if stChange != nil {
+			s.logger.LogStatus(*stChange) // Pass a copy of pointer value
 		}
 	}
 }
@@ -166,8 +106,7 @@ func (s *SubscribeServer) top10Mute() string {
 	return top10Str
 }
 
-// sma - Calculates the simple moving for a channel within a timeframe given by the client
-// use len of slice not count <<--- THIS
+// sma calculates the simple moving for a channel within a timeframe given by the client
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 	sumViewers := float64(0)
 	count := float64(0)
@@ -208,7 +147,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				resString = s.top10Duration()
 			} else if in.StatisticsType == "mute" {
 				resString = s.top10Mute()
-			} else if in.StatisticsType == "SMA" {
+			} else if in.StatisticsType == "sma" {
 				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
 			err := stream.Send(&pb.NotificationMessage{Top10: resString})
@@ -216,27 +155,5 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 				return err
 			}
 		}
-	}
-}
-
-func main() {
-	parseFlags()
-	grpcServer := grpc.NewServer()
-	startZapServer()
-
-	server := &SubscribeServer{logger: zlog.NewAdvancedZapLogger()}
-	go server.recordAll() // Record all zaps and store in logger
-
-	pb.RegisterSubscriptionServer(grpcServer, server)
-
-	listener, err := net.Listen("tcp", *endpoint)
-	if err != nil {
-		log.Fatalf("net.listen error: %v\n", err)
-	}
-
-	fmt.Printf("Preparing to serve incoming requests...\n")
-	err = grpcServer.Serve(listener)
-	if err != nil {
-		fmt.Printf("Error with gRPC serve. Quitting...")
 	}
 }

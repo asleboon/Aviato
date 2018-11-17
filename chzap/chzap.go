@@ -15,7 +15,6 @@ const timeOnly = "15:04:05"
 const timeLen = len(timeFormat)
 
 type StatusChange struct {
-	// Exported or Unexported?
 	Time   time.Time
 	IP     string
 	Status string
@@ -23,7 +22,6 @@ type StatusChange struct {
 
 // ChZap represent a channel change on a set-top box
 type ChZap struct {
-	// Exported or Unexported?
 	Time     time.Time
 	IP       string
 	ToChan   string

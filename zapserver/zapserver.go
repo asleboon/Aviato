@@ -17,9 +17,6 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
 
-var conn *net.UDPConn
-var err error
-
 type UDPServer struct {
 	conn *net.UDPConn
 }

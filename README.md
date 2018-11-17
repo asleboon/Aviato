@@ -269,10 +269,11 @@ Run from zapserver folder (package main).
 - `lab`: Which lab exercise to run
 - `mcast`: Specify multicast address, ip:port. Default: 224.0.1.130:10000
 - `memprofile`: Write memory profile to this file
+- `cpuprofile`: Write cpu profile to this file
 - `help`: Show help messages
 #### Command
 ```
-go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-h]
+go run *.go [-lab {tasknum}] [-mcast {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
 ```
 #### Example
 ```
@@ -286,13 +287,15 @@ Run from grpc/server folder
 #### Flag
 - `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
+- `memprofile`: Write memory profile to this file
+- `cpuprofile`: Write cpu profile to this file
 #### Command
 ```
-go run subscribeZapServer.go [-endpoint {addr}] [-help]
+go run subscribeServer.go [-endpoint {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
 ```
 #### Example
 ```
-go run subscribeZapServer.go -endpoint localhost:1994
+go run subscribeServer.go -endpoint localhost:1994
 ```
 
 ### Client
@@ -301,10 +304,13 @@ Run from grpc/client folder
 - `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
 - `rate`: Refresh rate at which the client will get a response from the server in seconds. Default: 1
-- `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute or duration
+- `type`: Statistics type which this client want to subscribe to. Options: viewership(default), mute, duration or sma
+- `smaChannel`: Channel for which you want to calculate simple moving average
+- `smaLength`: Interval for the simple moving average
 #### Command
 ```
-go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}]
+go run subscribeClient.go [-endpoint {addr}] [-help] [-rate {seconds}] [-type {viewership|mute|duration}] 
+   [-smaChannel {channel}] [smaLength {interval}]
 ```
 #### Example
 ```

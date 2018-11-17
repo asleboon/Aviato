@@ -8,7 +8,6 @@ import (
 	"github.com/uis-dat320-fall18/Aviato/util"
 )
 
-// Viewers holds a lock and a map with key: Channel, Value: viewers
 type Viewers struct {
 	views map[string]int // Key: Channelname, value: Viewers
 	lock  sync.Mutex

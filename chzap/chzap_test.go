@@ -86,10 +86,9 @@ func TestSTBStatusChange(t *testing.T) {
 			t.Errorf("NewSTBEvent(%q) => (%q, %q, %q), want (nil, %q, nil)",
 				tt.in, zap, schng, err, tt.out)
 		}
-		//TODO activate code later
-		// if schng.Status != tt.out {
-		// 	t.Errorf("NewSTBEvent(%q) => (nil, %q, nil), want (nil, %q, nil)",
-		// 		tt.in, schng.Status, tt.out)
-		// }
+		 if schng.Status != tt.out {
+		 	t.Errorf("NewSTBEvent(%q) => (nil, %q, nil), want (nil, %q, nil)",
+		 		tt.in, schng.Status, tt.out)
+		}
 	}
 }
