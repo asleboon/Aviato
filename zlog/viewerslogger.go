@@ -22,40 +22,40 @@ func NewViewersZapLogger() ZapLogger {
 
 // LogZap updates count for the two channels in the zap
 func (vs *Viewers) LogZap(z chzap.ChZap) {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
+	vs.lock.Lock()
+	defer vs.lock.Unlock()
 
 	// Log views
-	count, exists := (*vs).views[z.ToChan]
+	count, exists := vs.views[z.ToChan]
 	if exists {
-		(*vs).views[z.ToChan] = count + 1
+		vs.views[z.ToChan] = count + 1
 	} else {
-		(*vs).views[z.ToChan] = 1
+		vs.views[z.ToChan] = 1
 	}
 
-	count, exists = (*vs).views[z.FromChan]
+	count, exists = vs.views[z.FromChan]
 	if exists {
-		(*vs).views[z.FromChan] = count - 1
+		vs.views[z.FromChan] = count - 1
 	} else {
-		(*vs).views[z.FromChan] = -1
+		vs.views[z.FromChan] = -1
 	}
 }
 
 // Entries returns the length of views map (# of channnels)
 func (vs *Viewers) Entries() int {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
+	vs.lock.Lock()
+	defer vs.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Entries")
-	return len((*vs).views)
+	return len(vs.views)
 }
 
 // Viewers return number of viewers for a channel
 func (vs *Viewers) Viewers(channelName string) int {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
+	vs.lock.Lock()
+	defer vs.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Viewers")
 
-	count, exists := (*vs).views[channelName]
+	count, exists := vs.views[channelName]
 	if exists {
 		return count
 	}
@@ -64,12 +64,12 @@ func (vs *Viewers) Viewers(channelName string) int {
 
 // Channels creates a list of channels in the viewers.
 func (vs *Viewers) Channels() []string {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
+	vs.lock.Lock()
+	defer vs.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "Channels")
 
 	channels := make([]string, 0)
-	for channel := range (*vs).views {
+	for channel := range vs.views {
 		channels = append(channels, channel)
 	}
 	return channels
@@ -77,12 +77,12 @@ func (vs *Viewers) Channels() []string {
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
 func (vs *Viewers) ChannelsViewers() []*ChannelViewers {
-	(*vs).lock.Lock()
-	defer (*vs).lock.Unlock()
+	vs.lock.Lock()
+	defer vs.lock.Unlock()
 	defer util.TimeElapsed(time.Now(), "ChannelsViewers")
 
 	res := make([]*ChannelViewers, 0)
-	for channel, viewers := range (*vs).views {
+	for channel, viewers := range vs.views {
 		channelViewer := ChannelViewers{Channel: channel, Viewers: viewers}
 		res = append(res, &channelViewer)
 	}
