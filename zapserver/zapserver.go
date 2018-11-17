@@ -24,7 +24,7 @@ type UDPServer struct {
 	conn *net.UDPConn
 }
 
-func runLab() {
+func (s *UDPServer) runLab() {
 	switch *labnum {
 	case "a", "c1", "c2", "d", "e":
 		ztore = zlog.NewSimpleZapLogger()
@@ -36,23 +36,23 @@ func runLab() {
 	}
 	switch *labnum {
 	case "a":
-		go dumpAll()
+		go s.dumpAll()
 	case "c1":
-		go recordAll()
+		go s.recordAll()
 		go showViewers("NRK1")
 	case "c2":
-		go recordAll()
+		go s.recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
 		// See answer in separate document.
 	case "e":
-		go recordAll()
+		go s.recordAll()
 		go top10Viewers()
 	case "f":
-		go recordAll()
+		go s.recordAll()
 		go top10Viewers()
 	case "g":
-		go recordAll()
+		go s.recordAll()
 		go drawChart("NRK1", "TV2 Norge")
 	}
 }
