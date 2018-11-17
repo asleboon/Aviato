@@ -48,7 +48,6 @@ func main() {
 
 	// Here we wait for CTRL-C or some other kill signal
 	<-signalChan
-
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
 		if err != nil {
