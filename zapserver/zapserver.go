@@ -178,8 +178,8 @@ func drawChart(channelOne string, channelTwo string) {
 		}
 		data = ztoreGraph.GetChartVal(channelTwo)
 		for _, value := range data {
-			timesTwo = append(timesOne, value.Times)
-			viewsTwo = append(viewsOne, value.Views)
+			timesTwo = append(timesTwo, value.Times)
+			viewsTwo = append(viewsTwo, value.Views)
 		}
 		charting.DrawChart(channelOne, viewsOne, timesOne)
 		charting.DrawChart(channelTwo, viewsTwo, timesTwo)
