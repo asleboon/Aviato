@@ -184,5 +184,6 @@ func drawChart(channelOne string, channelTwo string) {
 		charting.DrawChart(channelOne, viewsOne, timesOne)
 		charting.DrawChart(channelTwo, viewsTwo, timesTwo)
 		// charting.DrawMulGraph(channelOne, viewsOne, channelTwo, viewsTwo, timesOne)
+	}
 
 }
