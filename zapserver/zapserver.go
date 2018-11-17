@@ -169,10 +169,10 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 
 // drawChart creates three charts for viewers from two channels. One for each and one combined
 func drawChart(channelOne string, channelTwo string) {
-	viewsOne, timesOne, viewsTwo, timesTwo := []float64{}, []time.Time{}, []float64{}, []time.Time{}
 	tickChan := time.NewTicker(time.Minute * 30)
 	defer tickChan.Stop()
 	for range tickChan.C { // Runs code inside loop every 30min
+		viewsOne, timesOne, viewsTwo, timesTwo := []float64{}, []time.Time{}, []float64{}, []time.Time{}
 		log.Printf("Drawing chart for '%v' and '%v'...\n", channelOne, channelTwo)
 		data := ztoreGraph.GetChartVal(channelOne)
 		for _, value := range data {
