@@ -14,9 +14,10 @@ import (
 func DrawChart(channelName string, channelViews []float64, viewTime []time.Time) {
 	graph := chart.Chart{
 		XAxis: chart.XAxis{
-			Name:      "Time",
-			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the x-axis
+			Name:           "Time",
+			NameStyle:      chart.StyleShow(),
+			Style:          chart.StyleShow(), //enables / displays the x-axis
+			ValueFormatter: chart.TimeHourValueFormatter,
 		},
 		YAxis: chart.YAxis{
 			Name:      "Viewers",
