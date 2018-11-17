@@ -50,7 +50,7 @@ func runLab() {
 		go top10Viewers()
 	case "g":
 		go recordAll()
-		go drawChart("NRK1")
+		go drawChart("NRK1", "TV2")
 		//go drawChart("TV2")
 	}
 }
@@ -99,8 +99,8 @@ func recordAll() {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
-					ztore.LogZap(*chZap) // Make a copy of pointer value
-					ztoreGraph.LogZap(*chZap)
+					ztore.LogZap(*chZap)      // Make a copy of pointer value
+					ztoreGraph.LogZap(*chZap) // Logger for logging data needed to create viewers graph
 				}
 			}
 		}
@@ -165,20 +165,24 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 	return channels
 }
 
-func drawChart(channelName string) {
-	fmt.Printf("Drawing chart for '%v'\n", channelName)
-	views, times := []float64{}, []time.Time{}
+func drawChart(channelOne string, channelTwo string) {
+	fmt.Printf("Drawing chart for '%v' and '%v'\n", channelOne, channelTwo)
+	viewsOne, timesOne, viewsTwo, timesTwo := []float64{}, []time.Time{}, []float64{}, []time.Time{}
 	tickChan := time.NewTicker(time.Second * 5) // TODO: Change to time.Hour * 24
 	defer tickChan.Stop()
 	for range tickChan.C { // Runs code inside loop every 24hrs
-		data := ztoreGraph.GetChartVal(channelName)
+		data := ztoreGraph.GetChartVal(channelOne)
 		for _, value := range data {
-			times = append(times, value.Times)
-			views = append(views, value.Views)
+			timesOne = append(timesOne, value.Times)
+			viewsOne = append(viewsOne, value.Views)
 		}
-		fmt.Printf("\nViews: %v", views)
-		fmt.Printf("\nTimes: %v", times)
-		charting.DrawChart(channelName, views, times)
-	}
+		data = ztoreGraph.GetChartVal(channelTwo)
+		for _, value := range data {
+			timesTwo = append(timesOne, value.Times)
+			viewsTwo = append(viewsOne, value.Views)
+		}
+		charting.DrawChart(channelOne, viewsOne, timesOne)
+		charting.DrawChart(channelTwo, viewsTwo, timesTwo)
+		// charting.DrawMulGraph(channelOne, viewsOne, channelTwo, viewsTwo, timesOne)
 
 }
