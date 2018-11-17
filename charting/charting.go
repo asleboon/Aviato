@@ -16,13 +16,13 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 		XAxis: chart.XAxis{
 			Name:           "Time",
 			NameStyle:      chart.StyleShow(),
-			Style:          chart.StyleShow(), //enables / displays the x-axis
-			ValueFormatter: chart.TimeValueFormatterWithFormat("2006-01-02 10:10"),
+			Style:          chart.StyleShow(),              // Displays the x-axis
+			ValueFormatter: chart.TimeMinuteValueFormatter, // Add desired time format
 		},
 		YAxis: chart.YAxis{
 			Name:      "Viewers",
 			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the y-axis
+			Style:     chart.StyleShow(), // Displays the x-axis
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
@@ -38,7 +38,7 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 		},
 	}
 
-	// add legend
+	// Add legend
 	graph.Elements = []chart.Renderable{
 		chart.Legend(&graph),
 	}
@@ -46,7 +46,7 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 	buffer := bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
-	// Write to file.
+	// Write to file
 	imgName := fmt.Sprintf(channelName + ".png")
 	fo, err := os.Create(imgName)
 	if err != nil {
@@ -86,17 +86,13 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 		XAxis: chart.XAxis{
 			Name:           "Time",
 			NameStyle:      chart.StyleShow(),
-			Style:          chart.StyleShow(), //enables / displays the x-axis
+			Style:          chart.StyleShow(), // Displays the x-axis
 			ValueFormatter: chart.TimeMinuteValueFormatter,
 		},
 		YAxis: chart.YAxis{
 			Name:      "Viewers",
 			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the y-axis
-			// Range: &chart.ContinuousRange{
-			// 	Max: 20000.0,
-			// 	Min: 0.0,
-			// },
+			Style:     chart.StyleShow(), // Displays the x-axis
 		},
 		Series: []chart.Series{
 			graphOne,
@@ -104,7 +100,7 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 		},
 	}
 
-	// add legend
+	// Add legend
 	graph.Elements = []chart.Renderable{
 		chart.Legend(&graph),
 	}
@@ -112,9 +108,9 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	buffer := bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
-	// Write to file.
-	fileName := fmt.Sprintf(channelOne + " and " + channelTwo + ".png")
-	fo, err := os.Create(fileName)
+	// Write to file
+	filePath := fmt.Sprintf("../charting/" + channelOne + " and " + channelTwo + ".png")
+	fo, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
 	}
