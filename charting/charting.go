@@ -62,9 +62,10 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graphOne := chart.TimeSeries{
 		Name: chartName,
 		Style: chart.Style{
-			Show:        true,
-			StrokeColor: chart.GetDefaultColor(1).WithAlpha(64),
-			FillColor:   chart.GetDefaultColor(1).WithAlpha(64),
+			Show:           true,
+			StrokeColor:    chart.GetDefaultColor(1).WithAlpha(64),
+			FillColor:      chart.GetDefaultColor(1).WithAlpha(64),
+			ValueFormatter: chart.TimeMinuteValueFormatter,
 		},
 		XValues: timesOne,
 		YValues: viewsOne,
@@ -74,9 +75,10 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graphTwo := chart.TimeSeries{
 		Name: chartName,
 		Style: chart.Style{
-			Show:        true,
-			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
-			FillColor:   chart.GetDefaultColor(0).WithAlpha(64),
+			Show:           true,
+			StrokeColor:    chart.GetDefaultColor(0).WithAlpha(64),
+			FillColor:      chart.GetDefaultColor(0).WithAlpha(64),
+			ValueFormatter: chart.TimeMinuteValueFormatter,
 		},
 		XValues: timesTwo,
 		YValues: viewsTwo,
