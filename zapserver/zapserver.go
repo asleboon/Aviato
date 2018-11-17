@@ -99,8 +99,10 @@ func (server *UDPServer) recordAll() {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
-					ztore.LogZap(*chZap)      // Make a copy of pointer value
-					ztoreGraph.LogZap(*chZap) // Logger for logging data needed to create viewers graph
+					ztore.LogZap(*chZap) // Make a copy of pointer value
+					if ztoreGraph != nil {
+						ztoreGraph.LogZap(*chZap) // Logger for logging data needed to create viewers graph
+					}
 				}
 			}
 		}
