@@ -55,9 +55,8 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 	fw.Write(buffer.Bytes())
 }
 
-/*
 // DrawMulChart renders a graph with viewer from two channels
-func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, channeTwo string, viewsTwo []float64, timesTwo []time.Time) {
+func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, channelTwo string, viewsTwo []float64, timesTwo []time.Time) {
 	chartName := fmt.Sprintf(channelOne + " viewers")
 	graphOne := chart.TimeSeries{
 		Name: chartName,
@@ -66,20 +65,20 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 			StrokeColor: chart.GetDefaultColor(1).WithAlpha(64),
 			FillColor:   chart.GetDefaultColor(1).WithAlpha(64),
 		},
-		XValues: viewTime,
-		YValues: channelViews1,
+		XValues: timesOne,
+		YValues: viewsOne,
 	}
 
 	chartName = fmt.Sprintf(channelTwo + " viewers")
 	graphTwo := chart.TimeSeries{
-		Name: "Tv2 Viewers",
+		Name: chartName,
 		Style: chart.Style{
 			Show:        true,
 			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
 			FillColor:   chart.GetDefaultColor(0).WithAlpha(64),
 		},
-		XValues: viewTime,
-		YValues: channelViews2,
+		XValues: timesTwo,
+		YValues: viewsTwo,
 	}
 
 	graph := chart.Chart{
@@ -92,14 +91,14 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 			Name:      "Viewers",
 			NameStyle: chart.StyleShow(),
 			Style:     chart.StyleShow(), //enables / displays the y-axis
-			Range: &chart.ContinuousRange{
-				Max: 20000.0,
-				Min: 0.0,
-			},
+			// Range: &chart.ContinuousRange{
+			// 	Max: 20000.0,
+			// 	Min: 0.0,
+			// },
 		},
 		Series: []chart.Series{
-			nrkGraph,
-			tv2Graph,
+			graphOne,
+			graphTwo,
 		},
 	}
 
@@ -112,11 +111,11 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graph.Render(chart.PNG, buffer)
 
 	// Write to file.
-	fo, err := os.Create("image.png")
+	fileName := fmt.Sprintf(channelOne + "AND" + channelTwo + ".png")
+	fo, err := os.Create(fileName)
 	if err != nil {
 		panic(err)
 	}
 	fw := bufio.NewWriter(fo)
 	fw.Write(buffer.Bytes())
 }
-*/
