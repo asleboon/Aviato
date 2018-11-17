@@ -17,7 +17,7 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 			Name:           "Time",
 			NameStyle:      chart.StyleShow(),
 			Style:          chart.StyleShow(), //enables / displays the x-axis
-			ValueFormatter: chart.TimeHourValueFormatter,
+			ValueFormatter: chart.TimeValueFormatterWithFormat("2006-01-02 10:10"),
 		},
 		YAxis: chart.YAxis{
 			Name:      "Viewers",
@@ -62,10 +62,9 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graphOne := chart.TimeSeries{
 		Name: chartName,
 		Style: chart.Style{
-			Show:           true,
-			StrokeColor:    chart.GetDefaultColor(1).WithAlpha(64),
-			FillColor:      chart.GetDefaultColor(1).WithAlpha(64),
-			ValueFormatter: chart.TimeMinuteValueFormatter,
+			Show:        true,
+			StrokeColor: chart.GetDefaultColor(1).WithAlpha(64),
+			FillColor:   chart.GetDefaultColor(1).WithAlpha(64),
 		},
 		XValues: timesOne,
 		YValues: viewsOne,
@@ -75,10 +74,9 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graphTwo := chart.TimeSeries{
 		Name: chartName,
 		Style: chart.Style{
-			Show:           true,
-			StrokeColor:    chart.GetDefaultColor(0).WithAlpha(64),
-			FillColor:      chart.GetDefaultColor(0).WithAlpha(64),
-			ValueFormatter: chart.TimeMinuteValueFormatter,
+			Show:        true,
+			StrokeColor: chart.GetDefaultColor(0).WithAlpha(64),
+			FillColor:   chart.GetDefaultColor(0).WithAlpha(64),
 		},
 		XValues: timesTwo,
 		YValues: viewsTwo,
@@ -86,9 +84,10 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 
 	graph := chart.Chart{
 		XAxis: chart.XAxis{
-			Name:      "Time",
-			NameStyle: chart.StyleShow(),
-			Style:     chart.StyleShow(), //enables / displays the x-axis
+			Name:           "Time",
+			NameStyle:      chart.StyleShow(),
+			Style:          chart.StyleShow(), //enables / displays the x-axis
+			ValueFormatter: chart.TimeMinuteValueFormatter,
 		},
 		YAxis: chart.YAxis{
 			Name:      "Viewers",
@@ -114,7 +113,7 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graph.Render(chart.PNG, buffer)
 
 	// Write to file.
-	fileName := fmt.Sprintf(channelOne + "AND" + channelTwo + ".png")
+	fileName := fmt.Sprintf(channelOne + " and " + channelTwo + ".png")
 	fo, err := os.Create(fileName)
 	if err != nil {
 		panic(err)
