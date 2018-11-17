@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/wcharczuk/go-chart"
@@ -46,9 +47,9 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 	buffer := bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
-	// Write to file
-	imgName := fmt.Sprintf(channelName + ".png")
-	fo, err := os.Create(imgName)
+	filePath := fmt.Sprintf("../charting/" + channelName + ".png")
+	filePath = strings.Replace(filePath, " ", "", -1) // Remove possible whitespace from channelnames
+	fo, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
 	}
@@ -108,8 +109,9 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	buffer := bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
-	// Write to file
-	filePath := fmt.Sprintf("../charting/" + channelOne + " and " + channelTwo + ".png")
+	// Write file to charting folder
+	filePath := fmt.Sprintf("../charting/" + channelOne + "And" + channelTwo + ".png")
+	filePath = strings.Replace(filePath, " ", "", -1) // Remove possible whitespace from channelnames
 	fo, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
