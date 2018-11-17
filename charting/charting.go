@@ -12,7 +12,6 @@ import (
 
 // DrawChart renders a graph with viewer from a channel
 func DrawChart(channelName string, channelViews []float64, viewTime []time.Time) {
-	chartName := fmt.Sprintf(channelName + " viewers")
 	graph := chart.Chart{
 		XAxis: chart.XAxis{
 			Name:      "Time",
@@ -56,6 +55,7 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 	fw.Write(buffer.Bytes())
 }
 
+/*
 // DrawMulChart renders a graph with viewer from two channels
 func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, channeTwo string, viewsTwo []float64, timesTwo []time.Time) {
 	chartName := fmt.Sprintf(channelOne + " viewers")
@@ -119,3 +119,4 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	fw := bufio.NewWriter(fo)
 	fw.Write(buffer.Bytes())
 }
+*/
