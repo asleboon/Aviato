@@ -21,6 +21,7 @@ var (
 )
 
 var ztore zlog.ZapLogger
+var ztoreGraph *zlog.Chartlogger
 
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS]\n", os.Args[0])
@@ -41,12 +42,13 @@ func main() {
 	parseFlags()
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Kill, os.Interrupt)
+
 	server, _ := NewUDPServer(*maddr)
 	server.runLab()
 
 	// Here we wait for CTRL-C or some other kill signal
-	s := <-signalChan
-	fmt.Println("Server stopping on", s, "signal")
+	<-signalChan
+
 	if *memprofile != "" {
 		f, err := os.Create(*memprofile)
 		if err != nil {

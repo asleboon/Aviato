@@ -12,6 +12,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/uis-dat320-fall18/Aviato/charting"
 	"github.com/uis-dat320-fall18/Aviato/chzap"
 	"github.com/uis-dat320-fall18/Aviato/zlog"
 )
@@ -26,6 +27,9 @@ func (s *UDPServer) runLab() {
 		ztore = zlog.NewSimpleZapLogger()
 	case "f":
 		ztore = zlog.NewViewersZapLogger()
+	case "g":
+		ztore = zlog.NewViewersZapLogger()
+		ztoreGraph = zlog.NewChartLogger()
 	}
 	switch *labnum {
 	case "a":
@@ -37,13 +41,16 @@ func (s *UDPServer) runLab() {
 		go s.recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
-		// See answer in serparate document.
+		// See answer in separate document.
 	case "e":
 		go s.recordAll()
 		go top10Viewers()
 	case "f":
 		go s.recordAll()
 		go top10Viewers()
+	case "g":
+		go s.recordAll()
+		go drawChart("NRK1", "TV2 Norge")
 	}
 }
 
@@ -92,7 +99,8 @@ func (server *UDPServer) recordAll() {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
-					ztore.LogZap(*chZap) // Make a copy of pointer value
+					ztore.LogZap(*chZap)      // Make a copy of pointer value
+					ztoreGraph.LogZap(*chZap) // Logger for logging data needed to create viewers graph
 				}
 			}
 		}
@@ -154,6 +162,29 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 	if len(channels) > 10 { // Only want top 10
 		channels = channels[:10]
 	}
-
 	return channels
+}
+
+// drawChart creates three charts for viewers from two channels. One for each and one combined
+func drawChart(channelOne string, channelTwo string) {
+	viewsOne, timesOne, viewsTwo, timesTwo := []float64{}, []time.Time{}, []float64{}, []time.Time{}
+	tickChan := time.NewTicker(time.Minute * 30)
+	defer tickChan.Stop()
+	for range tickChan.C { // Runs code inside loop every 30min
+		log.Printf("Drawing chart for '%v' and '%v'...\n", channelOne, channelTwo)
+		data := ztoreGraph.GetChartVal(channelOne)
+		for _, value := range data {
+			timesOne = append(timesOne, value.Times)
+			viewsOne = append(viewsOne, value.Views)
+		}
+		data = ztoreGraph.GetChartVal(channelTwo)
+		for _, value := range data {
+			timesTwo = append(timesTwo, value.Times)
+			viewsTwo = append(viewsTwo, value.Views)
+		}
+		charting.DrawChart(channelOne, viewsOne, timesOne)
+		charting.DrawChart(channelTwo, viewsTwo, timesTwo)
+		charting.DrawMulChart(channelOne, viewsOne, timesOne, channelTwo, viewsTwo, timesTwo)
+	}
+
 }
