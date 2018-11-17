@@ -19,7 +19,10 @@ import (
 
 var conn *net.UDPConn
 var err error
-var ztoreGraph *zlog.Chartlogger
+
+type UDPServer struct {
+	conn *net.UDPConn
+}
 
 func runLab() {
 	switch *labnum {
@@ -54,29 +57,30 @@ func runLab() {
 	}
 }
 
-func startServer() {
+func NewUDPServer(addr string) (*UDPServer, error) {
 	log.Println("Starting ZapServer...")
 	// Build UDP address
-	addr, _ := net.ResolveUDPAddr("udp", "224.0.1.130:10000")
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 
 	// Create connection
-	conn, err = net.ListenMulticastUDP("udp", nil, addr)
+	connUDP, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
 		fmt.Println("NewUDPServer: Error creating UDP connection")
 	}
+	return &UDPServer{conn: connUDP}, nil
 }
 
-func readFromUDP() (string, error) {
-	buf := make([]byte, 256)           // UDP packages usually ~50-70 bytes
-	n, _, err := conn.ReadFromUDP(buf) // n = Number of bytes read
+func (server *UDPServer) readFromUDP() (string, error) {
+	buf := make([]byte, 256)                  // UDP packages usually ~50-70 bytes
+	n, _, err := server.conn.ReadFromUDP(buf) // n = Number of bytes read
 	str := string(buf[:n])
 	return str, err
 }
 
 // dumpAll reads new STB events and prints to console
-func dumpAll() {
+func (server *UDPServer) dumpAll() {
 	for {
-		eventStr, err := readFromUDP()
+		eventStr, err := server.readFromUDP()
 		if err != nil { // ReadFromUDP error check
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
 		} else {
@@ -86,9 +90,9 @@ func dumpAll() {
 }
 
 // recordAll processes and stores new viewers in Zaplogger
-func recordAll() {
+func (server *UDPServer) recordAll() {
 	for {
-		eventStr, err := readFromUDP()
+		eventStr, err := server.readFromUDP()
 
 		if err != nil {
 			fmt.Printf("ReadFromUDP: error: %v\n", err)
@@ -164,6 +168,7 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 	return channels
 }
 
+// drawChart creates three charts for viewers from two channels. One for each and one combined
 func drawChart(channelOne string, channelTwo string) {
 	viewsOne, timesOne, viewsTwo, timesTwo := []float64{}, []time.Time{}, []float64{}, []time.Time{}
 	tickChan := time.NewTicker(time.Minute * 5) // TODO: Change to time.Hour * 24
