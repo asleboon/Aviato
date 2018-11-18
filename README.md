@@ -283,12 +283,16 @@ go run *.go -lab c1
 ## How to run gRPC
 
 ### Server
+
 Run from grpc/server folder
+
 #### Flag
+
 - `endpoint`: Endpoint on which server runs or to which client connects. Default: localhost:1994
 - `help`: Show usage help
 - `memprofile`: Write memory profile to this file
 - `cpuprofile`: Write cpu profile to this file
+
 #### Command
 ```
 go run *.go [-endpoint {addr}] [-memprofile {filename}] [-cpuprofile {filename}] [-help]
