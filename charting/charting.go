@@ -47,7 +47,7 @@ func DrawChart(channelName string, channelViews []float64, viewTime []time.Time)
 	buffer := bytes.NewBuffer([]byte{})
 	graph.Render(chart.PNG, buffer)
 
-	filePath := fmt.Sprintf("../charting/" + channelName + ".png")
+	filePath := fmt.Sprintf("../charting/" + channelName + "Viewers" + ".png")
 	filePath = strings.Replace(filePath, " ", "", -1) // Remove possible whitespace from channelnames
 	fo, err := os.Create(filePath)
 	if err != nil {
@@ -108,7 +108,7 @@ func DrawMulChart(channelOne string, viewsOne []float64, timesOne []time.Time, c
 	graph.Render(chart.PNG, buffer)
 
 	// Write file to charting folder
-	filePath := fmt.Sprintf("../charting/" + channelOne + "And" + channelTwo + ".png")
+	filePath := fmt.Sprintf("../charting/" + channelOne + "And" + channelTwo + "Viewers" + ".png")
 	filePath = strings.Replace(filePath, " ", "", -1) // Remove possible whitespace from channelnames
 	fo, err := os.Create(filePath)
 	if err != nil {
