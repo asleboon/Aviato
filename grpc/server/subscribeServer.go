@@ -108,8 +108,7 @@ func (s *SubscribeServer) top10Mute() string {
 
 // sma calculates the simple moving for a channel within a timeframe given by the client
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
-	sumViewers := float64(0)
-	count := float64(0)
+	sumViewers, count := float64(0), float64(0)
 	sma := s.logger.ChannelsSMA(smaChannel) // returns a map[channel][]*smaStats
 
 	for _, v := range *sma {
@@ -131,7 +130,7 @@ func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
 func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) error {
 	for {
 		in, err := stream.Recv()
-		if err == io.EOF { // Do we need this?
+		if err == io.EOF {
 			return nil
 		} else if err != nil {
 			return err

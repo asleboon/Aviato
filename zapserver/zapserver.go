@@ -21,7 +21,7 @@ type UDPServer struct {
 	conn *net.UDPConn
 }
 
-func (s *UDPServer) runLab() {
+func (server *UDPServer) runLab() {
 	switch *labnum {
 	case "a", "c1", "c2", "d", "e":
 		ztore = zlog.NewSimpleZapLogger()
@@ -99,7 +99,9 @@ func (server *UDPServer) recordAll() {
 				fmt.Printf("Error: %v\n", err)
 			} else {
 				if chZap != nil {
-					ztore.LogZap(*chZap) // Make a copy of pointer value
+					if ztore != nil {
+						ztore.LogZap(*chZap) // Make a copy of pointer value
+					}
 					if ztoreGraph != nil {
 						ztoreGraph.LogZap(*chZap) // Logger for logging data needed to create viewers graph
 					}
@@ -167,7 +169,7 @@ func calculateTop10Muted() []*zlog.ChannelViewers {
 	return channels
 }
 
-// drawChart creates three charts for viewers from two channels. One for each and one combined
+// drawChart creates viewers charts for two channels
 func drawChart(channelOne string, channelTwo string) {
 	tickChan := time.NewTicker(time.Hour * 24)
 	defer tickChan.Stop()
@@ -184,8 +186,11 @@ func drawChart(channelOne string, channelTwo string) {
 			timesTwo = append(timesTwo, value.Times)
 			viewsTwo = append(viewsTwo, value.Views)
 		}
+		// Draw one chart for each channel
 		charting.DrawChart(channelOne, viewsOne, timesOne)
 		charting.DrawChart(channelTwo, viewsTwo, timesTwo)
+
+		// Draw a combined chart for both channels
 		charting.DrawMulChart(channelOne, viewsOne, timesOne, channelTwo, viewsTwo, timesTwo)
 	}
 

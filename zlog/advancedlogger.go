@@ -11,13 +11,13 @@ import (
 // Logger type contains datastructure for logging viewers, duration and mute stats from a set-top box.
 // Remark: HDMI_Status and Volume not considered in mute and durationlogger
 type Logger struct {
+	lock     sync.Mutex
 	viewers  map[string]int           // Key: channel name, value: current number of viewers (viewerslogger)
 	duration map[string]time.Duration // Key: channel name, value: total viewtime (durationlogger)
-	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used for durationlogger)
-	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used for mutelogger)
+	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used in durationlogger and mutelogger)
+	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used in mutelogger)
 	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
 	sma      map[string][]*smaStats   // Key: channel name, value: slice with smaStats
-	lock     sync.Mutex
 }
 
 type chanMute struct {
@@ -157,14 +157,14 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 			if channelExists {
 				channelStats.numberOfMute++
 				if channelStats.numberOfMute > channelStats.maxMuteNum {
-					channelStats.maxMuteTime = time.Now() // TODO: Does this work?
+					channelStats.maxMuteTime = time.Now()
 					channelStats.maxMuteNum = channelStats.numberOfMute
 				}
 				channelStats.muteViewers[s.IP] = true
 			}
 			// Update prev mute values
 			prev.mute = "1"
-			prev.muteStart = s.Time // Can't change this to time.Now()!!
+			prev.muteStart = s.Time // Using event time to calculate duration
 
 		} else if s.Status == "Mute_Status: 0" {
 			if channelExists {
