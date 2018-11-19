@@ -1,0 +1,28 @@
+2018/11/17 16:10:25 Starting ZapServer...
+Preparing to serve incoming requests...
+flag provided but not defined: -lab
+Usage: /tmp/go-build775893663/b001/exe/main [OPTIONS]
+
+Options:
+  -cpuprofile string
+    	write cpu profile to this file
+  -endpoint string
+    	Endpoint on which server runs. Preferable (default "localhost:1994")
+  -help
+    	Show usage help
+  -memprofile string
+    	write memory profile to this file
+exit status 2
+flag provided but not defined: -lab
+Usage: /tmp/go-build256552422/b001/exe/main [OPTIONS]
+
+Options:
+  -cpuprofile string
+    	write cpu profile to this file
+  -endpoint string
+    	Endpoint on which server runs. Preferable (default "localhost:1994")
+  -help
+    	Show usage help
+  -memprofile string
+    	write memory profile to this file
+exit status 2
