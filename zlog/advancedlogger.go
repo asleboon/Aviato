@@ -56,6 +56,13 @@ func (lg *Logger) LogZap(z chzap.ChZap) {
 	logSma(lg)
 }
 
+// LogStatus updates loggers when a new status event is received
+func (lg *Logger) LogStatus(s chzap.StatusChange) {
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
+	logStatusMute(s, lg) // Update mute data structure
+}
+
 func logZapViewers(z chzap.ChZap, lg *Logger) {
 	// ToChan handling
 	count, exists := lg.viewers[z.ToChan]
@@ -123,19 +130,11 @@ func logZapMute(z chzap.ChZap, lg *Logger) {
 			prev.muteStart = z.Time
 
 			// Add IP address to map of IP addresses that have viewed this channel muted
-			toChannelStats.muteViewers[z.IP] = true
+			toChannelStats.muteViewers[z.IP] = true //teller den alle som har sett?
 		}
 	}
 }
 
-// LogStatus updates loggers when a new status event is received
-func (lg *Logger) LogStatus(s chzap.StatusChange) {
-	lg.lock.Lock()
-	defer lg.lock.Unlock()
-	logStatusMute(s, lg) // Update mute data structure
-}
-
-// logStatusMute is working, but not with correct time
 func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	pZap, pZapExists := lg.prevZap[s.IP]
 	if pZapExists { // No updates if no zap events on previous zap registred on this IP address
@@ -147,8 +146,11 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 				lg.prevMute[s.IP] = &muteStat{}
 				prev = lg.prevMute[s.IP]
 			}
-			if !channelExists { // Create new chanMute struct for IP if not present
+			if !channelExists {
+				/* If initialized to 0, this is the highest value. If there is a lot of unmutes
+				   we will not get a time for the maxMuteNum.*/
 				minInt := -int(^uint(0)>>1) - 1
+				// Create new chanMute struct for IP if not present
 				lg.mute[pZap.ToChan] = &chanMute{muteViewers: make(map[string]bool, 0), maxMuteNum: minInt}
 				channelStats = lg.mute[pZap.ToChan]
 			}
@@ -161,7 +163,7 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 					channelStats.maxMuteTime = time.Now()
 					channelStats.maxMuteNum = channelStats.numberOfMute
 				}
-				channelStats.muteViewers[s.IP] = true
+				channelStats.muteViewers[s.IP] = true // use map instead of slice for easier access to IP address
 			}
 			// Update prev mute values
 			prev.mute = "1"
