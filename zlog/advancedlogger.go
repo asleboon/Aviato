@@ -48,7 +48,7 @@ func NewAdvancedZapLogger() AdvZapLogger {
 
 // LogZap updates loggers when a new zap event is received
 func (lg *Logger) LogZap(z chzap.ChZap) {
-	lg.lock.Lock() // or (*lg)?
+	lg.lock.Lock()
 	defer lg.lock.Unlock()
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure

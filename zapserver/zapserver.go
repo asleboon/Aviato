@@ -28,7 +28,6 @@ func (server *UDPServer) runLab() {
 	case "f":
 		ztore = zlog.NewViewersZapLogger()
 	case "g":
-		ztore = zlog.NewViewersZapLogger()
 		ztoreGraph = zlog.NewChartLogger()
 	}
 	switch *labnum {
@@ -100,7 +99,7 @@ func (server *UDPServer) recordAll() {
 			} else {
 				if chZap != nil {
 					if ztore != nil {
-						ztore.LogZap(*chZap) // Make a copy of pointer value
+						ztore.LogZap(*chZap) // (*chZap) = copy of pointer value
 					}
 					if ztoreGraph != nil {
 						ztoreGraph.LogZap(*chZap) // Logger for logging data needed to create viewers graph
