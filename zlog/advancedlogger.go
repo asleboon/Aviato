@@ -18,8 +18,6 @@ type Logger struct {
 	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used in mutelogger)
 	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
 	sma      map[string][]*SmaStats   // Key: channel name, value: slice with smaStats
-	lock     sync.Mutex
-
 }
 
 type chanMute struct {
