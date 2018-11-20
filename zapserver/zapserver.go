@@ -32,23 +32,23 @@ func (server *UDPServer) runLab() {
 	}
 	switch *labnum {
 	case "a":
-		go s.dumpAll()
+		go server.dumpAll()
 	case "c1":
-		go s.recordAll()
+		go server.recordAll()
 		go showViewers("NRK1")
 	case "c2":
-		go s.recordAll()
+		go server.recordAll()
 		go showViewers("TV2 Norge")
 	case "d":
 		// See answer in separate document.
 	case "e":
-		go s.recordAll()
+		go server.recordAll()
 		go top10Viewers()
 	case "f":
-		go s.recordAll()
+		go server.recordAll()
 		go top10Viewers()
 	case "g":
-		go s.recordAll()
+		go server.recordAll()
 		go drawChart("NRK1", "TV2 Norge")
 	}
 }
