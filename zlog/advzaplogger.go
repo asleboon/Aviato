@@ -15,10 +15,10 @@ type AdvZapLogger interface {
 	ChannelsViewers() []*AdvChannelViewers
 	ChannelsDuration() []*AdvChannelDuration
 	ChannelsMute() []*AdvChannelMute
-	ChannelsSMA(channelName string) *map[string][]*smaStats
+	ChannelsSMA(channelName string) []*SmaStats
 }
 
-type smaStats struct {
+type SmaStats struct {
 	Views     int
 	TimeAdded time.Time
 }

@@ -108,16 +108,21 @@ func (s *SubscribeServer) top10Mute() string {
 
 // sma calculates the simple moving for a channel within a timeframe given by the client
 func (s *SubscribeServer) sma(smaChannel string, smaLength uint64) string {
-	sumViewers, count := float64(0), float64(0)
-	sma := s.logger.ChannelsSMA(smaChannel) // returns a map[channel][]*smaStats
+  sumViewers, count := float64(0), float64(0)
+	sma := s.logger.ChannelsSMA(smaChannel) // returns []*smaStats
+	if sma == nil {
+		return ""
+	}
 
-	for _, v := range *sma {
-		for _, smaStat := range v {
-			// Check if the views should be included in the calculation
-			if time.Now().Sub(smaStat.TimeAdded) < (time.Duration(smaLength) * time.Second) {
-				sumViewers += float64(smaStat.Views)
-				count++
-			}
+	lastTime := sma[len(sma)-1].TimeAdded
+	for i := len(sma) - 2; i > 0; i-- {
+		// Check if the views should be included in the calculation
+
+		if lastTime.Sub(sma[i].TimeAdded) < (time.Duration(smaLength) * time.Second) {
+			sumViewers += float64(sma[i].Views)
+			count++
+		} else {
+			break // because we loop backwords, no more times should be added
 		}
 	}
 	if count == 0 {
@@ -149,7 +154,7 @@ func (s *SubscribeServer) Subscribe(stream pb.Subscription_SubscribeServer) erro
 			} else if in.StatisticsType == "sma" {
 				resString = s.sma(in.SmaChannel, in.SmaLength)
 			}
-			err := stream.Send(&pb.NotificationMessage{Top10: resString})
+			err := stream.Send(&pb.NotificationMessage{Statistics: resString})
 			if err != nil {
 				return err
 			}

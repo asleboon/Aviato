@@ -4,7 +4,7 @@ package proto;
 
 
 // Takes a stream of messages, from different subscribers
-// returns a stream of messagas including the top10 list
+// returns a stream of messagas including the statistics
 service Subscription {
 	rpc Subscribe(stream SubscribeMessage) returns (stream NotificationMessage) {}
 }
@@ -19,5 +19,5 @@ message SubscribeMessage {
 }
 
 message NotificationMessage {
-	string top10 = 1;
+	string statistics = 1;
 }

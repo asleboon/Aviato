@@ -17,7 +17,9 @@ type Logger struct {
 	prevZap  map[string]chzap.ChZap   // Key: IP address, value: previous zap (used in durationlogger and mutelogger)
 	prevMute map[string]*muteStat     // Key: IP address, value: previous mute (used in mutelogger)
 	mute     map[string]*chanMute     // Key: channel name, value: mute stats (mutelogger)
-	sma      map[string][]*smaStats   // Key: channel name, value: slice with smaStats
+	sma      map[string][]*SmaStats   // Key: channel name, value: slice with smaStats
+	lock     sync.Mutex
+
 }
 
 type chanMute struct {
@@ -41,7 +43,7 @@ func NewAdvancedZapLogger() AdvZapLogger {
 		prevZap:  make(map[string]chzap.ChZap, 0),
 		prevMute: make(map[string]*muteStat, 0),
 		mute:     make(map[string]*chanMute, 0),
-		sma:      make(map[string][]*smaStats, 0),
+		sma:      make(map[string][]*SmaStats, 0),
 	}
 	return &lg
 }
@@ -53,6 +55,7 @@ func (lg *Logger) LogZap(z chzap.ChZap) {
 	logZapViewers(z, lg)  // Update viewers data structure
 	logZapDuration(z, lg) // Update durationdata structure
 	logZapMute(z, lg)     // Update mute data structure
+	logSma(lg)
 }
 
 func logZapViewers(z chzap.ChZap, lg *Logger) {
@@ -179,6 +182,14 @@ func logStatusMute(s chzap.StatusChange, lg *Logger) {
 	}
 }
 
+// logSma logs a list of views and time for a channel
+func logSma(lg *Logger) {
+	for channel, views := range lg.viewers {
+		smastats := &SmaStats{Views: views, TimeAdded: time.Now()}
+		lg.sma[channel] = append(lg.sma[channel], smastats)
+	}
+}
+
 // Entries returns the length of the views map (# of channels)
 func (lg *Logger) Entries() int {
 	lg.lock.Lock()
@@ -214,11 +225,16 @@ func (lg *Logger) Channels() []string {
 }
 
 // ChannelsSMA stores the number of viewers on a channel at a given time
-func (lg *Logger) ChannelsSMA(channelName string) *map[string][]*smaStats {
-	views := lg.viewers[channelName]
-	output := &smaStats{Views: views, TimeAdded: time.Now()}
-	lg.sma[channelName] = append(lg.sma[channelName], output)
-	return &lg.sma
+func (lg *Logger) ChannelsSMA(channelName string) []*SmaStats {
+	lg.lock.Lock()
+	defer lg.lock.Unlock()
+	defer util.TimeElapsed(time.Now(), "sma")
+
+	smaSlice, exists := lg.sma[channelName]
+	if exists {
+		return smaSlice
+	}
+	return nil
 }
 
 // ChannelsViewers creates a ChannelViewers slice (# of viewers per channel)
