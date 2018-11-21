@@ -101,7 +101,3 @@ func (zs *Zaps) ChannelsViewers() []*ChannelViewers {
 	}
 	return res
 }
-
-func (z *Zaps) StupidChart() (f []float64, t []time.Time) {
-	return f, t
-}
